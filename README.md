@@ -2,6 +2,13 @@
 
 This is a helm Chart for [GeoNode](https://geonode.org/), an open platform to manage and share geospatial information.
 
+This will deploy the following containers:
+
+* GeoNode, the main Web UI
+* A Celery container to process background tasks
+* GeoServer, the back-end managing storage of all geospatial data
+* Their dependencies...
+
 ## How to run
 
 ### Prerequisites
