@@ -15,7 +15,8 @@ general:
   externalScheme: http
   externalPort: 80
   debug: false
-  # This user will have access to kobotoolbox UI but also the built-in Django admin interface (/admin)
+  # This user will have access to geonode UI but also the built-in Django admin interface (/admin)
+  # Username is admin
   superUser:
     password: geonode
     email: support@example.com
