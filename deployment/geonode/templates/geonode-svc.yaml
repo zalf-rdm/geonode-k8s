@@ -1,0 +1,17 @@
+# Load-balancer for SGW
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-geonode
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    org.geonode.instance: {{ .Release.Name }}-geonode
+  ports:
+  - targetPort: 80
+    port: 80
+    name: www
+  - targetPort: 8080
+    port: 8080
+    name: geoserver
+  type: {{ .Values.general.serviceType }}

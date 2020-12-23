@@ -1,0 +1,248 @@
+# Sync gateway pod
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-geonode
+  namespace: {{ .Release.Namespace }}
+spec:
+  # This pod can NOT be scaled, because it persists local files
+  replicas: 1
+  selector:
+    matchLabels:
+      org.geonode.instance: {{ .Release.Name }}-geonode
+  template:
+    metadata:
+      annotations:
+        # Add a checksum to force the re-creation of the pods on every config update
+        # TODO: better checksums
+        checksum/nginx: {{ include "nginx_conf" . | sha256sum }}
+      labels:
+        org.geonode.instance: {{ .Release.Name }}-geonode
+    spec:
+      # Resolving some hardcoded links...
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - geonode
+        - geoserver
+
+      initContainers:
+      # Initialize default data
+      # The tag NEEDS to match with the geoserver tag
+      # See https://hub.docker.com/r/geonode/geoserver
+      - name: data-dir-conf
+        image: geonode/geoserver_data:{{ .Values.geoserver.image.tag }}
+        command:
+        - sh
+        - -c
+        - |
+          # Copy defaults from data container
+          cp -r /tmp/geonode/downloaded/data /geoserver_data
+
+          # Copy overrides from ConfigMap
+          cp /overrides/notifier.xml /geoserver_data/data/notifier/
+        volumeMounts:
+        - name: persistence
+          mountPath: /geoserver_data/data
+          subPath: geoserver-data-dir
+        - name: geoserver-conf
+          mountPath: /overrides
+
+      # Wait for Postgres and rabbit
+      - name: wait-db
+        image: jwilder/dockerize
+        args:
+        - -timeout=40s
+        - -wait
+        - tcp://{{ include "database_host" .}}
+        - -wait
+        - tcp://{{ include "rabbit_host" .}}
+        # Copy dockerize binary for later use in containers
+        # Doesn't seem to work for some reason?
+        # - sh
+        # - -c
+        # - cp /usr/local/bin/dockerize /tmp/ && ls -la /tmp/
+        # volumeMounts:
+        # - name: cache-volume
+        #   mountPath: /tmp
+
+      # All containers need to be in the same pod since they share volumes!
+      # This also means they probably can't be scaled up... (?)
+      # TODO: add some health probes
+      containers:
+      # This is the django app server
+      # TODO: liveness probes?
+      - name: geonode
+        image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
+        env:
+        {{ include "env_general" . | nindent 8 }}
+        - name: IS_CELERY
+          value: 'False'
+        - name: DOCKERIZE_VERSION
+          value: v0.6.1
+        command:
+        - bash
+        - -c
+        - |
+          # install dockerize...
+          wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+            && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+            && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          
+          # Add host alias since the scripts hardcode the db host as 'db' @##@?
+          echo "db {{ .Release.Name }}-postgresql" > /etc/host.aliases
+          export HOSTALIASES=/etc/host.aliases
+
+          # Setup
+          touch /usr/src/app/invoke.log
+          dockerize -stdout /usr/src/app/invoke.log /usr/src/app/entrypoint.sh
+
+          # Run web server
+          touch /var/log/geonode.log
+          dockerize -stdout /var/log/geonode.log /usr/local/bin/uwsgi --ini /usr/src/app/uwsgi.ini
+        # - /usr/src/geonode/entrypoint.sh
+        # - uwsgi
+        # - --ini
+        # - /usr/src/geonode/uwsgi.ini
+        # tty: true
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - name: persistence
+          mountPath: /mnt/volumes/statics
+          subPath: statics
+        - name: persistence
+          mountPath: /geoserver_data/data
+          subPath: geoserver-data-dir
+        - name: persistence
+          mountPath: /backup_restore
+          subPath: backup-restore
+        - name: persistence
+          mountPath: /data
+          subPath: data
+        - name: cache-volume
+          mountPath: /tmp
+        # healthcheck: curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8001/
+
+      # # Celery is the task worker
+      - name: celery
+        image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
+        env:
+        {{ include "env_general" . | nindent 8 }}
+        - name: IS_CELERY
+          value: 'True'
+        - name: DOCKERIZE_VERSION
+          value: v0.6.1
+        command:
+        - bash
+        - -c
+        - |
+          # install dockerize...
+          wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+            && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+            && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          
+          # Add host alias since the scripts hardcode the db host as 'db' @##@?
+          echo "db {{ .Release.Name }}-postgresql" > /etc/host.aliases
+          export HOSTALIASES=/etc/host.aliases
+
+          # Setup
+          touch /usr/src/app/invoke.log
+          dockerize -stdout /usr/src/app/invoke.log /usr/src/app/entrypoint.sh
+
+          # Run celery
+          celery -A geonode.celery_app:app worker -B -E --statedb=/mnt/volumes/statics/worker.state -s /mnt/volumes/statics/celerybeat-schedule --loglevel=INFO --concurrency=10 -n worker1@%h
+        # - /usr/src/geonode/entrypoint.sh
+        # - uwsgi
+        # - --ini
+        # - /usr/src/geonode/uwsgi.ini
+        # tty: true
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - name: persistence
+          mountPath: /mnt/volumes/statics
+          subPath: statics
+        - name: persistence
+          mountPath: /geoserver_data/data
+          subPath: geoserver-data-dir
+        - name: persistence
+          mountPath: /backup_restore
+          subPath: backup-restore
+        - name: persistence
+          mountPath: /data
+          subPath: data
+        - name: cache-volume
+          mountPath: /tmp
+        # healthcheck: curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8001/
+
+      - name: nginx
+        image: nginx:1.19
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: persistence
+          mountPath: /mnt/volumes/statics
+          subPath: statics
+        - name: nginx-confd
+          mountPath: /etc/nginx/conf.d
+
+      # Geoserver backend
+      - name: geoserver
+        image: "{{ .Values.geoserver.image.name }}:{{ .Values.geoserver.image.tag }}"
+        env:
+        ports:
+        - containerPort: 8080
+        env:
+        # - name: DOCKERHOST
+        #   value: 
+        - name: GEONODE_LB_HOST_IP
+          value: {{ .Values.general.externalDomain | quote }}
+        - name: GEONODE_LB_PORT
+          value: {{ .Values.general.externalPort | quote }}
+        - name: GEONODE_HOST_IP
+          value: localhost
+        - name: PUBLIC_PORT
+          value: {{ .Values.general.externalPort | quote }}
+        # - name: DOCKER_HOST_IP
+        #   value: 
+        - name: DJANGO_URL
+          value: http://localhost/
+        - name: ENABLE_JSONP
+          value: 'true'
+        - name: outFormat
+          value: text/javascript
+        - name: GEOSERVER_JAVA_OPTS
+          value: -Djava.awt.headless=true -Xms2G -Xmx4G -XX:PerfDataSamplingInterval=500 -XX:SoftRefLRUPolicyMSPerMB=36000 -XX:-UseGCOverheadLimit -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:ParallelGCThreads=4 -Dfile.encoding=UTF8 -Djavax.servlet.request.encoding=UTF-8 -Djavax.servlet.response.encoding=UTF-8 -Duser.timezone=GMT -Dorg.geotools.shapefile.datetime=false -DGEOSERVER_CSRF_DISABLED=true -DPRINT_BASE_URL=http://localhost:8080/geoserver/pdf
+        - name: NGINX_BASE_URL
+          value: "{{ include "public_url" . }}/"
+        volumeMounts:
+        # - name: persistence
+        #   mountPath: /mnt/volumes/statics
+        #   subPath: statics
+        - name: persistence
+          mountPath: /geoserver_data/data
+          subPath: geoserver-data-dir
+        # - name: persistence
+        #   mountPath: /backup_restore
+        #   subPath: backup-restore
+        # - name: persistence
+        #   mountPath: /data
+        #   subPath: data
+        # - name: cache-volume
+        #   mountPath: /tmp
+        # healthcheck: curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8001/
+
+      volumes:
+      - name: nginx-confd
+        configMap:
+          name: {{ .Release.Name }}-nginx-confd
+      - name: geoserver-conf
+        configMap:
+          name: {{ .Release.Name }}-geoserver-conf
+      - name: persistence
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-geonode
+      # Using an emptyDir to cache compiled statics... it will survive container crashes, but not pod restarts
+      - name: cache-volume
+        emptyDir: {}

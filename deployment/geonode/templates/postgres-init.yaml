@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-postgres-init
+  namespace: {{ .Release.Namespace }}
+stringData:
+  init.sql: |
+    CREATE USER "{{ .Values.postgresql.geonodeDb }}" WITH PASSWORD '{{ .Values.postgresql.password }}';
+    CREATE USER "{{ .Values.postgresql.geodataDb }}" WITH PASSWORD '{{ .Values.postgresql.password }}';
+
+    ALTER USER "{{ .Values.postgresql.geonodeDb }}" WITH SUPERUSER;
+    ALTER USER "{{ .Values.postgresql.geodataDb }}" WITH SUPERUSER;
+
+    CREATE DATABASE "{{ .Values.postgresql.geonodeDb }}" OWNER "{{ .Values.postgresql.geonodeDb }}";
+    \c "{{ .Values.postgresql.geonodeDb }}"
+    CREATE EXTENSION postgis;
+    CREATE EXTENSION postgis_topology;
+
+    CREATE DATABASE "{{ .Values.postgresql.geodataDb }}" OWNER "{{ .Values.postgresql.geodataDb }}";
+    \c "{{ .Values.postgresql.geodataDb }}"
+    CREATE EXTENSION postgis;
+    CREATE EXTENSION postgis_topology;

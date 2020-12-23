@@ -1,0 +1,16 @@
+apiVersion: v2
+name: geonode
+version: 0.1.0
+description: Helm Chart for Geonode
+home: https://github.com/one-acre-fund/geonode-k8s
+sources:
+  - https://github.com/one-acre-fund/geonode-k8s
+dependencies:
+  - name: postgresql
+    version: ~10.1.2
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+  - name: rabbitmq
+    version: ~8.6.0
+    repository: https://charts.bitnami.com/bitnami
+    condition: rabbitmq.enabled

@@ -1,0 +1,24 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-geonode
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    # Enable large media uploads
+    nginx.ingress.kubernetes.io/proxy-body-size: 100M
+    {{- .Values.ingress.annotations | toYaml | nindent 4 }}
+spec:
+  # The kobo sidecar nginx will do further host-based routing...
+  rules:
+  - host: {{ .Values.general.externalDomain }}
+    http:
+      paths:
+      - backend:
+          serviceName: {{ .Release.Name }}-geonode
+          servicePort: 80
+  tls:
+  - hosts:
+    - '*.oneacrefund.org'
+    secretName: oaf-tls
+{{- end -}}

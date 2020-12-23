@@ -1,0 +1,64 @@
+
+
+geonode:
+  image:
+    name: geonode/geonode
+    tag: '3.1'
+
+geoserver:
+  image:
+    name: geonode/geoserver
+    tag: '2.17.4'
+
+general:
+  externalDomain: example.com
+  externalScheme: http
+  externalPort: 80
+  debug: false
+  # This user will have access to kobotoolbox UI but also the built-in Django admin interface (/admin)
+  superUser:
+    password: geonode
+    email: support@example.com
+  supportEmail: support@example.com
+  storageSize: 10Gi
+  serviceType: ClusterIP
+  # set this to true in order to force internal resolution of external domains.
+  # Useful for troubleshooting, but won't work if the schemes are different...
+  forceInternal: false
+
+ingress:
+  enabled: false
+  annotations: {}
+
+smtp:
+  host: smtp.gmail.com
+  tls: true
+  port: '587'
+  user: 
+  password: 
+  from: 
+
+global:
+  # Will be used by this and all subcharts
+  storageClass: standard
+
+postgresql:
+  enabled: true
+  # The usernames will be the same as the database names
+  geonodeDb: geonode
+  geodataDb: geonode_data
+  password: Uxu3UhxFmK
+
+  # TODO: support external db
+  # For now we only support a db installed with a subchart
+
+  # Standard postgres chart values
+  # See https://artifacthub.io/packages/helm/bitnami/postgresql for docs
+  postgresqlPassword: admin
+  initdbScriptsSecret: '{{ .Release.Name }}-postgres-init'
+
+rabbitmq:
+  auth:
+    username: user
+    password: 3asgDlgwN7
+    erlangCookie: jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu
