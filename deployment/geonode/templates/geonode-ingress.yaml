@@ -9,7 +9,8 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: 100M
     {{- .Values.ingress.annotations | toYaml | nindent 4 }}
 spec:
-  # The kobo sidecar nginx will do further host-based routing...
+  # The sidecar nginx will do all the host-based routing, so we only expose this one
+  # TODO: check if we could directly route to geoserver?
   rules:
   - host: {{ .Values.general.externalDomain }}
     http:
@@ -17,8 +18,8 @@ spec:
       - backend:
           serviceName: {{ .Release.Name }}-geonode
           servicePort: 80
-  tls:
-  - hosts:
-    - '*.oneacrefund.org'
-    secretName: oaf-tls
+{{- if .Values.ingress.tls }}
+tls:
+  {{- .Values.ingress.tls | toYaml | nindent 2 }}
+{{- end }}
 {{- end -}}

@@ -1,4 +1,4 @@
-# kobo
+# geonode-k8s
 
 This is a helm Chart for [GeoNode](https://geonode.org/), an open platform to manage and share geospatial information.
 
@@ -28,7 +28,7 @@ Then, install the helm release as usual.
 git clone https://github.com/one-acre-fund/geonode-k8s && cd geonode-k8s
 
 # Install chart dependencies
-helm dependency update deployment/kobo
+helm dependency update deployment/geonode
 
 # Override desired values in your own override file
 vi my-values.yaml
