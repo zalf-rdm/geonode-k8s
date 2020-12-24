@@ -220,7 +220,7 @@ postgis://{{ .Values.postgresql.geodataDb }}:{{ .Values.postgresql.password }}@{
 - name: DJANGO_EMAIL_HOST_PASSWORD
   value: {{ .Values.smtp.password | quote }}
 - name: DJANGO_EMAIL_USE_TLS
-  value: {{ .Values.smtp.tls | quote }}
+  value: {{ include "boolean2str" .Values.smtp.tls | quote }}
 - name: DJANGO_EMAIL_USE_SSL
   value: 'False'
 - name: DEFAULT_FROM_EMAIL
