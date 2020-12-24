@@ -41,6 +41,15 @@ spec:
 
           # Copy overrides from ConfigMap
           cp /overrides/notifier.xml /geoserver_data/data/notifier/
+
+          # Update custom EPSG codes
+          {{- if .Values.geoserver.customEPSGs }}
+          cat /geoserver_data/data/user_projections/epsg.properties > /tmp/epsg.properties
+          {{- range .Values.geoserver.customEPSGs }}
+          echo '{{ . }}' >> /tmp/epsg.properties
+          {{- end }}
+          sort -u /tmp/epsg.properties > /geoserver_data/data/user_projections/epsg.properties
+          {{- end }}
         volumeMounts:
         - name: persistence
           mountPath: /geoserver_data/data
