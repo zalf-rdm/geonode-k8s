@@ -30,6 +30,7 @@ postgis://{{ .Values.postgresql.geodataDb }}:{{ .Values.postgresql.password }}@{
 {{- end -}}
 
 # TODO: move passwords to secrets...
+# Refer to https://docs.geonode.org/en/master/basic/settings/index.html for GeoNode settings
 {{- define "env_general" -}}
 - name: C_FORCE_ROOT
   value: '1'
@@ -157,10 +158,6 @@ postgis://{{ .Values.postgresql.geodataDb }}:{{ .Values.postgresql.password }}@{
 # GIS Client
 - name: GEONODE_CLIENT_LAYER_PREVIEW_LIBRARY
   value: mapstore
-- name: MAPBOX_ACCESS_TOKEN
-  value: 
-- name: BING_API_KEY
-  value: 
 - name: GOOGLE_API_KEY
   value: 
 

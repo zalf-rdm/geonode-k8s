@@ -4,6 +4,35 @@ geonode:
   image:
     name: geonode/geonode
     tag: '3.1'
+  extraEnvs: {}
+  extraConf: |
+    EXTRA_BASE_LAYERS = [
+      {
+        "type": "tileprovider",
+        "title": "OpenStreetMap Terrain",
+        "provider": "custom",
+        "name": "cyclosm",
+        "group": "background",
+        "visibility": false,
+        "url": "https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png",
+        "options": {
+            "subdomains": [ "a", "b", "c" ]
+        }
+      },
+      {
+        "type": "tileprovider",
+        "title": "Stamen Watercolor",
+        "provider": "Stamen.Watercolor",
+        "name": "Stamen.Watercolor",
+        "source": "Stamen",
+        "group": "background",
+        "thumbURL": "https://stamen-tiles-c.a.ssl.fastly.net/watercolor/0/0/0.jpg",
+        "visibility": False
+      }
+    ]
+
+    MAPSTORE_BASELAYERS = EXTRA_BASE_LAYERS + MAPSTORE_BASELAYERS
+
 
 geoserver:
   image:

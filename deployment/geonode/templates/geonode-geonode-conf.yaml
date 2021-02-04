@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-geonode-conf
+  namespace: {{ .Release.Namespace }}
+data:
+  local_settings.py: |
+    {{ .Values.geonode.extraConf | nindent 4 }}

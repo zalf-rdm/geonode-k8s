@@ -14,7 +14,7 @@ spec:
     metadata:
       annotations:
         # Add a checksum to force the re-creation of the pods on every config update
-        # TODO: better checksums
+        checksum/conf: {{ .Values.geonode.extraConf | sha256sum }}
         checksum/nginx: {{ include "nginx_conf" . | sha256sum }}
       labels:
         org.geonode.instance: {{ .Release.Name }}-geonode
@@ -77,10 +77,8 @@ spec:
 
       # All containers need to be in the same pod since they share volumes!
       # This also means they probably can't be scaled up... (?)
-      # TODO: add some health probes
       containers:
       # This is the django app server
-      # TODO: liveness probes?
       - name: geonode
         image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
         env:
@@ -89,6 +87,13 @@ spec:
           value: 'False'
         - name: DOCKERIZE_VERSION
           value: v0.6.1
+        # This allows geonode to expose some proxy URLs to whitelisted domains below. 'geoserver' is required to enable printing
+        - name: PROXY_ALLOWED_HOSTS
+          value: 'localhost,django,geonode,geoserver,spatialreference.org,nominatim.openstreetmap.org,dev.openlayers.org'
+        {{- range $key, $val := .Values.geonode.extraEnvs }}
+        - name: {{ $key | quote }}
+          value: {{ $val | quote }}
+        {{- end }}
         command:
         - bash
         - -c
@@ -101,6 +106,9 @@ spec:
           # Add host alias since the scripts hardcode the db host as 'db' @##@?
           echo "db {{ .Release.Name }}-postgresql" > /etc/host.aliases
           export HOSTALIASES=/etc/host.aliases
+
+          # Add config overrides
+          cat /usr/src/geonode/geonode/local_settings.py >> /usr/src/geonode/geonode/settings.py
 
           # Setup
           touch /usr/src/app/invoke.log
@@ -117,6 +125,9 @@ spec:
         ports:
         - containerPort: 8000
         volumeMounts:
+        - name: geonode-conf
+          mountPath: /usr/src/geonode/geonode/local_settings.py
+          subPath: local_settings.py
         - name: persistence
           mountPath: /mnt/volumes/statics
           subPath: statics
@@ -131,7 +142,20 @@ spec:
           subPath: data
         - name: cache-volume
           mountPath: /tmp
-        # healthcheck: curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8001/
+
+        readinessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          failureThreshold: 15
+
+        livenessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 180
+          periodSeconds: 3
+          failureThreshold: 5
 
       # # Celery is the task worker
       - name: celery
@@ -166,8 +190,6 @@ spec:
         # - --ini
         # - /usr/src/geonode/uwsgi.ini
         # tty: true
-        ports:
-        - containerPort: 8000
         volumeMounts:
         - name: persistence
           mountPath: /mnt/volumes/statics
@@ -197,6 +219,7 @@ spec:
           mountPath: /etc/nginx/conf.d
 
       # Geoserver backend
+      # TODO: route logs to console
       - name: geoserver
         image: "{{ .Values.geoserver.image.name }}:{{ .Values.geoserver.image.tag }}"
         env:
@@ -240,7 +263,21 @@ spec:
         #   subPath: data
         # - name: cache-volume
         #   mountPath: /tmp
-        # healthcheck: curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8001/
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          failureThreshold: 15
+
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 180
+          periodSeconds: 3
+          failureThreshold: 5
 
       volumes:
       - name: nginx-confd
@@ -249,6 +286,9 @@ spec:
       - name: geoserver-conf
         configMap:
           name: {{ .Release.Name }}-geoserver-conf
+      - name: geonode-conf
+        configMap:
+          name: {{ .Release.Name }}-geonode-conf
       - name: persistence
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-geonode
