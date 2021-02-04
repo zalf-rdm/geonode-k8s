@@ -7,7 +7,9 @@ This will deploy the following containers:
 * GeoNode, the main Web UI
 * A Celery container to process background tasks
 * GeoServer, the back-end managing storage of all geospatial data
-* Their dependencies...
+* Their dependencies, i.e.:
+  * A PostGIS database (Postgres with the gis extension) to back GeoServer
+  * RabbitMQ, to back the Celery job queue
 
 ## How to run
 
@@ -58,4 +60,10 @@ By default, no Ingress is installed, so you may have to use `kubectl port-forwar
 
 ## References
 
+* [GeoNode docs](https://geonode-docs.readthedocs.io)
 * [geonode-docker](https://github.com/GeoNode/geonode-docker) the base Docker image
+
+## Useful Geospatial Data Sources
+
+* [ArcGIS Hub](https://hub.arcgis.com/)
+* [World Bank Dataset](https://datacatalog.worldbank.org/search/type/dataset)
