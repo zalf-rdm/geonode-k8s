@@ -4,20 +4,42 @@ geonode:
   image:
     name: geonode/geonode
     tag: '3.1'
+  # You can use this to pass any env from https://docs.geonode.org/en/master/basic/settings/index.html
   extraEnvs: {}
+  # Can be used to configure new base maps or any other setting from https://github.com/GeoNode/geonode/blob/master/geonode/settings.py
+  # For base maps available in MapStore, see https://github.com/geosolutions-it/MapStore2/blob/master/web/client/utils/ConfigProvider.js
   extraConf: |
     EXTRA_BASE_LAYERS = [
       {
         "type": "tileprovider",
         "title": "OpenStreetMap Terrain",
+        "thumbURL": "https://a.tile-cyclosm.openstreetmap.fr/cyclosm/10/594/518.png",
         "provider": "custom",
         "name": "cyclosm",
         "group": "background",
-        "visibility": false,
+        "visibility": False,
         "url": "https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png",
         "options": {
-            "subdomains": [ "a", "b", "c" ]
+          "subdomains": [ "a", "b", "c" ]
         }
+      },
+      {
+        "type": "tileprovider",
+        "title": "OpenStreetMap B&W",
+        "thumbURL": "https://tiles.wmflabs.org/bw-mapnik/0/0/0.png",
+        "provider": "OpenStreetMap.BlackAndWhite",
+        "name": "osmbw",
+        "group": "background",
+        "visibility": False
+      },
+      {
+        "type": "tileprovider",
+        "title": "CartoDB Light",
+        "thumbURL": "https://a.basemaps.cartocdn.com/light_all/0/0/0.png",
+        "provider": "CartoDB.Positron",
+        "name": "cartol",
+        "group": "background",
+        "visibility": False
       },
       {
         "type": "tileprovider",
@@ -31,7 +53,7 @@ geonode:
       }
     ]
 
-    MAPSTORE_BASELAYERS = EXTRA_BASE_LAYERS + MAPSTORE_BASELAYERS
+    MAPSTORE_BASELAYERS =  EXTRA_BASE_LAYERS + MAPSTORE_BASELAYERS
 
 
 geoserver:

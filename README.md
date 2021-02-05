@@ -60,7 +60,7 @@ By default, no Ingress is installed, so you may have to use `kubectl port-forwar
 
 ## References
 
-* [GeoNode docs](https://geonode-docs.readthedocs.io)
+* [GeoNode docs](https://docs.geonode.org/en/master/index.html)
 * [geonode-docker](https://github.com/GeoNode/geonode-docker) the base Docker image
 
 ## Useful Geospatial Data Sources
