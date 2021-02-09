@@ -1,0 +1,47 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+- develop
+
+pr:
+- master
+- develop
+- feature/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+name: Geonode_$(Date:yyyyMMdd)$(Rev:.r)
+
+steps:
+- task: HelmInstaller@1
+  inputs:
+    helmVersionToInstall: latest
+
+- script: |
+    # Lint, as sanity check
+    helm lint deployment/geonode
+  displayName: Validate Helm chart
+
+- task: HelmDeploy@0
+  displayName: Package Helm Chart
+  inputs:
+    command: package
+    chartPath: $(System.DefaultWorkingDirectory)/deployment/geonode
+    destination: $(Build.ArtifactStagingDirectory)
+    updatedependency: true
+
+
+
+- task: PublishBuildArtifacts@1
+  displayName: Publish configuration package
+  # Only publish master branch
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    PathtoPublish: $(Build.ArtifactStagingDirectory)
+    ArtifactName: 'geoneode'
+    publishLocation: 'Container'
