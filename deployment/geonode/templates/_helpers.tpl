@@ -215,7 +215,10 @@ postgis://{{ .Values.postgresql.geodataDb }}:{{ .Values.postgresql.password }}@{
 - name: DJANGO_EMAIL_HOST_USER
   value: {{ .Values.smtp.user | quote }}
 - name: DJANGO_EMAIL_HOST_PASSWORD
-  value: {{ .Values.smtp.password | quote }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets
+      key: smtp.password
 - name: DJANGO_EMAIL_USE_TLS
   value: {{ include "boolean2str" .Values.smtp.tls | quote }}
 - name: DJANGO_EMAIL_USE_SSL
