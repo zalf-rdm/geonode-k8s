@@ -87,7 +87,7 @@ smtp:
   tls: true
   port: '587'
   user: 
-  password: 
+  password: "changeme"
   from: 
 
 global:
