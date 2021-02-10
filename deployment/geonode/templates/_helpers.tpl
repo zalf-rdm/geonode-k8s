@@ -14,6 +14,10 @@ postgis://{{ .Values.postgresql.geonodeDb }}:{{ .Values.postgresql.password }}@{
 postgis://{{ .Values.postgresql.geodataDb }}:{{ .Values.postgresql.password }}@{{ include "database_host" .}}/{{ .Values.postgresql.geodataDb }}
 {{- end -}}
 
+{{- define "broker_url" -}}
+amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@{{ include "rabbit_host" . }}/
+{{- end -}}
+
 {{- define "boolean2str" -}}
 {{ . | ternary "True" "False" }}
 {{- end -}}
@@ -29,7 +33,6 @@ postgis://{{ .Values.postgresql.geodataDb }}:{{ .Values.postgresql.password }}@{
 {{ .Values.general.externalScheme }}://{{ .Values.general.externalDomain }}{{ include "external_port" . }}
 {{- end -}}
 
-# TODO: move passwords to secrets...
 # Refer to https://docs.geonode.org/en/master/basic/settings/index.html for GeoNode settings
 {{- define "env_general" -}}
 - name: C_FORCE_ROOT
@@ -53,23 +56,38 @@ postgis://{{ .Values.postgresql.geodataDb }}:{{ .Values.postgresql.password }}@{
 - name: POSTGRES_USER
   value: postgres
 - name: POSTGRES_PASSWORD
-  value: {{ .Values.postgresql.postgresqlPassword | quote }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets
+      key: POSTGRES_PASSWORD
 - name: GEONODE_DATABASE
   value: {{ .Values.postgresql.geonodeDb | quote }}
 - name: GEONODE_DATABASE_PASSWORD
-  value: {{ .Values.postgresql.password | quote }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets
+      key: GEONODE_DATABASE_PASSWORD
 - name: GEONODE_GEODATABASE
   value: {{ .Values.postgresql.geodataDb | quote }}
 - name: GEONODE_GEODATABASE_PASSWORD
-  value: {{ .Values.postgresql.password | quote }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets
+      key: GEONODE_GEODATABASE_PASSWORD
 - name: GEONODE_DATABASE_SCHEMA
   value: public
 - name: GEONODE_GEODATABASE_SCHEMA
   value: public
 - name: DATABASE_URL
-  value: {{ include "database_geonode" . | quote }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets
+      key: DATABASE_URL
 - name: GEODATABASE_URL
-  value: {{ include "database_geonode_data" . | quote }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets
+      key: GEODATABASE_URL
 - name: GEONODE_DB_CONN_MAX_AGE
   value: '0'
 - name: GEONODE_DB_CONN_TOUT
@@ -77,12 +95,17 @@ postgis://{{ .Values.postgresql.geodataDb }}:{{ .Values.postgresql.password }}@{
 - name: DEFAULT_BACKEND_DATASTORE
   value: datastore
 - name: BROKER_URL
-  value: amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@{{ include "rabbit_host" . }}/
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets
+      key: BROKER_URL
 - name: ASYNC_SIGNALS
   value: 'True'
 
 - name: SITEURL
   value: "{{ include "public_url" . }}/"
+- name: SITE_HOST_SCHEMA
+  value: {{ .Values.general.externalScheme | quote }}
 
 - name: STATIC_ROOT
   value: /mnt/volumes/statics/static/
@@ -127,8 +150,6 @@ postgis://{{ .Values.postgresql.geodataDb }}:{{ .Values.postgresql.password }}@{
 
 - name: MAX_DOCUMENT_SIZE
   value: '2'
-- name: CLIENT_RESULTS_LIMIT
-  value: '5'
 - name: API_LIMIT_PER_PAGE
   value: '1000'
 
@@ -137,13 +158,17 @@ postgis://{{ .Values.postgresql.geodataDb }}:{{ .Values.postgresql.password }}@{
   value: "{{ include "public_url" . }}/geoserver/"
 - name: GEOSERVER_PUBLIC_LOCATION
   value: "{{ include "public_url" . }}/geoserver/"
+- name: GEOSERVER_PUBLIC_SCHEMA
+  value: {{ .Values.general.externalScheme | quote }}
 - name: GEOSERVER_LOCATION
   value: http://localhost:8080/geoserver/
 - name: GEOSERVER_ADMIN_USER
   value: admin
 - name: GEOSERVER_ADMIN_PASSWORD
-  value: geoserver
-
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets
+      key: GEOSERVER_ADMIN_PASSWORD
 - name: OGC_REQUEST_TIMEOUT
   value: '30'
 - name: OGC_REQUEST_MAX_RETRIES
@@ -163,7 +188,7 @@ postgis://{{ .Values.postgresql.geodataDb }}:{{ .Values.postgresql.password }}@{
 
 # Monitoring
 - name: MONITORING_ENABLED
-  value: 'True'
+  value: 'False'
 - name: MONITORING_DATA_TTL
   value: '365'
 - name: USER_ANALYTICS_ENABLED
@@ -199,7 +224,10 @@ postgis://{{ .Values.postgresql.geodataDb }}:{{ .Values.postgresql.password }}@{
 - name: ADMIN_USERNAME
   value: admin
 - name: ADMIN_PASSWORD
-  value: {{ .Values.general.superUser.password | quote }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets
+      key: ADMIN_PASSWORD
 - name: ADMIN_EMAIL
   value: {{ .Values.general.superUser.email | quote }}
 
@@ -218,7 +246,7 @@ postgis://{{ .Values.postgresql.geodataDb }}:{{ .Values.postgresql.password }}@{
   valueFrom:
     secretKeyRef:
       name: {{ .Release.Name }}-secrets
-      key: smtp.password
+      key: DJANGO_EMAIL_HOST_PASSWORD
 - name: DJANGO_EMAIL_USE_TLS
   value: {{ include "boolean2str" .Values.smtp.tls | quote }}
 - name: DJANGO_EMAIL_USE_SSL
@@ -313,15 +341,19 @@ server {
   gzip_min_length 1100;
   gzip_comp_level 6;
   gzip_types
-          text/css
-          text/javascript
-          text/xml
-          text/plain
-          application/xml
-          application/xml+rss
-          application/javascript
-          application/x-javascript
-          application/json;
+    text/css
+    text/javascript
+    text/xml
+    text/plain
+    application/xml
+    application/xml+rss
+    application/javascript
+    application/x-javascript
+    application/json;
+
+  location = /favicon.ico {
+    alias /mnt/volumes/statics/static/favicon.ico;
+  }
 
   # GeoServer
   location /geoserver {
@@ -333,32 +365,16 @@ server {
     proxy_pass http://localhost:8080;
   }
 
-  # # Jenkins
-  # location /jenkins {
-
-  #     # Using a variable is a trick to let Nginx start even if upstream host is not up yet
-  #     # (see https://sandro-keil.de/blog/2017/07/24/let-nginx-start-if-upstream-host-is-unavailable-or-down/)
-  #     set $upstream jenkins:$JENKINS_HTTP_PORT;
-  #     # set $upstream $HTTP_HOST$HTTPS_HOST:$JENKINS_HTTP_PORT;
-
-  #     proxy_set_header Host $http_host;
-  #     proxy_set_header X-Real-IP $remote_addr;
-  #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-  #     proxy_set_header X-Forwarded-Proto $scheme;
-
-  #     proxy_pass http://$upstream;
-  # }
-
   # GeoNode
   location /static/ {
     alias /mnt/volumes/statics/static/;
 
     location ~* \.(?:html|js|jpg|jpeg|gif|png|css|tgz|gz|rar|bz2|doc|pdf|ppt|tar|wav|bmp|ttf|rtf|swf|ico|flv|txt|woff|woff2|svg|xml)$ {
-        gzip_static always;
-        expires 30d;
-        access_log off;
-        add_header Pragma "public";
-        add_header Cache-Control "max-age=31536000, public";
+      gzip_static always;
+      expires 30d;
+      access_log off;
+      add_header Pragma "public";
+      add_header Cache-Control "max-age=31536000, public";
     }
   }
 
@@ -366,43 +382,47 @@ server {
     alias /mnt/volumes/statics/uploaded/;
 
     location ~* \.(?:html|js|jpg|jpeg|gif|png|css|tgz|gz|rar|bz2|doc|pdf|ppt|tar|wav|bmp|ttf|rtf|swf|ico|flv|txt|woff|woff2|svg|xml)$ {
-        gzip_static always;
-        expires 30d;
-        access_log off;
-        add_header Pragma "public";
-        add_header Cache-Control "max-age=31536000, public";
+      gzip_static always;
+      expires 30d;
+      access_log off;
+      add_header Pragma "public";
+      add_header Cache-Control "max-age=31536000, public";
     }
   }
 
   location ~ ^/celery-monitor/? {
-      # Using a variable is a trick to let Nginx start even if upstream host is not up yet
-      # (see https://sandro-keil.de/blog/2017/07/24/let-nginx-start-if-upstream-host-is-unavailable-or-down/)
-      set $upstream localhost:5555;
+    # Using a variable is a trick to let Nginx start even if upstream host is not up yet
+    # (see https://sandro-keil.de/blog/2017/07/24/let-nginx-start-if-upstream-host-is-unavailable-or-down/)
+    set $upstream localhost:5555;
 
-      rewrite ^/celery-monitor/?(.*)$ /$1 break;
+    rewrite ^/celery-monitor/?(.*)$ /$1 break;
 
-      sub_filter '="/' '="/celery-monitor/';
-      sub_filter_last_modified on;
-      sub_filter_once off;
+    sub_filter '="/' '="/celery-monitor/';
+    sub_filter_last_modified on;
+    sub_filter_once off;
 
-      # proxy_pass http://unix:/tmp/flower.sock:/;
-      proxy_pass http://$upstream;
-      proxy_redirect off;
-      proxy_set_header Host $host;
-      proxy_set_header Upgrade $http_upgrade;
-      proxy_set_header Connection "upgrade";
-      proxy_http_version 1.1;
+    # proxy_pass http://unix:/tmp/flower.sock:/;
+    proxy_pass http://$upstream;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_http_version 1.1;
   }
 
   location / {
+    # FIXME: Work around /proxy sometimes using a mix of public/internal URL to geonode...
+    rewrite_log on;
+    rewrite ^/proxy/(.*)url=https?://{{.Values.general.externalDomain}}(:\d+)?/geoserver(.*) /proxy/$1url=http://localhost/geoserver$3 last;
+
     if ($request_method = OPTIONS) {
-        add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, OPTIONS";
-        add_header Access-Control-Allow-Headers "Authorization, Content-Type, Accept";
-        add_header Access-Control-Allow-Credentials true;
-        add_header Content-Length 0;
-        add_header Content-Type text/plain;
-        add_header Access-Control-Max-Age 1728000;
-        return 200;
+      add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, OPTIONS";
+      add_header Access-Control-Allow-Headers "Authorization, Content-Type, Accept";
+      add_header Access-Control-Allow-Credentials true;
+      add_header Content-Length 0;
+      add_header Content-Type text/plain;
+      add_header Access-Control-Max-Age 1728000;
+      return 200;
     }
 
     add_header Access-Control-Allow-Credentials false;
@@ -433,11 +453,11 @@ server {
     include /etc/nginx/uwsgi_params;
 
     location ~* \.(?:js|jpg|jpeg|gif|png|tgz|gz|rar|bz2|doc|pdf|ppt|tar|wav|bmp|ttf|rtf|swf|ico|flv|woff|woff2|svg|xml)$ {
-        gzip_static always;
-        expires 30d;
-        access_log off;
-        add_header Pragma "public";
-        add_header Cache-Control "max-age=31536000, public";
+      gzip_static always;
+      expires 30d;
+      access_log off;
+      add_header Pragma "public";
+      add_header Cache-Control "max-age=31536000, public";
     }
   }
 }
