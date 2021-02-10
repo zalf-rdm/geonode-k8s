@@ -1,1 +1,5 @@
 localtest
+my-values.yaml
+**/Chart.lock
+**/postgresql-*.tgz
+**/rabbitmq-*.tgz

@@ -22,6 +22,11 @@ steps:
   inputs:
     helmVersionToInstall: latest
 
+- script: |
+    # Lint, as sanity check
+    helm lint deployment/geonode
+  displayName: Validate Helm chart
+
 - task: HelmDeploy@0
   displayName: Package Helm Chart
   inputs:
