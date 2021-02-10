@@ -7,6 +7,9 @@ metadata:
 spec:
   # This pod can NOT be scaled, because it persists local files
   replicas: 1
+  strategy:
+    # Need to kill previous pods before running new ones to avoid double-attaching volumes...
+    type: Recreate
   selector:
     matchLabels:
       org.geonode.instance: {{ .Release.Name }}-geonode
@@ -43,13 +46,14 @@ spec:
           cp /overrides/notifier.xml /geoserver_data/data/notifier/
 
           # Update custom EPSG codes
-          {{- if .Values.geoserver.customEPSGs }}
           cat /geoserver_data/data/user_projections/epsg.properties > /tmp/epsg.properties
           {{- range .Values.geoserver.customEPSGs }}
           echo '{{ . }}' >> /tmp/epsg.properties
           {{- end }}
-          sort -u /tmp/epsg.properties > /geoserver_data/data/user_projections/epsg.properties
+          {{- range .Values.geoserver.extraCustomEPSGs }}
+          echo '{{ . }}' >> /tmp/epsg.properties
           {{- end }}
+          sort -u /tmp/epsg.properties > /geoserver_data/data/user_projections/epsg.properties
         volumeMounts:
         - name: persistence
           mountPath: /geoserver_data/data
@@ -93,6 +97,13 @@ spec:
         {{- range $key, $val := .Values.geonode.extraEnvs }}
         - name: {{ $key | quote }}
           value: {{ $val | quote }}
+        {{- end }}
+        {{- range $key, $val := .Values.geonode.extraSecretEnvs }}
+        - name: {{ $key | quote }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ $.Release.Name }}-secrets
+              key: {{ $key | quote }}
         {{- end }}
         command:
         - bash
@@ -215,6 +226,9 @@ spec:
         - name: persistence
           mountPath: /mnt/volumes/statics
           subPath: statics
+        - name: geonode-conf
+          mountPath: /mnt/volumes/statics/favicon.ico
+          subPath: favicon.ico
         - name: nginx-confd
           mountPath: /etc/nginx/conf.d
 
