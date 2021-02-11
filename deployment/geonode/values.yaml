@@ -59,17 +59,17 @@ geonode:
     MAPSTORE_BASELAYERS =  EXTRA_BASE_LAYERS + MAPSTORE_BASELAYERS
 
   extraConf2: |
-    SOCIALACCOUNT_PROVIDERS = {
-      'google': {
-        'SCOPE': [
-          'profile',
-          'email',
-        ],
-        'AUTH_PARAMS': {
-          'access_type': 'online',
-        }
+    SOCIALACCOUNT_PROVIDERS['google'] = {
+      'SCOPE': [
+        'profile',
+        'email',
+      ],
+      'AUTH_PARAMS': {
+        'access_type': 'online',
       }
     }
+
+    INSTALLED_APPS += ('allauth.socialaccount.providers.google',)
 
 
 geoserver:
