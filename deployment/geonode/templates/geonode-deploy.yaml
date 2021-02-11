@@ -18,6 +18,7 @@ spec:
       annotations:
         # Add a checksum to force the re-creation of the pods on every config update
         checksum/conf: {{ .Values.geonode.extraConf | sha256sum }}
+        checksum/conf2: {{ .Values.geonode.extraConf2 | sha256sum }}
         checksum/nginx: {{ include "nginx_conf" . | sha256sum }}
       labels:
         org.geonode.instance: {{ .Release.Name }}-geonode
