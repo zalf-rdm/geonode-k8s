@@ -35,8 +35,17 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
 
 # Refer to https://docs.geonode.org/en/master/basic/settings/index.html for GeoNode settings
 {{- define "env_general" -}}
-- name: C_FORCE_ROOT
-  value: '1'
+{{- range $key, $val := .Values.geonode.extraEnvs }}
+- name: {{ $key | quote }}
+  value: {{ $val | quote }}
+{{- end }}
+{{- range $key, $val := .Values.geonode.extraSecretEnvs }}
+- name: {{ $key | quote }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $.Release.Name }}-secrets
+      key: {{ $key | quote }}
+{{- end }}
 
 - name: DEBUG
   value: {{ include "boolean2str" .Values.general.debug | quote }}
@@ -183,8 +192,6 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
 # GIS Client
 - name: GEONODE_CLIENT_LAYER_PREVIEW_LIBRARY
   value: mapstore
-- name: GOOGLE_API_KEY
-  value: 
 
 # Monitoring
 - name: MONITORING_ENABLED
@@ -253,59 +260,6 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
   value: 'False'
 - name: DEFAULT_FROM_EMAIL
   value: {{ .Values.smtp.from | quote }}
-
-# Session/Access Control
-- name: LOCKDOWN_GEONODE
-  value: 'False'
-- name: CORS_ORIGIN_ALLOW_ALL
-  value: 'True'
-- name: X_FRAME_OPTIONS
-  value: ALLOW-FROM ALL
-- name: SESSION_EXPIRED_CONTROL_ENABLED
-  value: 'True'
-- name: DEFAULT_ANONYMOUS_VIEW_PERMISSION
-  value: 'True'
-- name: DEFAULT_ANONYMOUS_DOWNLOAD_PERMISSION
-  value: 'True'
-
-# Users Registration
-- name: ACCOUNT_OPEN_SIGNUP
-  value: 'False'
-- name: ACCOUNT_EMAIL_REQUIRED
-  value: 'True'
-- name: ACCOUNT_APPROVAL_REQUIRED
-  value: 'False'
-- name: ACCOUNT_CONFIRM_EMAIL_ON_GET
-  value: 'False'
-- name: ACCOUNT_EMAIL_VERIFICATION
-  value: none
-- name: ACCOUNT_EMAIL_CONFIRMATION_EMAIL
-  value: 'False'
-- name: ACCOUNT_EMAIL_CONFIRMATION_REQUIRED
-  value: 'False'
-- name: ACCOUNT_AUTHENTICATION_METHOD
-  value: username_email
-- name: AUTO_ASSIGN_REGISTERED_MEMBERS_TO_REGISTERED_MEMBERS_GROUP_NAME
-  value: 'True'
-
-# OAuth2
-- name: OAUTH2_API_KEY
-  value: 
-- name: OAUTH2_CLIENT_ID
-  value: Jrchz2oPY3akmzndmgUTYrs9gczlgoV20YPSvqaV
-- name: OAUTH2_CLIENT_SECRET
-  value: rCnp5txobUo83EpQEblM8fVj3QT5zb5qRfxNsuPzCqZaiRyIoxM4jdgMiZKFfePBHYXCLd7B8NlkfDBY9HKeIQPcy5Cp08KQNpRHQbjpLItDHv12GvkSeXp6OxaUETv3
-
-# GeoNode APIs
-- name: API_LOCKDOWN
-  value: 'False'
-- name: TASTYPIE_APIKEY
-  value: 
-
-- name: IS_FIRST_START
-  value: 'True'
-- name: FORCE_REINIT
-  value: 'False'
 {{- end -}}
 
 {{- define "nginx_conf" -}}

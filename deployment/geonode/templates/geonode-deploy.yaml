@@ -92,20 +92,6 @@ spec:
           value: 'False'
         - name: DOCKERIZE_VERSION
           value: v0.6.1
-        # This allows geonode to expose some proxy URLs to whitelisted domains below. 'geoserver' is required to enable printing
-        - name: PROXY_ALLOWED_HOSTS
-          value: 'localhost,django,geonode,geoserver,spatialreference.org,nominatim.openstreetmap.org,dev.openlayers.org'
-        {{- range $key, $val := .Values.geonode.extraEnvs }}
-        - name: {{ $key | quote }}
-          value: {{ $val | quote }}
-        {{- end }}
-        {{- range $key, $val := .Values.geonode.extraSecretEnvs }}
-        - name: {{ $key | quote }}
-          valueFrom:
-            secretKeyRef:
-              name: {{ $.Release.Name }}-secrets
-              key: {{ $key | quote }}
-        {{- end }}
         command:
         - bash
         - -c
