@@ -106,6 +106,7 @@ geonode:
     }
 
     INSTALLED_APPS += ('allauth.socialaccount.providers.google',)
+    SOCIALACCOUNT_PROFILE_EXTRACTORS['google'] = "geonode.people.profileextractors.OpenIDExtractor"
 
 
 geoserver:
