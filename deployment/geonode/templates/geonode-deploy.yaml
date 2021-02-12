@@ -214,7 +214,7 @@ spec:
           mountPath: /mnt/volumes/statics
           subPath: statics
         - name: geonode-conf
-          mountPath: /mnt/volumes/statics/favicon.ico
+          mountPath: /mnt/volumes/statics/static/geonode/img/favicon.ico
           subPath: favicon.ico
         - name: nginx-confd
           mountPath: /etc/nginx/conf.d

@@ -127,7 +127,6 @@ general:
   externalScheme: https
   externalPort: 443
   debug: false
-  serviceType: NodePort
   # This user will have access to geonode UI but also the built-in Django admin interface (/admin)
   # Username is admin
   superUser:
