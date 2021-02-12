@@ -105,6 +105,9 @@ geonode:
       }
     }
 
+    if os.getenv('AUTH_DOMAIN'):
+      SOCIALACCOUNT_PROVIDERS['google']['AUTH_PARAMS']['hd'] = os.getenv('AUTH_DOMAIN')
+
     INSTALLED_APPS += ('allauth.socialaccount.providers.google',)
     SOCIALACCOUNT_PROFILE_EXTRACTORS['google'] = "geonode.people.profileextractors.OpenIDExtractor"
 
