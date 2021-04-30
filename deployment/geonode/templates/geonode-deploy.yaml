@@ -153,7 +153,13 @@ spec:
           subPath: data
         - name: cache-volume
           mountPath: /tmp
-
+        resources:
+          requests:
+            memory: 1Gi
+            cpu: 100
+          limits:
+            memory: 3Gi
+            cpu: 300
         readinessProbe:
           tcpSocket:
             port: 8000
@@ -217,6 +223,13 @@ spec:
         - name: cache-volume
           mountPath: /tmp
         # healthcheck: curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8001/
+        resources:
+          requests:
+            memory: 1Gi
+            cpu: 100
+          limits:
+            memory: 2Gi
+            cpu: 200
 
       - name: nginx
         image: nginx:1.19
@@ -231,6 +244,13 @@ spec:
           subPath: favicon.ico
         - name: nginx-confd
           mountPath: /etc/nginx/conf.d
+        resources:
+          requests:
+            memory: 128Mi
+            cpu: 100
+          limits:
+            memory: 256Mi
+            cpu: 200
 
       # Geoserver backend
       # TODO: route logs to console
@@ -292,6 +312,13 @@ spec:
           initialDelaySeconds: 180
           periodSeconds: 3
           failureThreshold: 5
+        resources:
+          requests:
+            memory: 1Gi
+            cpu: 100
+          limits:
+            memory: 3Gi
+            cpu: 200
 
       volumes:
       - name: nginx-confd
