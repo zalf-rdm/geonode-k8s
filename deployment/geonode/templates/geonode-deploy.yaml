@@ -143,10 +143,10 @@ spec:
         resources:
           requests:
             memory: 1Gi
-            cpu: 100
+            cpu: 100m
           limits:
             memory: 3Gi
-            cpu: 300
+            cpu: 300m
         readinessProbe:
           tcpSocket:
             port: 8000
@@ -213,10 +213,10 @@ spec:
         resources:
           requests:
             memory: 1Gi
-            cpu: 100
+            cpu: 100m
           limits:
             memory: 2Gi
-            cpu: 200
+            cpu: 200m
 
       - name: nginx
         image: nginx:1.19
@@ -234,10 +234,10 @@ spec:
         resources:
           requests:
             memory: 128Mi
-            cpu: 100
+            cpu: 100m
           limits:
             memory: 256Mi
-            cpu: 200
+            cpu: 200m
 
       # Geoserver backend
       # TODO: route logs to console
@@ -302,10 +302,10 @@ spec:
         resources:
           requests:
             memory: 1Gi
-            cpu: 100
+            cpu: 100m
           limits:
             memory: 3Gi
-            cpu: 200
+            cpu: 200m
 
       volumes:
       - name: nginx-confd
