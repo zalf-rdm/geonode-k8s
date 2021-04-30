@@ -18,6 +18,7 @@ spec:
       annotations:
         # Add a checksum to force the re-creation of the pods on every config update
         checksum/conf: {{ .Values.geonode.extraConf | sha256sum }}
+        checksum/conf2: {{ .Values.geonode.extraConf2 | sha256sum }}
         checksum/nginx: {{ include "nginx_conf" . | sha256sum }}
       labels:
         org.geonode.instance: {{ .Release.Name }}-geonode
@@ -91,20 +92,6 @@ spec:
           value: 'False'
         - name: DOCKERIZE_VERSION
           value: v0.6.1
-        # This allows geonode to expose some proxy URLs to whitelisted domains below. 'geoserver' is required to enable printing
-        - name: PROXY_ALLOWED_HOSTS
-          value: 'localhost,django,geonode,geoserver,spatialreference.org,nominatim.openstreetmap.org,dev.openlayers.org'
-        {{- range $key, $val := .Values.geonode.extraEnvs }}
-        - name: {{ $key | quote }}
-          value: {{ $val | quote }}
-        {{- end }}
-        {{- range $key, $val := .Values.geonode.extraSecretEnvs }}
-        - name: {{ $key | quote }}
-          valueFrom:
-            secretKeyRef:
-              name: {{ $.Release.Name }}-secrets
-              key: {{ $key | quote }}
-        {{- end }}
         command:
         - bash
         - -c
@@ -240,7 +227,7 @@ spec:
           mountPath: /mnt/volumes/statics
           subPath: statics
         - name: geonode-conf
-          mountPath: /mnt/volumes/statics/favicon.ico
+          mountPath: /mnt/volumes/statics/static/geonode/img/favicon.ico
           subPath: favicon.ico
         - name: nginx-confd
           mountPath: /etc/nginx/conf.d
