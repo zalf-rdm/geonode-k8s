@@ -23,9 +23,16 @@ steps:
     helmVersionToInstall: latest
 
 - script: |
-    # Lint, as sanity check
-    helm lint deployment/geonode
-  displayName: Validate Helm chart
+    # See https://kind.sigs.k8s.io/docs/user/quick-start/ for kind usage
+    # Create cluster 'kind'
+    kind create cluster --wait 5m
+
+    # Install Helm dependencies
+    helm dependency update deployment/geonode
+
+    kubectl config use-context kind-kind
+    helm install geonode deployment/geonode --wait --timeout 10m
+  displayName: Test deployment
 
 - task: HelmDeploy@0
   displayName: Package Helm Chart
@@ -34,8 +41,6 @@ steps:
     chartPath: $(System.DefaultWorkingDirectory)/deployment/geonode
     destination: $(Build.ArtifactStagingDirectory)
     updatedependency: true
-
-
 
 - task: PublishBuildArtifacts@1
   displayName: Publish configuration package
