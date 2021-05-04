@@ -160,7 +160,7 @@ spec:
             port: 8000
           initialDelaySeconds: 300
           periodSeconds: 10
-          failureThreshold: 5
+          failureThreshold: 15
 
       # # Celery is the task worker
       - name: celery
@@ -217,7 +217,7 @@ spec:
             cpu: 100m
           limits:
             memory: 2Gi
-            cpu: 200m
+            cpu: 1000m
 
       - name: nginx
         image: nginx:1.19
@@ -290,7 +290,7 @@ spec:
           # httpGet:
             # path: /
             port: 8080
-          initialDelaySeconds: 30
+          initialDelaySeconds: 60
           periodSeconds: 5
           failureThreshold: 15
 
@@ -300,8 +300,8 @@ spec:
             # path: /
             port: 8080
           initialDelaySeconds: 180
-          periodSeconds: 3
-          failureThreshold: 5
+          periodSeconds: 5
+          failureThreshold: 15
         resources:
           requests:
             memory: 1Gi
