@@ -285,16 +285,18 @@ spec:
         # - name: cache-volume
         #   mountPath: /tmp
         readinessProbe:
-          httpGet:
-            path: /
+          tcpSocket:
+          # httpGet:
+            # path: /
             port: 8080
           initialDelaySeconds: 30
           periodSeconds: 5
           failureThreshold: 15
 
         livenessProbe:
-          httpGet:
-            path: /
+          tcpSocket:
+          # httpGet:
+            # path: /
             port: 8080
           initialDelaySeconds: 180
           periodSeconds: 3
