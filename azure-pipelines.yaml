@@ -31,7 +31,8 @@ steps:
     helm dependency update deployment/geonode
 
     kubectl config use-context kind-kind
-    helm install geonode deployment/geonode --wait --timeout 10m
+    helm install geonode deployment/geonode --wait --timeout 20m
+    kubectl describe pods
   displayName: Test deployment
 
 - task: HelmDeploy@0

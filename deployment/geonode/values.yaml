@@ -115,7 +115,7 @@ geonode:
 geoserver:
   image:
     name: geonode/geoserver
-    tag: '2.17.4'
+    tag: '2.18.2'
   # A list of one-line custom EPSGs to add to GeoServer
   # see https://docs.geoserver.org/stable/en/user/configuration/crshandling/customcrs.html
   customEPSGs:

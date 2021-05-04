@@ -65,8 +65,9 @@ spec:
       # Wait for Postgres and rabbit
       - name: wait-db
         image: jwilder/dockerize
+        imagePullPolicy: IfNotPresent
         args:
-        - -timeout=40s
+        - -timeout=120s
         - -wait
         - tcp://{{ include "database_host" .}}
         - -wait
