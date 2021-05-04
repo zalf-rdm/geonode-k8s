@@ -147,18 +147,20 @@ spec:
             cpu: 100m
           limits:
             memory: 3Gi
-            cpu: 300m
-        readinessProbe:
-          tcpSocket:
-            port: 8000
-          initialDelaySeconds: 60
-          periodSeconds: 10
-          failureThreshold: 15
+            cpu: 400m
+        # This one is HORRIBLY SLOW!!!
+        # Disabling readiness probe...
+        # readinessProbe:
+        #   tcpSocket:
+        #     port: 8000
+        #   initialDelaySeconds: 60
+        #   periodSeconds: 10
+        #   failureThreshold: 15
 
         livenessProbe:
           tcpSocket:
             port: 8000
-          initialDelaySeconds: 300
+          initialDelaySeconds: 1200
           periodSeconds: 10
           failureThreshold: 15
 
