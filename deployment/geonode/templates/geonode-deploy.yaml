@@ -147,7 +147,7 @@ spec:
             cpu: 100m
           limits:
             memory: 3Gi
-            cpu: 400m
+            cpu: 1000m
         # This one is HORRIBLY SLOW!!!
         # Disabling readiness probe...
         # readinessProbe:
@@ -219,7 +219,7 @@ spec:
             cpu: 100m
           limits:
             memory: 2Gi
-            cpu: 1000m
+            cpu: 400m
 
       - name: nginx
         image: nginx:1.19
@@ -310,7 +310,7 @@ spec:
             cpu: 100m
           limits:
             memory: 3Gi
-            cpu: 200m
+            cpu: 400m
 
       volumes:
       - name: nginx-confd
