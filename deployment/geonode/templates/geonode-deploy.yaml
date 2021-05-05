@@ -143,10 +143,10 @@ spec:
           mountPath: /tmp
         resources:
           requests:
-            memory: 1Gi
+            memory: 3Gi
             cpu: 100m
           limits:
-            memory: 3Gi
+            memory: 4Gi
             cpu: 1000m
         # This one is HORRIBLY SLOW!!!
         # Disabling readiness probe...
@@ -306,10 +306,10 @@ spec:
           failureThreshold: 15
         resources:
           requests:
-            memory: 1Gi
+            memory: 2Gi
             cpu: 100m
           limits:
-            memory: 3Gi
+            memory: 4Gi
             cpu: 400m
 
       volumes:
