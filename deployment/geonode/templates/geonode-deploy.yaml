@@ -20,6 +20,7 @@ spec:
         checksum/conf: {{ .Values.geonode.extraConf | sha256sum }}
         checksum/conf2: {{ .Values.geonode.extraConf2 | sha256sum }}
         checksum/nginx: {{ include "nginx_conf" . | sha256sum }}
+        co.elastic.logs/enabled: "true"
       labels:
         org.geonode.instance: {{ .Release.Name }}-geonode
     spec:
