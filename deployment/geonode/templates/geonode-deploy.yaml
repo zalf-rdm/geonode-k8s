@@ -242,6 +242,10 @@ spec:
           limits:
             memory: 256Mi
             cpu: 200m
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
 
       # Geoserver backend
       # TODO: route logs to console
