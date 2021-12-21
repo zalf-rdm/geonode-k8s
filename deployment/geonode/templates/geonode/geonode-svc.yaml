@@ -1,0 +1,23 @@
+# Load-balancer for SGW
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-geonode
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    org.geonode.instance: {{ .Release.Name }}-geonode
+  ports:
+  - targetPort: 8000
+    port: 8000
+    name: geonode
+  - targetPort: 8001
+    port: 8001
+    name: geonode-liveprobe
+  - targetPort: 5555
+    port: 5555
+    name: celery
+  - targetPort: 8080
+    port: 8080
+    name: geoserver
+  type: ClusterIP

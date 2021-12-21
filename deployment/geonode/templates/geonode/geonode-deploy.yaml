@@ -1,0 +1,167 @@
+# geonode stateful set
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-geonode
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      org.geonode.instance: {{ .Release.Name }}-geonode
+  serviceName: {{ .Release.Name }}-geonode
+  replicas: {{ .Values.nginx.replicas }}
+  template:
+    metadata:
+      annotations:
+        # Add a checksum to force the re-creation of the pods on every config update
+        checksum/conf: {{ .Values.geonode.extraConf | sha256sum }}
+        checksum/conf2: {{ .Values.geonode.extraConf2 | sha256sum }}
+        co.elastic.logs/enabled: "true"
+      labels:
+        org.geonode.instance: {{ .Release.Name }}-geonode
+    spec:
+      terminationGracePeriodSeconds: 3
+      initContainers:
+      # Wait for Postgres and rabbit
+      - name: wait-db
+        image: jwilder/dockerize
+        imagePullPolicy: IfNotPresent
+        args:
+        - -timeout=120s
+        - -wait
+        - tcp://{{ include "database_host" .}}
+        - -wait
+        - tcp://{{ include "rabbit_host" .}}
+      # All containers need to be in the same pod since they share volumes!
+      # This also means they probably can't be scaled up... (?)
+      containers:
+      # This is the django app server
+      - name: geonode
+        image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
+        env:
+        {{ include "env_general" . | nindent 8 }}
+        - name: IS_CELERY
+          value: 'False'
+        - name: DOCKERIZE_VERSION
+          value: v0.6.1
+        command:
+        - bash
+        - -c
+        - |
+          # install dockerize...
+          wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+            && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+            && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          
+          # Add host alias since the scripts hardcode the db host as 'db' @##@?
+          echo "db {{ .Release.Name }}-postgresql" > /etc/host.aliases
+          export HOSTALIASES=/etc/host.aliases
+
+          # Add config overrides
+          cat /usr/src/geonode/geonode/local_settings.py >> /usr/src/geonode/geonode/settings.py
+
+          # Setup
+          touch /usr/src/app/invoke.log
+          dockerize -stdout /usr/src/app/invoke.log /usr/src/app/entrypoint.sh
+
+          # Run web server
+          touch /var/log/geonode.log
+          dockerize -stdout /var/log/geonode.log /usr/local/bin/uwsgi --ini /usr/src/app/uwsgi.ini
+        ports:
+        - containerPort: 8000
+        - containerPort: 8001
+        volumeMounts:
+        - name: geonode-conf
+          mountPath: /usr/src/geonode/geonode/local_settings.py
+          subPath: local_settings.py
+        - name: persistence
+          mountPath: /mnt/volumes/statics
+          subPath: statics
+        - name: persistence
+          mountPath: /geoserver_data/data
+          subPath: geoserver-data-dir
+        - name: persistence
+          mountPath: /backup_restore
+          subPath: backup-restore
+        - name: persistence
+          mountPath: /data
+          subPath: data
+        - name: cache-volume
+          mountPath: /tmp
+        resources:
+          requests:
+            memory: 3Gi
+            cpu: 100m
+          limits:
+            memory: 4Gi
+            cpu: 1000m
+        livenessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 1200
+          periodSeconds: 10
+          failureThreshold: 15
+      # # Celery is the task worker
+      - name: celery
+        image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
+        env:
+        {{ include "env_general" . | nindent 8 }}
+        - name: IS_CELERY
+          value: 'True'
+        - name: DOCKERIZE_VERSION
+          value: v0.6.1
+        command:
+        - bash
+        - -c
+        - |
+          # install dockerize...
+          wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+            && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+            && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          
+          # Add host alias since the scripts hardcode the db host as 'db' @##@?
+          echo "db {{ .Release.Name }}-postgresql" > /etc/host.aliases
+          export HOSTALIASES=/etc/host.aliases
+
+          # Setup
+          touch /usr/src/app/invoke.log
+          dockerize -stdout /usr/src/app/invoke.log /usr/src/app/entrypoint.sh
+
+          # Run celery
+          celery -A geonode.celery_app:app worker -B -E --statedb=/mnt/volumes/statics/worker.state -s /mnt/volumes/statics/celerybeat-schedule --loglevel=INFO --concurrency=10 -n worker1@%h
+        volumeMounts:
+        - name: persistence
+          mountPath: /mnt/volumes/statics
+          subPath: statics
+        - name: persistence
+          mountPath: /geoserver_data/data
+          subPath: geoserver-data-dir
+        - name: persistence
+          mountPath: /backup_restore
+          subPath: backup-restore
+        - name: persistence
+          mountPath: /data
+          subPath: data
+        - name: cache-volume
+          mountPath: /tmp
+        # healthcheck: curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8001/
+        resources:
+          requests:
+            memory: 1Gi
+            cpu: 100m
+          limits:
+            memory: 2Gi
+            cpu: 400m
+      volumes:
+      - name: geoserver-conf
+        configMap:
+          name: {{ .Release.Name }}-geoserver-conf
+      - name: geonode-conf
+        configMap:
+          name: {{ .Release.Name }}-geonode-conf
+      - name: persistence
+        persistentVolumeClaim:
+          claimName: pvc-{{ .Release.Name }}-geonode
+      # Using an emptyDir to cache compiled statics... it will survive container crashes, but not pod restarts
+      - name: cache-volume
+        emptyDir: {}
