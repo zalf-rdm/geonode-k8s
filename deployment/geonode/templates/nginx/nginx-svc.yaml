@@ -1,0 +1,14 @@
+# Load-balancer
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-nginx
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    org.geonode.instance: {{ .Release.Name }}-nginx
+  ports:
+  - targetPort: 80
+    port: 80
+    name: www
+  type: {{ .Values.general.serviceType }}

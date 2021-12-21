@@ -1,0 +1,54 @@
+  # nginx stateful set
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-nginx
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      org.geonode.instance: {{ .Release.Name }}-nginx
+  serviceName: {{ .Release.Name }}-nginx
+  replicas: {{ .Values.nginx.replicas }}
+  template:
+    metadata:
+      annotations:
+        checksum/nginx: {{ include "nginx_conf" . | sha256sum }}
+      labels:
+        org.geonode.instance: {{ .Release.Name }}-nginx
+    spec:
+      terminationGracePeriodSeconds: 3
+      containers:
+      - name: nginx
+        image: "{{ .Values.nginx.image.name }}:{{ .Values.nginx.image.tag }}"
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+        volumeMounts:
+        - name: persistence
+          mountPath: /mnt/volumes/statics
+          subPath: statics
+        - name: geonode-conf
+          mountPath: /mnt/volumes/statics/static/geonode/img/favicon.ico
+          subPath: favicon.ico
+        - name: nginx-confd
+          mountPath: /etc/nginx/conf.d
+        resources:
+          requests:
+            memory: 128Mi
+            cpu: 100m
+          limits:
+            memory: 256Mi
+            cpu: 200m        
+      volumes:
+      - name: nginx-confd
+        configMap:
+          name: {{ .Release.Name }}-nginx-confd
+      - name: geonode-conf
+        configMap:
+          name: {{ .Release.Name }}-geonode-conf
+      - name: persistence
+        persistentVolumeClaim:
+          claimName: pvc-{{ .Release.Name }}-geonode

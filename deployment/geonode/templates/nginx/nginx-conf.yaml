@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-nginx-confd
+  namespace: {{ .Release.Namespace }}
+data:
+  geonode.conf: |
+    {{- include "nginx_conf" .  | nindent 4 }}
