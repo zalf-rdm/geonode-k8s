@@ -47,14 +47,13 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
       key: {{ $key | quote }}
 {{- end }}
 
+########################
+# DJANGO CONFIGURATION #
+########################
+
 - name: DEBUG
   value: {{ include "boolean2str" .Values.general.debug | quote }}
 
-- name: DOCKER_ENV
-  value: production
-
-- name: DJANGO_SETTINGS_MODULE
-  value: geonode.settings
 - name: GEONODE_INSTANCE_NAME
   value: geonode
 - name: GEONODE_LB_HOST_IP
@@ -97,136 +96,28 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
     secretKeyRef:
       name: {{ .Release.Name }}-secrets
       key: GEODATABASE_URL
+
 - name: GEONODE_DB_CONN_MAX_AGE
   value: '0'
 - name: GEONODE_DB_CONN_TOUT
   value: '5'
-- name: DEFAULT_BACKEND_DATASTORE
-  value: datastore
+
 - name: BROKER_URL
   valueFrom:
     secretKeyRef:
       name: {{ .Release.Name }}-secrets
       key: BROKER_URL
-- name: ASYNC_SIGNALS
-  value: 'True'
 
 - name: SITEURL
   value: "{{ include "public_url" . }}/"
 - name: SITE_HOST_SCHEMA
   value: {{ .Values.general.externalScheme | quote }}
 
-- name: STATIC_ROOT
-  value: /mnt/volumes/statics/static/
-- name: MEDIA_ROOT
-  value: /mnt/volumes/statics/uploaded/
-- name: GEOIP_PATH
-  value: /mnt/volumes/statics/geoip.db
-
 - name: ALLOWED_HOSTS
   value: "['django', '*', '{{ .Values.general.externalDomain }}']"
 
-- name: DEFAULT_BACKEND_UPLOADER
-  value: geonode.importer
-- name: TIME_ENABLED
-  value: 'True'
-- name: MOSAIC_ENABLED
-  value: 'False'
-- name: HAYSTACK_SEARCH
-  value: 'False'
-- name: HAYSTACK_ENGINE_URL
-  value: http://elasticsearch:9200/
-- name: HAYSTACK_ENGINE_INDEX_NAME
-  value: haystack
-- name: HAYSTACK_SEARCH_RESULTS_PER_PAGE
-  value: '200'
-
-- name: CACHE_BUSTING_STATIC_ENABLED
-  value: 'False'
-- name: CACHE_BUSTING_MEDIA_ENABLED
-  value: 'False'
-
-- name: MEMCACHED_ENABLED
-  value: 'False'
-- name: MEMCACHED_BACKEND
-  value: django.core.cache.backends.memcached.MemcachedCache
-- name: MEMCACHED_LOCATION
-  value: '127.0.0.1:11211'
-- name: MEMCACHED_LOCK_EXPIRE
-  value: '3600'
-- name: MEMCACHED_LOCK_TIMEOUT
-  value: '10'
-
-- name: MAX_DOCUMENT_SIZE
-  value: '2'
-- name: API_LIMIT_PER_PAGE
-  value: '1000'
-
-# GIS Server
-- name: GEOSERVER_WEB_UI_LOCATION
-  value: "{{ include "public_url" . }}/geoserver/"
-- name: GEOSERVER_PUBLIC_LOCATION
-  value: "{{ include "public_url" . }}/geoserver/"
-- name: GEOSERVER_PUBLIC_SCHEMA
-  value: {{ .Values.general.externalScheme | quote }}
-- name: GEOSERVER_LOCATION
-  value: http://{{ .Release.Name }}-geonode:8080/geoserver/
-- name: GEOSERVER_ADMIN_USER
-  value: admin
-- name: GEOSERVER_ADMIN_PASSWORD
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Release.Name }}-secrets
-      key: GEOSERVER_ADMIN_PASSWORD
-- name: OGC_REQUEST_TIMEOUT
-  value: '30'
-- name: OGC_REQUEST_MAX_RETRIES
-  value: '1'
-- name: OGC_REQUEST_BACKOFF_FACTOR
-  value: '0.3'
-- name: OGC_REQUEST_POOL_MAXSIZE
-  value: '10'
-- name: OGC_REQUEST_POOL_CONNECTIONS
-  value: '10'
-
-# GIS Client
-- name: GEONODE_CLIENT_LAYER_PREVIEW_LIBRARY
-  value: mapstore
-
-# Monitoring
-- name: MONITORING_ENABLED
-  value: 'False'
-- name: MONITORING_DATA_TTL
-  value: '365'
-- name: USER_ANALYTICS_ENABLED
-  value: 'True'
-- name: USER_ANALYTICS_GZIP
-  value: 'True'
-- name: CENTRALIZED_DASHBOARD_ENABLED
-  value: 'False'
-- name: MONITORING_SERVICE_NAME
-  value: local-geonode
-- name: MONITORING_HOST_NAME
-  value: geonode
-
-# Other Options/Contribs
-- name: MODIFY_TOPICCATEGORY
-  value: 'True'
-- name: AVATAR_GRAVATAR_SSL
-  value: 'True'
-- name: AVATAR_DEFAULT_URL
-  value: /geonode/img/avatar.png
-
-- name: EXIF_ENABLED
-  value: 'True'
-- name: CREATE_LAYER
-  value: 'True'
-- name: FAVORITE_ENABLED
-  value: 'True'
-
-# #################
 # Security
-# #################
+
 # Admin Settings
 - name: ADMIN_USERNAME
   value: admin
@@ -260,6 +151,47 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
   value: 'False'
 - name: DEFAULT_FROM_EMAIL
   value: {{ .Values.smtp.from | quote }}
+
+###########################
+# GEOSERVER CONFIGURATION #
+###########################
+- name: GEOSERVER_WEB_UI_LOCATION
+  value: "{{ include "public_url" . }}/geoserver/"
+- name: GEOSERVER_PUBLIC_LOCATION
+  value: "{{ include "public_url" . }}/geoserver/"
+- name: GEOSERVER_PUBLIC_SCHEMA
+  value: {{ .Values.general.externalScheme | quote }}
+- name: GEOSERVER_LOCATION
+  value: "{{ include "public_url" . }}/geoserver/"
+- name: GEOSERVER_ADMIN_USER
+  value: admin
+- name: GEOSERVER_ADMIN_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets
+      key: GEOSERVER_ADMIN_PASSWORD
+- name: OGC_REQUEST_TIMEOUT
+  value: '30'
+- name: OGC_REQUEST_MAX_RETRIES
+  value: '1'
+- name: OGC_REQUEST_BACKOFF_FACTOR
+  value: '0.3'
+- name: OGC_REQUEST_POOL_MAXSIZE
+  value: '10'
+- name: OGC_REQUEST_POOL_CONNECTIONS
+  value: '10'
+
+# GIS Client
+- name: GEONODE_CLIENT_LAYER_PREVIEW_LIBRARY
+  value: mapstore
+
+###############
+# UNKNOWN USE #
+###############
+
+- name: DOCKER_ENV
+  value: production
+
 {{- end -}}
 
 {{- define "nginx_conf" -}}
@@ -367,7 +299,7 @@ server {
   location / {
     # FIXME: Work around /proxy sometimes using a mix of public/internal URL to geonode...
     rewrite_log on;
-    rewrite ^/proxy/(.*)url=http?://{{.Values.general.externalDomain}}(:\d+)?/geoserver(.*) /proxy/$1url=http://{{ .Release.Name }}-geonode/geoserver$3 last;
+    #rewrite ^/proxy/(.*)url=http?://{{.Values.general.externalDomain}}(:\d+)?/geoserver(.*) /proxy/$1url=http://geoserver:8080$3 last;
 
     if ($request_method = OPTIONS) {
       add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, OPTIONS";

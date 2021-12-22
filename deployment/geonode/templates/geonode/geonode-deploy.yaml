@@ -9,7 +9,6 @@ spec:
     matchLabels:
       org.geonode.instance: {{ .Release.Name }}-geonode
   serviceName: {{ .Release.Name }}-geonode
-  replicas: {{ .Values.nginx.replicas }}
   template:
     metadata:
       annotations:
@@ -63,6 +62,10 @@ spec:
           # Setup
           touch /usr/src/app/invoke.log
           dockerize -stdout /usr/src/app/invoke.log /usr/src/app/entrypoint.sh
+
+          # run sync
+          # fixes issue that sessions ends instantly after login
+          paver sync
 
           # Run web server
           touch /var/log/geonode.log
@@ -144,6 +147,8 @@ spec:
           subPath: data
         - name: cache-volume
           mountPath: /tmp
+        ports:
+        - containerPort: 5555
         # healthcheck: curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8001/
         resources:
           requests:
