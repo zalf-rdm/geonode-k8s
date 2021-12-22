@@ -1,12 +1,11 @@
-# PVC for mariadb and nextcloud disk
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-geonode
+  name: pvc-{{ .Release.Name }}-geonode
   namespace: {{ .Release.Namespace }}
 spec:
   accessModes:
-  - ReadWriteOnce
+  - ReadWriteMany
   storageClassName: {{ .Values.global.storageClass }}
   resources:
     requests:

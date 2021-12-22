@@ -1,0 +1,123 @@
+# geoserver stateful set
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-geoserver
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      org.geonode.instance: {{ .Release.Name }}-geoserver
+  serviceName: {{ .Release.Name }}-geoserver
+  replicas: {{ .Values.nginx.replicas }}
+  template:
+    metadata:
+      labels:
+        org.geonode.instance: {{ .Release.Name }}-geoserver
+    spec:
+      terminationGracePeriodSeconds: 3
+      initContainers:
+      - name: data-dir-conf
+        image: geonode/geoserver_data:{{ .Values.geoserver.image.tag }}
+        command:
+        - sh
+        - -c
+        - |
+          # Copy defaults from data container
+          cp -r /tmp/geonode/downloaded/data /geoserver_data
+
+          # Copy overrides from ConfigMap
+          cp /overrides/notifier.xml /geoserver_data/data/notifier/
+
+          # Update custom EPSG codes
+          cat /geoserver_data/data/user_projections/epsg.properties > /tmp/epsg.properties
+          {{- range .Values.geoserver.customEPSGs }}
+          echo '{{ . }}' >> /tmp/epsg.properties
+          {{- end }}
+          {{- range .Values.geoserver.extraCustomEPSGs }}
+          echo '{{ . }}' >> /tmp/epsg.properties
+          {{- end }}
+          sort -u /tmp/epsg.properties > /geoserver_data/data/user_projections/epsg.properties
+        volumeMounts:
+        - name: persistence
+          mountPath: /geoserver_data/data
+          subPath: geoserver-data-dir
+        - name: geoserver-conf
+          mountPath: /overrides
+
+      containers:
+      - name: geoserver
+        image: "{{ .Values.geoserver.image.name }}:{{ .Values.geoserver.image.tag }}"
+        env:
+        ports:
+        - containerPort: 8080
+        env:
+        # - name: DOCKERHOST
+        #   value: 
+        - name: GEONODE_LB_HOST_IP
+          value: {{ .Values.general.externalDomain | quote }}
+        - name: GEONODE_LB_PORT
+          value: {{ .Values.general.externalPort | quote }}
+        - name: GEONODE_HOST_IP
+          value: localhost
+        - name: PUBLIC_PORT
+          value: {{ .Values.general.externalPort | quote }}
+        # - name: DOCKER_HOST_IP
+        #   value: 
+        - name: DJANGO_URL
+          value: http://{{ .Release.Name }}-geonode/
+        - name: ENABLE_JSONP
+          value: 'true'
+        - name: outFormat
+          value: text/javascript
+        - name: GEOSERVER_JAVA_OPTS
+          value: |
+            -Djava.awt.headless=true 
+            -Xms2G 
+            -Xmx4G 
+            -XX:PerfDataSamplingInterval=500 
+            -XX:SoftRefLRUPolicyMSPerMB=36000 
+            -XX:-UseGCOverheadLimit 
+            -XX:+UseConcMarkSweepGC 
+            -XX:+UseParNewGC 
+            -XX:ParallelGCThreads=4 
+            -Dfile.encoding=UTF8 
+            -Djavax.servlet.request.encoding=UTF-8 
+            -Djavax.servlet.response.encoding=UTF-8 
+            -Duser.timezone=GMT 
+            -Dorg.geotools.shapefile.datetime=false 
+            -DGEOSERVER_CSRF_DISABLED=true 
+            -DPRINT_BASE_URL=http://{{ .Release.Name }}-geoserver:8080/geoserver/pdf        
+        
+        - name: NGINX_BASE_URL
+          value: "{{ include "public_url" . }}/"
+        volumeMounts:
+        - name: persistence
+          mountPath: /geoserver_data/data
+          subPath: geoserver-data-dir
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 5
+          failureThreshold: 15
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 180
+          periodSeconds: 5
+          failureThreshold: 15
+        resources:
+          requests:
+            memory: 2Gi
+            cpu: 100m
+          limits:
+            memory: 4Gi
+            cpu: 400m
+      volumes:
+      - name: geoserver-conf
+        configMap:
+          name: {{ .Release.Name }}-geoserver-conf
+      - name: persistence
+        persistentVolumeClaim:
+          claimName: pvc-{{ .Release.Name }}-geonode

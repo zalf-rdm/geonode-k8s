@@ -170,7 +170,7 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
 - name: GEOSERVER_PUBLIC_SCHEMA
   value: {{ .Values.general.externalScheme | quote }}
 - name: GEOSERVER_LOCATION
-  value: http://localhost:8080/geoserver/
+  value: http://{{ .Release.Name }}-geonode:8080/geoserver/
 - name: GEOSERVER_ADMIN_USER
   value: admin
 - name: GEOSERVER_ADMIN_PASSWORD
@@ -316,7 +316,7 @@ server {
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
 
-    proxy_pass http://localhost:8080;
+    proxy_pass http://{{ .Release.Name }}-geoserver:8080;
   }
 
   # GeoNode
@@ -347,7 +347,7 @@ server {
   location ~ ^/celery-monitor/? {
     # Using a variable is a trick to let Nginx start even if upstream host is not up yet
     # (see https://sandro-keil.de/blog/2017/07/24/let-nginx-start-if-upstream-host-is-unavailable-or-down/)
-    set $upstream localhost:5555;
+    set $upstream {{ .Release.Name }}-geonode:5555;
 
     rewrite ^/celery-monitor/?(.*)$ /$1 break;
 
@@ -367,7 +367,7 @@ server {
   location / {
     # FIXME: Work around /proxy sometimes using a mix of public/internal URL to geonode...
     rewrite_log on;
-    rewrite ^/proxy/(.*)url=https?://{{.Values.general.externalDomain}}(:\d+)?/geoserver(.*) /proxy/$1url=http://localhost/geoserver$3 last;
+    rewrite ^/proxy/(.*)url=http?://{{.Values.general.externalDomain}}(:\d+)?/geoserver(.*) /proxy/$1url=http://{{ .Release.Name }}-geonode/geoserver$3 last;
 
     if ($request_method = OPTIONS) {
       add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, OPTIONS";
@@ -398,7 +398,7 @@ server {
     include /etc/nginx/uwsgi_params;
 
     # proxy_pass http://$upstream;
-    uwsgi_pass localhost:8000;
+    uwsgi_pass {{ .Release.Name }}-geonode:8000;
 
     # when a client closes the connection then keep the channel to uwsgi open. Otherwise uwsgi throws an IOError
     uwsgi_ignore_client_abort on;
