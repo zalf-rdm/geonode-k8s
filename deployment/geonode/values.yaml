@@ -6,6 +6,9 @@ geonode:
     tag: '3.1'
   # You can use this to pass any env from https://docs.geonode.org/en/master/basic/settings/index.html
   extraEnvs:
+
+    # GEONODE ENV VARS
+    
     CLIENT_RESULTS_LIMIT: '25'
     SOCIALACCOUNT_WITH_GEONODE_LOCAL_SINGUP: "False"
     C_FORCE_ROOT: '1'
@@ -31,7 +34,9 @@ geonode:
     AUTO_ASSIGN_REGISTERED_MEMBERS_TO_REGISTERED_MEMBERS_GROUP_NAME: 'True'
 
     # OAuth2
-    OAUTH2_API_KEY: 
+    OAUTH2_API_KEY:
+    OAUTH2_CLIENT_ID:
+    OAUTH2_CLIENT_SECRET:
 
     # GeoNode APIs
     API_LOCKDOWN: 'False'
@@ -39,6 +44,53 @@ geonode:
 
     IS_FIRST_START: 'True'
     FORCE_REINIT: 'False'
+    DJANGO_SETTINGS_MODULE: geonode.settings
+    DEFAULT_BACKEND_DATASTORE: datastore
+
+    ASYNC_SIGNALS: 'True'
+
+    STATIC_ROOT: /mnt/volumes/statics/static/
+    MEDIA_ROOT: /mnt/volumes/statics/uploaded/
+    GEOIP_PATH: /mnt/volumes/statics/geoip.db
+
+
+    DEFAULT_BACKEND_UPLOADER: geonode.importer
+    TIME_ENABLED: 'True'
+    MOSAIC_ENABLED: 'False'
+    HAYSTACK_SEARCH: 'False'
+    HAYSTACK_ENGINE_URL: http://elasticsearch:9200/
+    HAYSTACK_ENGINE_INDEX_NAME: haystack
+    HAYSTACK_SEARCH_RESULTS_PER_PAGE: '200'
+
+    CACHE_BUSTING_STATIC_ENABLED: 'False'
+    CACHE_BUSTING_MEDIA_ENABLED: 'False'
+
+    MEMCACHED_ENABLED: 'False'
+    MEMCACHED_BACKEND: django.core.cache.backends.memcached.MemcachedCache
+    MEMCACHED_LOCATION: '127.0.0.1:11211'
+    MEMCACHED_LOCK_EXPIRE: '3600'
+    MEMCACHED_LOCK_TIMEOUT: '10'
+
+    MAX_DOCUMENT_SIZE: '2'
+    API_LIMIT_PER_PAGE: '1000'
+
+    # Monitoring
+    MONITORING_ENABLED: 'False'
+    MONITORING_DATA_TTL: '365'
+    USER_ANALYTICS_ENABLED: 'True'
+    USER_ANALYTICS_GZIP: 'True'
+    CENTRALIZED_DASHBOARD_ENABLED: 'False'
+    MONITORING_SERVICE_NAME: local-geonode
+    MONITORING_HOST_NAME: geonode
+
+    # Other Options/Contribs
+    MODIFY_TOPICCATEGORY: 'True'
+    AVATAR_GRAVATAR_SSL: 'True'
+    AVATAR_DEFAULT_URL: /geonode/img/avatar.png
+
+    EXIF_ENABLED: 'True'
+    CREATE_LAYER: 'True'
+    FAVORITE_ENABLED: 'True'
 
   # Extra env vars to pass to geonode container - will be passed as a secret
   extraSecretEnvs: {}
@@ -121,15 +173,15 @@ geoserver:
   extraCustomEPSGs: []
 
 nginx:
-  replicas: 3
+  replicas: 1
   image:
     name: nginx
     tag: '1.20'
 
 general:
   externalDomain: geonode
-  externalScheme: https
-  externalPort: 443
+  externalScheme: http
+  externalPort: 80
   debug: false
   # This user will have access to geonode UI but also the built-in Django admin interface (/admin)
   # Username is admin
