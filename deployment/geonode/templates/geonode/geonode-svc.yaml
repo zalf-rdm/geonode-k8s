@@ -17,7 +17,3 @@ spec:
   - targetPort: 5555
     port: 5555
     name: celery
-  - targetPort: 8080
-    port: 8080
-    name: geoserver
-  type: ClusterIP
