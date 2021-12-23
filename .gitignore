@@ -1,5 +1,5 @@
 localtest
 my-values.yaml
 **/Chart.lock
-**/postgresql-*.tgz
-**/rabbitmq-*.tgz
+deployment/geonode/charts/*.tgz
+deployment/geonode/Chart.lock
