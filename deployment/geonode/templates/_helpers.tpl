@@ -1,18 +1,27 @@
+
+# # check if multiple database backends are active
+{{ $postgres_operator := index .Values "postgres-operator" "enabled" }}
+{{- if and (eq .Values.postgresql.enabled true) ( eq $postgres_operator true ) }}
+  {{- fail "Error, two Database backends enabled ..." }}
+{{- end }}
+
+
+
 {{- define "database_host" -}}
-{{ .Release.Name }}-postgresql:5432
+{{ .Release.Name }}-postgresql
 {{- end -}}
+
+
+{{- define "database_port" -}}
+5432
+{{- end -}}
+
 
 {{- define "rabbit_host" -}}
 {{ .Release.Name }}-rabbitmq:5672
 {{- end -}}
 
-{{- define "database_geonode" -}}
-postgis://{{ .Values.postgresql.geonodeDb }}:{{ .Values.postgresql.password }}@{{ include "database_host" .}}/{{ .Values.postgresql.geonodeDb }}
-{{- end -}}
 
-{{- define "database_geonode_data" -}}
-postgis://{{ .Values.postgresql.geodataDb }}:{{ .Values.postgresql.password }}@{{ include "database_host" .}}/{{ .Values.postgresql.geodataDb }}
-{{- end -}}
 
 {{- define "broker_url" -}}
 amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@{{ include "rabbit_host" . }}/
@@ -47,6 +56,7 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
       key: {{ $key | quote }}
 {{- end }}
 
+
 ########################
 # DJANGO CONFIGURATION #
 ########################
@@ -60,43 +70,6 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
   value: {{ .Values.general.externalDomain | quote }}
 - name: GEONODE_LB_PORT
   value: {{ .Values.general.externalPort | quote }}
-
-- name: POSTGRES_USER
-  value: postgres
-- name: POSTGRES_PASSWORD
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Release.Name }}-secrets
-      key: POSTGRES_PASSWORD
-- name: GEONODE_DATABASE
-  value: {{ .Values.postgresql.geonodeDb | quote }}
-- name: GEONODE_DATABASE_PASSWORD
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Release.Name }}-secrets
-      key: GEONODE_DATABASE_PASSWORD
-- name: GEONODE_GEODATABASE
-  value: {{ .Values.postgresql.geodataDb | quote }}
-- name: GEONODE_GEODATABASE_PASSWORD
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Release.Name }}-secrets
-      key: GEONODE_GEODATABASE_PASSWORD
-- name: GEONODE_DATABASE_SCHEMA
-  value: public
-- name: GEONODE_GEODATABASE_SCHEMA
-  value: public
-- name: DATABASE_URL
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Release.Name }}-secrets
-      key: DATABASE_URL
-- name: GEODATABASE_URL
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Release.Name }}-secrets
-      key: GEODATABASE_URL
-
 - name: GEONODE_DB_CONN_MAX_AGE
   value: '0'
 - name: GEONODE_DB_CONN_TOUT
@@ -115,6 +88,8 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
 
 - name: ALLOWED_HOSTS
   value: "['django', '*', '{{ .Values.general.externalDomain }}']"
+
+
 
 # Security
 
