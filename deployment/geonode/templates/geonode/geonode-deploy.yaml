@@ -31,8 +31,6 @@ spec:
         - tcp://{{ include "database_host" .}}:{{ include "database_port" .}}
         - -wait
         - tcp://{{ include "rabbit_host" .}}
-      # All containers need to be in the same pod since they share volumes!
-      # This also means they probably can't be scaled up... (?)
       containers:
       # This is the django app server
       - name: geonode
@@ -41,14 +39,11 @@ spec:
         - bash
         - -c
         - |
+
           # install dockerize...
           wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-          
-          # Add host alias since the scripts hardcode the db host as 'db' @##@?
-          echo "db {{ .Release.Name }}-postgresql" > /etc/host.aliases
-          export HOSTALIASES=/etc/host.aliases
 
           # Add config overrides
           cat /usr/src/geonode/geonode/local_settings.py >> /usr/src/geonode/geonode/settings.py
@@ -56,10 +51,6 @@ spec:
           # Setup
           touch /usr/src/app/invoke.log
           dockerize -stdout /usr/src/app/invoke.log /usr/src/app/entrypoint.sh
-
-          # run sync
-          # fixes issue that sessions ends instantly after login
-          paver sync
 
           # Run web server
           touch /var/log/geonode.log
@@ -137,7 +128,7 @@ spec:
             secretKeyRef:
               name: postgres.geonode-postgresql.credentials.postgresql.acid.zalan.do
               key: password
-        
+
         # TODO REMOVE THIS FROM wait-for-databases.sh
         #
         # DATABASE CREDENTIALS USED BY DJANGO
@@ -155,7 +146,7 @@ spec:
               name: geonode.geonode-postgresql.credentials.postgresql.acid.zalan.do
               key: password
         - name: DATABASE_URL
-          value: "postgis://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"        
+          value: "postgis://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"
         #
         # GEODATABASE CREDENTIALS USED BY GEOSERVER
         #
@@ -175,7 +166,7 @@ spec:
           value: "postgis://$(GEONODE_GEODATABASE):$(GEONODE_GEODATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_GEODATABASE)"
 
         {{- end }}
-        
+
         volumeMounts:
         - name: geonode-conf
           mountPath: /usr/src/geonode/geonode/local_settings.py
@@ -194,6 +185,10 @@ spec:
           subPath: data
         - name: cache-volume
           mountPath: /tmp
+        - name: task-py
+          mountPath: "/usr/src/app/tasks.py"
+          subPath: tasks.py
+          readOnly: true
         resources:
           requests:
             memory: 3Gi
@@ -270,6 +265,12 @@ spec:
       - name: persistence
         persistentVolumeClaim:
           claimName: pvc-{{ .Release.Name }}-geonode
+      - name: task-py
+        configMap:
+          name: tasks-py-configmap
+          items:
+          - key: tasks.py
+            path: "tasks.py"
       # Using an emptyDir to cache compiled statics... it will survive container crashes, but not pod restarts
       - name: cache-volume
         emptyDir: {}
