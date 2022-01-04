@@ -12,7 +12,7 @@ general:
   externalDomain: geonode
   externalScheme: http
   externalPort: 80
-  debug: false
+  debug: true
   # This user will have access to geonode UI but also the built-in Django admin interface (/admin)
   # Username is admin
   superUser:
@@ -31,7 +31,7 @@ ingress:
 global:
   # Will be used by this and all subcharts
   storageClass: standard
-
+  accessMode: ReadWriteMany
 
 #####################
 # STS CONFIGURATION #
@@ -275,3 +275,6 @@ rabbitmq:
     # Override these!
     password: 3asgDlgwN7
     erlangCookie: jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu
+  persistence:
+    enabled:  True
+    storageClass: "standard" 
