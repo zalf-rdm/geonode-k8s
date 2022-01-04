@@ -5,23 +5,17 @@
   {{- fail "Error, two Database backends enabled ..." }}
 {{- end }}
 
-
-
 {{- define "database_host" -}}
 {{ .Release.Name }}-postgresql
 {{- end -}}
-
 
 {{- define "database_port" -}}
 5432
 {{- end -}}
 
-
 {{- define "rabbit_host" -}}
 {{ .Release.Name }}-rabbitmq:5672
 {{- end -}}
-
-
 
 {{- define "broker_url" -}}
 amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@{{ include "rabbit_host" . }}/
@@ -89,10 +83,6 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
 - name: ALLOWED_HOSTS
   value: "['django', '*', '{{ .Values.general.externalDomain }}']"
 
-
-
-# Security
-
 # Admin Settings
 - name: ADMIN_USERNAME
   value: admin
@@ -137,7 +127,7 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
 - name: GEOSERVER_PUBLIC_SCHEMA
   value: {{ .Values.general.externalScheme | quote }}
 - name: GEOSERVER_LOCATION
-  value: "{{ include "public_url" . }}/geoserver/"
+  value: "{{ .Release.Name }}-geonode/geoserver/"
 - name: GEOSERVER_ADMIN_USER
   value: admin
 - name: GEOSERVER_ADMIN_PASSWORD
@@ -239,6 +229,7 @@ server {
     }
   }
 
+  # GeoNode Upload
   location /uploaded/ {
     alias /mnt/volumes/statics/uploaded/;
 
