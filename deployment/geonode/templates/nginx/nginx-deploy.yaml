@@ -12,8 +12,6 @@ spec:
   replicas: {{ .Values.nginx.replicas }}
   template:
     metadata:
-      annotations:
-        checksum/nginx: {{ include "nginx_conf" . | sha256sum }}
       labels:
         org.geonode.instance: {{ .Release.Name }}-nginx
     spec:

@@ -246,7 +246,7 @@ data:
     --settings={_localsettings()}", pty=True)
         ctx.run(f"python manage.py loaddata /tmp/default_oauth_apps_docker.json \
     --settings={_localsettings()}", pty=True)
-        ctx.run(f"python manage.py loaddata geonode/base/fixtures/initial_data.json \
+        ctx.run(f"python manage.py loaddata /usr/src/geonode/geonode/base/fixtures/initial_data.json \
     --settings={_localsettings()}", pty=True)
 
 
