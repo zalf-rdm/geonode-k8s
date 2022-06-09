@@ -1,0 +1,38 @@
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: geonode-postgresql
+spec:
+  teamId: "geonode"
+  volume:
+    size: 3Gi
+  numberOfInstances: 1
+  users:
+    postgres:
+    - superuser
+    geonode:
+    - superuser
+    - createdb
+    - login
+    geogeonode:
+    - superuser
+    - createdb
+    - login
+  databases:
+    geonode: geonode
+    geogeonode: geogeonode
+  preparedDatabases:
+    geogeonode:
+      schemas:
+        public: {}
+      extensions:
+        pg_partman: public
+        postgis: public
+    geonode:
+      schemas:
+        public: {}
+      extensions:
+        pg_partman: public
+        postgis: public
+  postgresql:
+    version: "13"

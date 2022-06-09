@@ -1,9 +1,15 @@
 dependencies:
+- name: postgres-operator-ui
+  repository: https://opensource.zalando.com/postgres-operator/charts/postgres-operator-ui/
+  version: 1.8.1
+- name: postgres-operator
+  repository: https://opensource.zalando.com/postgres-operator/charts/postgres-operator/
+  version: 1.8.1
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami
   version: 10.1.4
 - name: rabbitmq
   repository: https://charts.bitnami.com/bitnami
-  version: 8.6.4
-digest: sha256:ceddcd3499d613ee83cd1bc843517ef09d1021e3f32c1f7fe620df86e267421d
-generated: "2021-02-09T10:06:07.7240304+03:00"
+  version: 9.0.8
+digest: sha256:4478e2bed591edaf0e8fe4568a285d32707a0a41be123d0e20b7d08bc3638a89
+generated: "2022-06-01T14:52:47.85053357+02:00"

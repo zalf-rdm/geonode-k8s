@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-nginx-ingress
+spec:
+  ingressClassName: {{ .Values.geonode.ingress.ingressClassName }}
+  rules:
+  - host: {{ .Values.geonode.ingress.hostname }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: {{ .Release.Name }}-nginx
+            port: 
+              number: {{ .Values.geonode.ingress.externalPort }}

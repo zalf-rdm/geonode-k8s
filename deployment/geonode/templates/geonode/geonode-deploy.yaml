@@ -28,21 +28,13 @@ spec:
         args:
         - -timeout=120s
         - -wait
-        - tcp://{{ include "database_host" .}}
+        - tcp://{{ include "database_host" .}}:{{ include "database_port" .}}
         - -wait
         - tcp://{{ include "rabbit_host" .}}
-      # All containers need to be in the same pod since they share volumes!
-      # This also means they probably can't be scaled up... (?)
       containers:
       # This is the django app server
       - name: geonode
         image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
-        env:
-        {{ include "env_general" . | nindent 8 }}
-        - name: IS_CELERY
-          value: 'False'
-        - name: DOCKERIZE_VERSION
-          value: v0.6.1
         command:
         - bash
         - -c
@@ -51,30 +43,132 @@ spec:
           wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-          
-          # Add host alias since the scripts hardcode the db host as 'db' @##@?
-          echo "db {{ .Release.Name }}-postgresql" > /etc/host.aliases
-          export HOSTALIASES=/etc/host.aliases
 
           # Add config overrides
           cat /usr/src/geonode/geonode/local_settings.py >> /usr/src/geonode/geonode/settings.py
 
           # Setup
-          touch /usr/src/app/invoke.log
-          dockerize -stdout /usr/src/app/invoke.log /usr/src/app/entrypoint.sh
-
-          # run sync
-          # fixes issue that sessions ends instantly after login
-          paver sync
+          touch /usr/src/geonode/invoke.log
+          dockerize -stdout /usr/src/geonode/invoke.log /usr/src/geonode/entrypoint.sh
 
           # Run web server
           touch /var/log/geonode.log
-          dockerize -stdout /var/log/geonode.log /usr/local/bin/uwsgi --ini /usr/src/app/uwsgi.ini
+          dockerize -stdout /var/log/geonode.log /usr/local/bin/uwsgi --ini /usr/src/geonode/uwsgi.ini
         ports:
         - containerPort: 8000
         - containerPort: 8001
+        env:
+        {{ include "env_general" . | nindent 8 }}
+        - name: IS_CELERY
+          value: 'False'
+        - name: DOCKERIZE_VERSION
+          value: v0.6.1
+
+        ##########################
+        # DATABASE CONFIGURATION #
+        ##########################
+
+        # Postgresql configuration
+        {{ $postgres_operator := index .Values "postgres-operator" "enabled" }}
+        {{ if (eq .Values.postgresql.enabled true) }}
+
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-secrets
+              key: POSTGRES_PASSWORD
+        - name: GEONODE_DATABASE
+          value: {{ .Values.postgresql.geonodeDb | quote }}
+        - name: GEONODE_DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-secrets
+              key: GEONODE_DATABASE_PASSWORD
+        - name: GEONODE_GEODATABASE
+          value: {{ .Values.postgresql.geodataDb | quote }}
+        - name: GEONODE_GEODATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-secrets
+              key: GEONODE_GEODATABASE_PASSWORD
+        - name: GEONODE_DATABASE_SCHEMA
+          value: public
+        - name: GEONODE_GEODATABASE_SCHEMA
+          value: public
+        - name: DATABASE_URL
+          value: postgis://{{ .Values.postgresql.geonodeDb }}:{{ .Values.postgresql.password }}@{{ include "database_host" .}}:{{ include "database_port" .}}/{{ .Values.postgresql.geonodeDb }}
+        - name: GEODATABASE_URL
+          value: postgis://{{ .Values.postgresql.geodataDb }}:{{ .Values.postgresql.password }}@{{ include "database_host" .}}:{{ include "database_port" .}}/{{ .Values.postgresql.geodataDb }}
+        - name: DATABASE_HOST
+          value: {{ include "database_host" .}}
+        - name: DATABASE_PORT
+          value: {{ include "database_port" .}}
+
+        {{ else if (eq $postgres_operator true) }}
+
+        # patroni login credentials from
+        # {username}.{team}-{clustername}.credentials.postgresql.acid.zalan.do
+        # requires to be variables
+        # geogenode database
+        - name: DATABASE_HOST
+          value: "$(GEONODE_POSTGRESQL_SERVICE_HOST)"
+        - name: DATABASE_PORT
+          value: "$(GEONODE_POSTGRESQL_SERVICE_PORT)"
+
+        # Postgres superuser
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres.geonode-postgresql.credentials.postgresql.acid.zalan.do
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres.geonode-postgresql.credentials.postgresql.acid.zalan.do
+              key: password
+
+        # TODO REMOVE THIS FROM wait-for-databases.sh
+        #
+        # DATABASE CREDENTIALS USED BY DJANGO
+        #
+        # geonode database/user
+        - name: GEONODE_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: geonode.geonode-postgresql.credentials.postgresql.acid.zalan.do
+              key: username
+        # geonode user password
+        - name: GEONODE_DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: geonode.geonode-postgresql.credentials.postgresql.acid.zalan.do
+              key: password
+        - name: DATABASE_URL
+          value: "postgis://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"
+        #
+        # GEODATABASE CREDENTIALS USED BY GEOSERVER
+        #
+        # geogeonode database/user
+        - name: GEONODE_GEODATABASE
+          valueFrom:
+            secretKeyRef:
+              name: geogeonode.geonode-postgresql.credentials.postgresql.acid.zalan.do
+              key: username
+        # geonode user password
+        - name: GEONODE_GEODATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: geogeonode.geonode-postgresql.credentials.postgresql.acid.zalan.do
+              key: password
+        - name: GEODATABASE_URL
+          value: "postgis://$(GEONODE_GEODATABASE):$(GEONODE_GEODATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_GEODATABASE)"
+
+        {{ end }}
+
         volumeMounts:
-        - name: geonode-conf
+        - name: geonode-local-settings-extra
           mountPath: /usr/src/geonode/geonode/local_settings.py
           subPath: local_settings.py
         - name: persistence
@@ -91,20 +185,27 @@ spec:
           subPath: data
         - name: cache-volume
           mountPath: /tmp
-        resources:
-          requests:
-            memory: 3Gi
-            cpu: 100m
-          limits:
-            memory: 4Gi
-            cpu: 1000m
-        livenessProbe:
-          tcpSocket:
-            port: 8000
-          initialDelaySeconds: 1200
-          periodSeconds: 10
-          failureThreshold: 15
+        - name: task-py
+          mountPath: "/usr/src/geonode/tasks.py"
+          subPath: tasks.py
+          readOnly: true
+        # resources:
+        #   requests:
+        #     memory: 3Gi
+        #     cpu: 100m
+        #   limits:
+        #     memory: 4Gi
+        #     cpu: 1000m
+        # livenessProbe:
+        #   tcpSocket:
+        #     port: 8000
+        #   initialDelaySeconds: 1200
+        #   periodSeconds: 10
+        #   failureThreshold: 15
       # # Celery is the task worker
+      
+      {{ if (eq .Values.geonode.celery.enabled true) }}
+      
       - name: celery
         image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
         env:
@@ -123,8 +224,8 @@ spec:
             && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
           
           # Add host alias since the scripts hardcode the db host as 'db' @##@?
-          echo "db {{ .Release.Name }}-postgresql" > /etc/host.aliases
-          export HOSTALIASES=/etc/host.aliases
+          # echo "db {{ .Release.Name }}-postgresql" > /etc/host.aliases
+          # export HOSTALIASES=/etc/host.aliases
 
           # Setup
           touch /usr/src/app/invoke.log
@@ -150,23 +251,28 @@ spec:
         ports:
         - containerPort: 5555
         # healthcheck: curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8001/
-        resources:
-          requests:
-            memory: 1Gi
-            cpu: 100m
-          limits:
-            memory: 2Gi
-            cpu: 400m
+        # resources:
+        #   requests:
+        #     memory: 1Gi
+        #     cpu: 100m
+        #   limits:
+        #     memory: 2Gi
+        #     cpu: 400m
+        {{ end }}
+
       volumes:
-      - name: geoserver-conf
+      - name: geonode-local-settings-extra
         configMap:
-          name: {{ .Release.Name }}-geoserver-conf
-      - name: geonode-conf
-        configMap:
-          name: {{ .Release.Name }}-geonode-conf
+          name: {{ .Release.Name }}-geonode-local-settings-extra
       - name: persistence
         persistentVolumeClaim:
           claimName: pvc-{{ .Release.Name }}-geonode
+      - name: task-py
+        configMap:
+          name: {{ .Release.Name }}-geonode-tasks-py
+          items:
+          - key: tasks.py
+            path: "tasks.py"
       # Using an emptyDir to cache compiled statics... it will survive container crashes, but not pod restarts
       - name: cache-volume
         emptyDir: {}

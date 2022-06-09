@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-geoserver-env
+  namespace: {{ .Release.Namespace }}
+data:
+  GEONODE_LB_HOST_IP: {{ .Values.general.externalDomain | quote }}
+  GEONODE_LB_PORT: {{ .Values.general.externalPort | quote }}
+  GEONODE_HOST_IP: localhost
+  PUBLIC_PORT: {{ .Values.general.externalPort | quote }}
+  DJANGO_URL: http://{{ .Release.Name }}-geonode/
+  ENABLE_JSONP: 'true'
+  outFormat: text/javascript
+  GEOSERVER_JAVA_OPTS: "-Djava.awt.headless=true -Xms2G -Xmx4G -XX:+UnlockDiagnosticVMOptions -XX:+LogVMOutput -XX:LogFile=/var/log/jvm.log -XX:PerfDataSamplingInterval=500 -XX:SoftRefLRUPolicyMSPerMB=36000 -XX:-UseGCOverheadLimit -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:ParallelGCThreads=4 -Dfile.encoding=UTF8 -Djavax.servlet.request.encoding=UTF-8 -Djavax.servlet.response.encoding=UTF-8 -Duser.timezone=GMT -Dorg.geotools.shapefile.datetime=false -DGEOSERVER_CSRF_DISABLED=true -DPRINT_BASE_URL=http://localhost/geoserver/pdf -DALLOW_ENV_PARAMETRIZATION=true -Xbootclasspath/a:/usr/local/tomcat/webapps/geoserver/WEB-INF/lib/marlin-0.9.3-Unsafe.jar -Dsun.java2d.renderer=org.marlin.pisces.MarlinRenderingEngine"
+  NGINX_BASE_URL: "{{ include "public_url" . }}/"

@@ -10,5 +10,4 @@ spec:
   ports:
   - targetPort: 80
     port: 80
-    name: www
-  type: {{ .Values.general.serviceType }}
+  type: {{ .Values.nginx.serviceType }}
