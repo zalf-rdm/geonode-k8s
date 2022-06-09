@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-geonode-local-settings-extra
+  namespace: {{ .Release.Namespace }}
+data:
+  local_settings.py: |
+    # From helm chart basic conf
+    {{ .Values.geonode.extraConf | nindent 4 }}
+
+    # From helm chart extra conf
+    {{ .Values.geonode.extraConf2 | nindent 4 }}

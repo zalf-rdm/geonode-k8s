@@ -19,18 +19,11 @@ general:
     password: geonode
     email: support@example.com
   supportEmail: support@example.com
-  storageSize: 2Gi
   serviceType: ClusterIP
 
-ingress:
-  enabled: false
-  # Those are passed straight to the ingress
-  annotations: {}
-  tls: {}
-
 global:
+  storageClass: 
   # Will be used by this and all subcharts
-  storageClass: standard
   accessMode: ReadWriteMany
 
 #####################
@@ -39,14 +32,23 @@ global:
 
 # CONFIGURATION FOR GEONODE DEPLOYMENT
 geonode:
+  persistant:
+    storageSize: 2Gi
   image:
-    name: geonode/geonode
-    tag: '3.1'
+    name: zalf/geonode
+    tag: '4.x'
+  
+  celery:
+    enabled: False
+
+  ingress:
+    ingressClassName:
+    hostname: geonode
+    externalPort: 80
   # You can use this to pass any env from https://docs.geonode.org/en/master/basic/settings/index.html
+  
   extraEnvs:
-
     # GEONODE ENV VARS
-
     CLIENT_RESULTS_LIMIT: '25'
     SOCIALACCOUNT_WITH_GEONODE_LOCAL_SINGUP: "False"
     C_FORCE_ROOT: '1'
@@ -85,7 +87,7 @@ geonode:
     DJANGO_SETTINGS_MODULE: geonode.settings
     DEFAULT_BACKEND_DATASTORE: datastore
 
-    ASYNC_SIGNALS: 'True'
+    ASYNC_SIGNALS: 'False'
 
     STATIC_ROOT: /mnt/volumes/statics/static/
     MEDIA_ROOT: /mnt/volumes/statics/uploaded/
@@ -125,11 +127,10 @@ geonode:
     MODIFY_TOPICCATEGORY: 'True'
     AVATAR_GRAVATAR_SSL: 'True'
     AVATAR_DEFAULT_URL: /geonode/img/avatar.png
-
     EXIF_ENABLED: 'True'
     CREATE_LAYER: 'True'
     FAVORITE_ENABLED: 'True'
-
+    
   # Extra env vars to pass to geonode container - will be passed as a secret
   extraSecretEnvs: {}
   # Can be used to configure new base maps or any other setting from https://github.com/GeoNode/geonode/blob/master/geonode/settings.py
@@ -203,8 +204,9 @@ geonode:
 # CONFIGURATION FOR GEOSERVER DEPLOYMENT
 geoserver:
   image:
-    name: geonode/geoserver
-    tag: '2.18.2'
+    name: zalf/geoserver
+    tag: '2.19.6' 
+  
   # A list of one-line custom EPSGs to add to GeoServer
   # see https://docs.geoserver.org/stable/en/user/configuration/crshandling/customcrs.html
   customEPSGs:
@@ -215,23 +217,28 @@ geoserver:
 # CONFIGURATION FOR NGINX DEPLOYMENT
 # MAY MOVE TO CHART
 nginx:
+  serviceType: LoadBalancer
   replicas: 1
   image:
     name: nginx
     tag: '1.20'
-
 
 ########################
 # CHART CONFIGURATIONS #
 ########################
 
 # VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator/values.yaml
+
+# TODO (mwall) make all configurations available in manifest
 postgres-operator:
+  operatorApiUrl: "http://{{ .Release.Name }}-postgres-operator:8080"
   enabled: true
   configLoggingRestApi:
   # REST API listener listens to this port
   api_port: 8080
-  # number of entries
+  storageSize: 3Gi
+  storageClass: 
+  numberOfInstances: 1
 
 # VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml
 postgres-operator-ui:
@@ -245,17 +252,22 @@ postgres-operator-ui:
   service:
     type: LoadBalancer
     port: 80
-
+  
+  ingress:
+    enabled: False
+    ingressClassName: nginx
+    hosts:
+      - host: postgres-ui
+        paths: [""]
 
 # VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/postgresql/values.yaml
 postgresql:
-  enabled: false
+  enabled: False
   
   # The usernames will be the same as the database names
   geonodeDb: geonode
   geodataDb: geonode_data
-  # Override this!
-  password: Uxu3UhxFmK
+  password: # PLS SET IF ACTICATED 
 
   # TODO: support external db
   # For now we only support a db installed with a subchart
@@ -271,10 +283,8 @@ postgresql:
 rabbitmq:
   enabled: true
   auth:
-    username: user
-    # Override these!
-    password: 3asgDlgwN7
+    username: rabbituser
+    password: # PLS SET
     erlangCookie: jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu
   persistence:
-    enabled:  True
-    storageClass: "standard" 
+    enabled:  False

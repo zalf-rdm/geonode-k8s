@@ -28,7 +28,7 @@ spec:
         - name: persistence
           mountPath: /mnt/volumes/statics
           subPath: statics
-        - name: geonode-conf
+        - name: geonode-favicon
           mountPath: /mnt/volumes/statics/static/geonode/img/favicon.ico
           subPath: favicon.ico
         - name: nginx-confd
@@ -44,9 +44,9 @@ spec:
       - name: nginx-confd
         configMap:
           name: {{ .Release.Name }}-nginx-confd
-      - name: geonode-conf
+      - name: geonode-favicon
         configMap:
-          name: {{ .Release.Name }}-geonode-conf
+          name: {{ .Release.Name }}-geonode-favicon
       - name: persistence
         persistentVolumeClaim:
           claimName: pvc-{{ .Release.Name }}-geonode

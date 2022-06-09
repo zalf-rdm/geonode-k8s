@@ -48,12 +48,12 @@ spec:
           cat /usr/src/geonode/geonode/local_settings.py >> /usr/src/geonode/geonode/settings.py
 
           # Setup
-          touch /usr/src/app/invoke.log
-          dockerize -stdout /usr/src/app/invoke.log /usr/src/app/entrypoint.sh
+          touch /usr/src/geonode/invoke.log
+          dockerize -stdout /usr/src/geonode/invoke.log /usr/src/geonode/entrypoint.sh
 
           # Run web server
           touch /var/log/geonode.log
-          dockerize -stdout /var/log/geonode.log /usr/local/bin/uwsgi --ini /usr/src/app/uwsgi.ini
+          dockerize -stdout /var/log/geonode.log /usr/local/bin/uwsgi --ini /usr/src/geonode/uwsgi.ini
         ports:
         - containerPort: 8000
         - containerPort: 8001
@@ -63,6 +63,7 @@ spec:
           value: 'False'
         - name: DOCKERIZE_VERSION
           value: v0.6.1
+
         ##########################
         # DATABASE CONFIGURATION #
         ##########################
@@ -164,10 +165,10 @@ spec:
         - name: GEODATABASE_URL
           value: "postgis://$(GEONODE_GEODATABASE):$(GEONODE_GEODATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_GEODATABASE)"
 
-        {{- end }}
+        {{ end }}
 
         volumeMounts:
-        - name: geonode-conf
+        - name: geonode-local-settings-extra
           mountPath: /usr/src/geonode/geonode/local_settings.py
           subPath: local_settings.py
         - name: persistence
@@ -185,23 +186,26 @@ spec:
         - name: cache-volume
           mountPath: /tmp
         - name: task-py
-          mountPath: "/usr/src/app/tasks.py"
+          mountPath: "/usr/src/geonode/tasks.py"
           subPath: tasks.py
           readOnly: true
-        resources:
-          requests:
-            memory: 3Gi
-            cpu: 100m
-          limits:
-            memory: 4Gi
-            cpu: 1000m
-        livenessProbe:
-          tcpSocket:
-            port: 8000
-          initialDelaySeconds: 1200
-          periodSeconds: 10
-          failureThreshold: 15
+        # resources:
+        #   requests:
+        #     memory: 3Gi
+        #     cpu: 100m
+        #   limits:
+        #     memory: 4Gi
+        #     cpu: 1000m
+        # livenessProbe:
+        #   tcpSocket:
+        #     port: 8000
+        #   initialDelaySeconds: 1200
+        #   periodSeconds: 10
+        #   failureThreshold: 15
       # # Celery is the task worker
+      
+      {{ if (eq .Values.geonode.celery.enabled true) }}
+      
       - name: celery
         image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
         env:
@@ -247,26 +251,25 @@ spec:
         ports:
         - containerPort: 5555
         # healthcheck: curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8001/
-        resources:
-          requests:
-            memory: 1Gi
-            cpu: 100m
-          limits:
-            memory: 2Gi
-            cpu: 400m
+        # resources:
+        #   requests:
+        #     memory: 1Gi
+        #     cpu: 100m
+        #   limits:
+        #     memory: 2Gi
+        #     cpu: 400m
+        {{ end }}
+
       volumes:
-      - name: geoserver-conf
+      - name: geonode-local-settings-extra
         configMap:
-          name: {{ .Release.Name }}-geoserver-conf
-      - name: geonode-conf
-        configMap:
-          name: {{ .Release.Name }}-geonode-conf
+          name: {{ .Release.Name }}-geonode-local-settings-extra
       - name: persistence
         persistentVolumeClaim:
           claimName: pvc-{{ .Release.Name }}-geonode
       - name: task-py
         configMap:
-          name: tasks-py-configmap
+          name: {{ .Release.Name }}-geonode-tasks-py
           items:
           - key: tasks.py
             path: "tasks.py"

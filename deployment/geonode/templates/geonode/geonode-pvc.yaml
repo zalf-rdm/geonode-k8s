@@ -9,4 +9,4 @@ spec:
   storageClassName: {{ .Values.global.storageClass }}
   resources:
     requests:
-      storage: {{ .Values.general.storageSize }}
+      storage: {{ .Values.geonode.persistant.storageSize }}

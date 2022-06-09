@@ -28,13 +28,11 @@ spec:
       extensions:
         pg_partman: public
         postgis: public
-        postgis_topology: public
     geonode:
       schemas:
         public: {}
       extensions:
         pg_partman: public
         postgis: public
-        postgis_topology: public
   postgresql:
     version: "13"

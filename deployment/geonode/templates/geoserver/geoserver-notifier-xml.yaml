@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-geoserver-conf
+  name: {{ .Release.Name }}-geoserver-notifier-xml
   namespace: {{ .Release.Namespace }}
 data:
   notifier.xml: |

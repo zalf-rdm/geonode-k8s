@@ -42,55 +42,21 @@ spec:
         - name: persistence
           mountPath: /geoserver_data/data
           subPath: geoserver-data-dir
-        - name: geoserver-conf
+        - name: geoserver-notifier-xml
           mountPath: /overrides
 
       containers:
       - name: geoserver
         image: "{{ .Values.geoserver.image.name }}:{{ .Values.geoserver.image.tag }}"
-        env:
+        # command: 
+        #   - tail
+        #   - -f
+        #   - /dev/null
         ports:
         - containerPort: 8080
-        env:
-        # - name: DOCKERHOST
-        #   value: 
-        - name: GEONODE_LB_HOST_IP
-          value: {{ .Values.general.externalDomain | quote }}
-        - name: GEONODE_LB_PORT
-          value: {{ .Values.general.externalPort | quote }}
-        - name: GEONODE_HOST_IP
-          value: localhost
-        - name: PUBLIC_PORT
-          value: {{ .Values.general.externalPort | quote }}
-        # - name: DOCKER_HOST_IP
-        #   value: 
-        - name: DJANGO_URL
-          value: http://{{ .Release.Name }}-geonode/
-        - name: ENABLE_JSONP
-          value: 'true'
-        - name: outFormat
-          value: text/javascript
-        - name: GEOSERVER_JAVA_OPTS
-          value: |
-            -Djava.awt.headless=true 
-            -Xms2G 
-            -Xmx4G 
-            -XX:PerfDataSamplingInterval=500 
-            -XX:SoftRefLRUPolicyMSPerMB=36000 
-            -XX:-UseGCOverheadLimit 
-            -XX:+UseConcMarkSweepGC 
-            -XX:+UseParNewGC 
-            -XX:ParallelGCThreads=4 
-            -Dfile.encoding=UTF8 
-            -Djavax.servlet.request.encoding=UTF-8 
-            -Djavax.servlet.response.encoding=UTF-8 
-            -Duser.timezone=GMT 
-            -Dorg.geotools.shapefile.datetime=false 
-            -DGEOSERVER_CSRF_DISABLED=true 
-            -DPRINT_BASE_URL=http://{{ .Release.Name }}-geoserver:8080/geoserver/pdf        
-        
-        - name: NGINX_BASE_URL
-          value: "{{ include "public_url" . }}/"
+        envFrom:
+          - configMapRef:
+              name: {{ .Release.Name }}-geoserver-env
         volumeMounts:
         - name: persistence
           mountPath: /geoserver_data/data
@@ -107,17 +73,17 @@ spec:
           initialDelaySeconds: 180
           periodSeconds: 5
           failureThreshold: 15
-        resources:
-          requests:
-            memory: 2Gi
-            cpu: 100m
-          limits:
-            memory: 4Gi
-            cpu: 400m
+        # resources:
+        #   requests:
+        #     memory: 2Gi
+        #     cpu: 100m
+        #   limits:
+        #     memory: 4Gi
+        #     cpu: 400m
       volumes:
-      - name: geoserver-conf
+      - name: geoserver-notifier-xml
         configMap:
-          name: {{ .Release.Name }}-geoserver-conf
+          name: {{ .Release.Name }}-geoserver-notifier-xml
       - name: persistence
         persistentVolumeClaim:
           claimName: pvc-{{ .Release.Name }}-geonode
