@@ -59,10 +59,6 @@ spec:
         - containerPort: 8001
         env:
         {{ include "env_general" . | nindent 8 }}
-        - name: IS_CELERY
-          value: 'False'
-        - name: DOCKERIZE_VERSION
-          value: v0.6.1
 
         ##########################
         # DATABASE CONFIGURATION #
