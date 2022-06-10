@@ -4,12 +4,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-geoserver-env
+  name: {{ .Release.Name }}-geonode-env
   namespace: {{ .Release.Namespace }}
 data:
-  IS_CELERY: 'False'
-  DOCKERIZE_VERSION: v0.6.1
-  DEBUG: {{ include "boolean2str" .Values.general.debug | quote }}
+  IS_CELERY: "False"
+  DOCKERIZE_VERSION: "v0.6.1"
+  DEBUG: {{ include "boolean2str" .Values.geonode.general.debug | quote }}
   CLIENT_RESULTS_LIMIT: '25'
   SOCIALACCOUNT_WITH_GEONODE_LOCAL_SINGUP: "False"
   C_FORCE_ROOT: '1'
@@ -17,7 +17,7 @@ data:
   API_LIMIT_PER_PAGE: {{ .Values.geonode.general.api_limit_per_page | quote }}
   # GeoNode APIs
   API_LOCKDOWN: 'False'
-  TASTYPIE_APIKEY:
+  TASTYPIE_APIKEY: ""
   # TODO (mwall) set this automatically with helm magics
   IS_FIRST_START: 'True'
   FORCE_REINIT: 'False'
@@ -25,30 +25,32 @@ data:
   ASYNC_SIGNALS: 'False'
   CACHE_BUSTING_STATIC_ENABLED: 'False'
   CACHE_BUSTING_MEDIA_ENABLED: 'False'
+  DOCKER_ENV: production
+
 
   GEONODE_INSTANCE_NAME: {{ .Release.Name }}
-  GEONODE_LB_HOST_IP: {{ .Values.general.externalDomain | quote }}
-  GEONODE_LB_PORT: {{ .Values.general.externalPort | quote }}
+  GEONODE_LB_HOST_IP: {{ .Values.geonode.ingress.externalDomain | quote }}
+  GEONODE_LB_PORT: {{ .Values.geonode.ingress.externalPort | quote }}
   GEONODE_DB_CONN_MAX_AGE: '0'
   GEONODE_DB_CONN_TOUT: '5'
 
   # Rabbitmq
-  BROKER_URL: {{ include "broker_url" . | quote }}
+  BROKER_URL: "{{ include "broker_url" . }}"
 
   # DJANGO SITE CONF
   SITEURL: "{{ include "public_url" . }}/"
-  SITE_HOST_SCHEMA: {{ .Values.general.externalScheme | quote }}
-  ALLOWED_HOSTS: "['django', '*', '{{ .Values.general.externalDomain }}']"
+  SITE_HOST_SCHEMA: {{ .Values.geonode.ingress.externalScheme | quote }}
+  ALLOWED_HOSTS: "['django', '*', '{{ .Values.geonode.ingress.externalDomain }}']"
   PROXY_ALLOWED_HOSTS: 'localhost,django,geonode,geoserver,spatialreference.org,nominatim.openstreetmap.org,dev.openlayers.org'
 
   # Admin Settings
   ADMIN_USERNAME: admin
   # admin password in secret
-  ADMIN_EMAIL: {{ .Values.geonode.mail.superUser.email | quote }}
-  ADMIN_PASSWORD: {{ .Values.general.superUser.password | quote }}
+  ADMIN_EMAIL: {{ .Values.geonode.general.superUser.email | quote }}
+  ADMIN_PASSWORD: {{ .Values.geonode.general.superUser.password | quote }}
 
   # EMAIL Notifications
-  EMAIL_ENABLE:  {{ .Values.geonode.mail.enabled | quote }}
+  EMAIL_ENABLE:  {{  include "boolean2str" .Values.geonode.mail.enabled | quote }}
   DJANGO_EMAIL_BACKEND: {{ .Values.geonode.mail.backend | quote }}
   DJANGO_EMAIL_HOST: {{ .Values.geonode.mail.host | quote }}
   DJANGO_EMAIL_PORT: {{ .Values.geonode.mail.port | quote }}
@@ -56,7 +58,7 @@ data:
   DJANGO_EMAIL_HOST_PASSWORD: {{ .Values.geonode.mail.password | quote }}
 
   DJANGO_EMAIL_USE_TLS: {{ include "boolean2str" .Values.geonode.mail.tls | quote }}
-  DJANGO_EMAIL_USE_SSL: {{ .Values.geonode.mail.use_ssl | quote }}
+  DJANGO_EMAIL_USE_SSL: {{ include "boolean2str" .Values.geonode.mail.use_ssl | quote }}
   DEFAULT_FROM_EMAIL: {{ .Values.geonode.mail.from | quote }}
 
   # PATH
@@ -85,9 +87,9 @@ data:
 
   # OAuth2
   # TODO (mwall) implement OAUTH2
-  OAUTH2_API_KEY:
-  OAUTH2_CLIENT_ID:
-  OAUTH2_CLIENT_SECRET:
+  OAUTH2_API_KEY: ""
+  OAUTH2_CLIENT_ID: ""
+  OAUTH2_CLIENT_SECRET: ""
 
   DJANGO_SETTINGS_MODULE: geonode.settings
   DEFAULT_BACKEND_DATASTORE: datastore
@@ -96,23 +98,23 @@ data:
   TIME_ENABLED: 'True'
   MOSAIC_ENABLED: 'False'
 
-  HAYSTACK_SEARCH: {{ .Values.geonode.haystack.search | quote }}
+  HAYSTACK_SEARCH: {{ include "boolean2str" .Values.geonode.haystack.enabled | quote }}
   HAYSTACK_ENGINE_URL: {{ .Values.geonode.haystack.engine_url | quote }}
   HAYSTACK_ENGINE_INDEX_NAME: {{ .Values.geonode.haystack.engine_index_name | quote }}
   HAYSTACK_SEARCH_RESULTS_PER_PAGE: {{ .Values.geonode.haystack.search_results_per_page | quote }}
 
-  MEMCACHED_ENABLED: {{ .Values.geonode.memcached.enabled | quote }}
+  MEMCACHED_ENABLED: {{  include "boolean2str" .Values.geonode.memcached.enabled | quote }}
   MEMCACHED_BACKEND: django.core.cache.backends.memcached.MemcachedCache
   MEMCACHED_LOCATION: {{ .Release.Name }}-memcached
   MEMCACHED_LOCK_EXPIRE: {{ .Values.geonode.memcached.lock_expire | quote }}
   MEMCACHED_LOCK_TIMEOUT: {{ .Values.geonode.memcached.lock_timeout | quote }}
 
   # Monitoring
-  MONITORING_ENABLED: {{ .Values.geonode.monitoring.enabled | quote }}
+  MONITORING_ENABLED: {{  include "boolean2str" .Values.geonode.monitoring.enabled | quote }}
   MONITORING_DATA_TTL: {{ .Values.geonode.monitoring.data_tls | quote }}
-  USER_ANALYTICS_ENABLED: {{ .Values.geonode.monitoring.user_analytics_enabled | quote }}
-  USER_ANALYTICS_GZIP: {{ .Values.geonode.monitoring.user_analytics_gzip | quote }}
-  CENTRALIZED_DASHBOARD_ENABLED: {{ .Values.geonode.monitoring.centralized_dashboard_enabled | quote }}
+  USER_ANALYTICS_ENABLED: {{  include "boolean2str" .Values.geonode.monitoring.user_analytics_enabled | quote }}
+  USER_ANALYTICS_GZIP: {{  include "boolean2str" .Values.geonode.monitoring.user_analytics_gzip | quote }}
+  CENTRALIZED_DASHBOARD_ENABLED: {{  include "boolean2str" .Values.geonode.monitoring.centralized_dashboard_enabled | quote }}
   MONITORING_SERVICE_NAME: {{ .Release.Name }}-geonode-monitoring
   MONITORING_HOST_NAME: {{ .Release.Name }}-geonode-monitoring
 
@@ -123,3 +125,19 @@ data:
   EXIF_ENABLED: 'True'
   CREATE_LAYER: 'True'
   FAVORITE_ENABLED: 'True'
+
+  # GEOSERVER CONFIGURATION #
+  GEOSERVER_WEB_UI_LOCATION: "{{ include "public_url" . }}/geoserver/"
+  GEOSERVER_PUBLIC_LOCATION: "{{ include "public_url" . }}/geoserver/"
+  GEOSERVER_PUBLIC_SCHEMA: {{ .Values.geonode.ingress.externalScheme | quote }}
+  GEOSERVER_LOCATION: "http://{{ .Release.Name }}-geoserver:8080/geoserver/"
+  GEOSERVER_ADMIN_USER: {{ .Values.geoserver.admin_password | quote }}
+  GEOSERVER_ADMIN_PASSWORD: {{ .Values.geoserver.admin_password | quote }}
+
+  OGC_REQUEST_TIMEOUT: '30'
+  OGC_REQUEST_MAX_RETRIES: '1'
+  OGC_REQUEST_BACKOFF_FACTOR: '0.3'
+  OGC_REQUEST_POOL_MAXSIZE: '10'
+  OGC_REQUEST_POOL_CONNECTIONS: '10'
+  # GIS Client
+  GEONODE_CLIENT_LAYER_PREVIEW_LIBRARY: mapstore

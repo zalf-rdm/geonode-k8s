@@ -1,18 +1,5 @@
 
 
-general:
-  externalDomain: geonode
-  externalScheme: http
-  externalPort: 80
-  debug: true
-  # This user will have access to geonode UI but also the built-in Django admin interface (/admin)
-  # Username is admin
-  superUser:
-    password: geonode
-    email: support@example.com
-  supportEmail: support@example.com
-  serviceType: ClusterIP
-
 global:
   storageClass: 
   # Will be used by this and all subcharts
@@ -29,14 +16,21 @@ geonode:
   image:
     name: zalf/geonode
     tag: '4.x'
+  
   ingress:
+    enabled: True
     ingressClassName:
-    hostname: geonode
+    externalScheme: http
+    externalDomain: geonode
     externalPort: 80
   
   general:
     max_document_size: 10
     api_limit_per_page: 1000
+    debug: False
+    superUser:
+      password: geonode
+      email: support@example.com
 
   mail:
     enabled: False
@@ -45,12 +39,12 @@ geonode:
     port: '587'
     tls: true
     use_ssl: False
-    user:
+    user: "changeme"
     password: "changeme"
-    from:
+    from: "changeme@web.de"
   # TODO add haystack chart
   haystack:
-    search: False
+    enabled: False
     engine_url: http://elasticsearch:9200/
     engine_index_name: haystack
     search_results_per_page: '200'
@@ -59,6 +53,7 @@ geonode:
     enabled: False
     lock_expire: '3600'
     lock_timeout: '10'
+  
   monitoring:
     enabled: False
     data_tls: 365
@@ -140,6 +135,7 @@ geoserver:
     name: zalf/geoserver
     tag: '2.19.6' 
   
+  admin_password: "geoserver"
   # A list of one-line custom EPSGs to add to GeoServer
   # see https://docs.geoserver.org/stable/en/user/configuration/crshandling/customcrs.html
   customEPSGs:

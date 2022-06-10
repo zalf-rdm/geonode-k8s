@@ -11,10 +11,9 @@ spec:
   - targetPort: 8000
     port: 8000
     name: geonode
-    
-  # - targetPort: 8001
-  #   port: 8001
-  #   name: geonode-liveprobe
+  - targetPort: 8001
+    port: 8001
+    name: geonode-liveprobe
   
   {{ if (eq .Values.geonode.celery.enabled true) }}
   - targetPort: 5555

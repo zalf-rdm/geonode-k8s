@@ -2,10 +2,11 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-nginx-ingress
+# TODO (mwwall) add annotations if  {{ .Values.geonode.ingress.externalSchema }} is https
 spec:
   ingressClassName: {{ .Values.geonode.ingress.ingressClassName }}
   rules:
-  - host: {{ .Values.geonode.ingress.hostname }}
+  - host: {{ .Values.geonode.ingress.externalDomain }}
     http:
       paths:
       - pathType: Prefix
