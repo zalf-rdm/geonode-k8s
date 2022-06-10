@@ -1,12 +1,4 @@
 
-smtp:
-  host: smtp.gmail.com
-  tls: true
-  port: '587'
-  user:
-  password: "changeme"
-  from:
-
 
 general:
   externalDomain: geonode
@@ -37,104 +29,46 @@ geonode:
   image:
     name: zalf/geonode
     tag: '4.x'
-  
-  celery:
-    enabled: False
-
   ingress:
     ingressClassName:
     hostname: geonode
     externalPort: 80
-  # You can use this to pass any env from https://docs.geonode.org/en/master/basic/settings/index.html
   
-  extraEnvs:
-    # GEONODE ENV VARS
-    CLIENT_RESULTS_LIMIT: '25'
-    SOCIALACCOUNT_WITH_GEONODE_LOCAL_SINGUP: "False"
-    C_FORCE_ROOT: '1'
-    # This allows geonode to expose some proxy URLs to whitelisted domains below. 'geoserver' is required to enable printing
-    PROXY_ALLOWED_HOSTS: 'localhost,django,geonode,geoserver,spatialreference.org,nominatim.openstreetmap.org,dev.openlayers.org'
+  general:
+    max_document_size: 10
+    api_limit_per_page: 1000
 
-    # Session/Access Control
-    LOCKDOWN_GEONODE: 'False'
-    CORS_ORIGIN_ALLOW_ALL: 'True'
-    X_FRAME_OPTIONS: ALLOW-FROM ALL
-    SESSION_EXPIRED_CONTROL_ENABLED: 'True'
-    DEFAULT_ANONYMOUS_VIEW_PERMISSION: 'True'
-    DEFAULT_ANONYMOUS_DOWNLOAD_PERMISSION: 'True'
+  mail:
+    enabled: False
+    backend: "django.core.mail.backends.smtp.EmailBackend"
+    host: smtp.gmail.com
+    port: '587'
+    tls: true
+    use_ssl: False
+    user:
+    password: "changeme"
+    from:
+  # TODO add haystack chart
+  haystack:
+    search: False
+    engine_url: http://elasticsearch:9200/
+    engine_index_name: haystack
+    search_results_per_page: '200'
+  # TODO add memcached chart
+  memcached:
+    enabled: False
+    lock_expire: '3600'
+    lock_timeout: '10'
+  monitoring:
+    enabled: False
+    data_tls: 365
+    user_analytics_enabled: True
+    user_analytics_gzip: True
+    centralized_dashboard_enabled: False
+  celery:
+    enabled: False
 
-    # Users Registration
-    ACCOUNT_EMAIL_REQUIRED: 'True'
-    ACCOUNT_APPROVAL_REQUIRED: 'False'
-    ACCOUNT_CONFIRM_EMAIL_ON_GET: 'False'
-    ACCOUNT_EMAIL_VERIFICATION: none
-    ACCOUNT_EMAIL_CONFIRMATION_EMAIL: 'False'
-    ACCOUNT_EMAIL_CONFIRMATION_REQUIRED: 'False'
-    ACCOUNT_AUTHENTICATION_METHOD: username_email
-    AUTO_ASSIGN_REGISTERED_MEMBERS_TO_REGISTERED_MEMBERS_GROUP_NAME: 'True'
-
-    # OAuth2
-    OAUTH2_API_KEY:
-    OAUTH2_CLIENT_ID:
-    OAUTH2_CLIENT_SECRET:
-
-    # GeoNode APIs
-    API_LOCKDOWN: 'False'
-    TASTYPIE_APIKEY:
-
-    IS_FIRST_START: 'True'
-    FORCE_REINIT: 'False'
-    DJANGO_SETTINGS_MODULE: geonode.settings
-    DEFAULT_BACKEND_DATASTORE: datastore
-
-    ASYNC_SIGNALS: 'False'
-
-    STATIC_ROOT: /mnt/volumes/statics/static/
-    MEDIA_ROOT: /mnt/volumes/statics/uploaded/
-    GEOIP_PATH: /mnt/volumes/statics/geoip.db
-
-
-    DEFAULT_BACKEND_UPLOADER: geonode.importer
-    TIME_ENABLED: 'True'
-    MOSAIC_ENABLED: 'False'
-    HAYSTACK_SEARCH: 'False'
-    HAYSTACK_ENGINE_URL: http://elasticsearch:9200/
-    HAYSTACK_ENGINE_INDEX_NAME: haystack
-    HAYSTACK_SEARCH_RESULTS_PER_PAGE: '200'
-
-    CACHE_BUSTING_STATIC_ENABLED: 'False'
-    CACHE_BUSTING_MEDIA_ENABLED: 'False'
-
-    MEMCACHED_ENABLED: 'False'
-    MEMCACHED_BACKEND: django.core.cache.backends.memcached.MemcachedCache
-    MEMCACHED_LOCATION: '127.0.0.1:11211'
-    MEMCACHED_LOCK_EXPIRE: '3600'
-    MEMCACHED_LOCK_TIMEOUT: '10'
-
-    MAX_DOCUMENT_SIZE: '2'
-    API_LIMIT_PER_PAGE: '1000'
-
-    # Monitoring
-    MONITORING_ENABLED: 'False'
-    MONITORING_DATA_TTL: '365'
-    USER_ANALYTICS_ENABLED: 'True'
-    USER_ANALYTICS_GZIP: 'True'
-    CENTRALIZED_DASHBOARD_ENABLED: 'False'
-    MONITORING_SERVICE_NAME: local-geonode
-    MONITORING_HOST_NAME: geonode
-
-    # Other Options/Contribs
-    MODIFY_TOPICCATEGORY: 'True'
-    AVATAR_GRAVATAR_SSL: 'True'
-    AVATAR_DEFAULT_URL: /geonode/img/avatar.png
-    EXIF_ENABLED: 'True'
-    CREATE_LAYER: 'True'
-    FAVORITE_ENABLED: 'True'
-    
-  # Extra env vars to pass to geonode container - will be passed as a secret
-  extraSecretEnvs: {}
-  # Can be used to configure new base maps or any other setting from https://github.com/GeoNode/geonode/blob/master/geonode/settings.py
-  # For base maps available in MapStore, see https://github.com/geosolutions-it/MapStore2/blob/master/web/client/utils/ConfigProvider.js
+  # TODO (mwall) rethink this part
   extraConf: |
     EXTRA_BASE_LAYERS = [
       {
@@ -181,7 +115,6 @@ geonode:
     ]
 
     MAPSTORE_BASELAYERS =  EXTRA_BASE_LAYERS + MAPSTORE_BASELAYERS
-
   extraConf2: |
     # Add Google provider
     SOCIALACCOUNT_PROVIDERS['google'] = {

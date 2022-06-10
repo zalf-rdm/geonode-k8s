@@ -1,0 +1,125 @@
+
+# env vars for Django Geonode
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-geoserver-env
+  namespace: {{ .Release.Namespace }}
+data:
+  IS_CELERY: 'False'
+  DOCKERIZE_VERSION: v0.6.1
+  DEBUG: {{ include "boolean2str" .Values.general.debug | quote }}
+  CLIENT_RESULTS_LIMIT: '25'
+  SOCIALACCOUNT_WITH_GEONODE_LOCAL_SINGUP: "False"
+  C_FORCE_ROOT: '1'
+  MAX_DOCUMENT_SIZE:  {{ .Values.geonode.general.max_document_size | quote }}
+  API_LIMIT_PER_PAGE: {{ .Values.geonode.general.api_limit_per_page | quote }}
+  # GeoNode APIs
+  API_LOCKDOWN: 'False'
+  TASTYPIE_APIKEY:
+  # TODO (mwall) set this automatically with helm magics
+  IS_FIRST_START: 'True'
+  FORCE_REINIT: 'False'
+  # set this to true breaks upload
+  ASYNC_SIGNALS: 'False'
+  CACHE_BUSTING_STATIC_ENABLED: 'False'
+  CACHE_BUSTING_MEDIA_ENABLED: 'False'
+
+  GEONODE_INSTANCE_NAME: {{ .Release.Name }}
+  GEONODE_LB_HOST_IP: {{ .Values.general.externalDomain | quote }}
+  GEONODE_LB_PORT: {{ .Values.general.externalPort | quote }}
+  GEONODE_DB_CONN_MAX_AGE: '0'
+  GEONODE_DB_CONN_TOUT: '5'
+
+  # Rabbitmq
+  BROKER_URL: {{ include "broker_url" . | quote }}
+
+  # DJANGO SITE CONF
+  SITEURL: "{{ include "public_url" . }}/"
+  SITE_HOST_SCHEMA: {{ .Values.general.externalScheme | quote }}
+  ALLOWED_HOSTS: "['django', '*', '{{ .Values.general.externalDomain }}']"
+  PROXY_ALLOWED_HOSTS: 'localhost,django,geonode,geoserver,spatialreference.org,nominatim.openstreetmap.org,dev.openlayers.org'
+
+  # Admin Settings
+  ADMIN_USERNAME: admin
+  # admin password in secret
+  ADMIN_EMAIL: {{ .Values.geonode.mail.superUser.email | quote }}
+  ADMIN_PASSWORD: {{ .Values.general.superUser.password | quote }}
+
+  # EMAIL Notifications
+  EMAIL_ENABLE:  {{ .Values.geonode.mail.enabled | quote }}
+  DJANGO_EMAIL_BACKEND: {{ .Values.geonode.mail.backend | quote }}
+  DJANGO_EMAIL_HOST: {{ .Values.geonode.mail.host | quote }}
+  DJANGO_EMAIL_PORT: {{ .Values.geonode.mail.port | quote }}
+  DJANGO_EMAIL_HOST_USER: {{ .Values.geonode.mail.user | quote }}
+  DJANGO_EMAIL_HOST_PASSWORD: {{ .Values.geonode.mail.password | quote }}
+
+  DJANGO_EMAIL_USE_TLS: {{ include "boolean2str" .Values.geonode.mail.tls | quote }}
+  DJANGO_EMAIL_USE_SSL: {{ .Values.geonode.mail.use_ssl | quote }}
+  DEFAULT_FROM_EMAIL: {{ .Values.geonode.mail.from | quote }}
+
+  # PATH
+  # TODO (mwall) allign with volumeMount locations
+  STATIC_ROOT: /mnt/volumes/statics/static/
+  MEDIA_ROOT: /mnt/volumes/statics/uploaded/
+  GEOIP_PATH: /mnt/volumes/statics/geoip.db
+
+  # Session/Access Control
+  LOCKDOWN_GEONODE: 'False'
+  CORS_ORIGIN_ALLOW_ALL: 'True'
+  X_FRAME_OPTIONS: ALLOW-FROM ALL
+  SESSION_EXPIRED_CONTROL_ENABLED: 'True'
+  DEFAULT_ANONYMOUS_VIEW_PERMISSION: 'True'
+  DEFAULT_ANONYMOUS_DOWNLOAD_PERMISSION: 'True'
+
+  # Users Registration
+  ACCOUNT_EMAIL_REQUIRED: 'True'
+  ACCOUNT_APPROVAL_REQUIRED: 'False'
+  ACCOUNT_CONFIRM_EMAIL_ON_GET: 'False'
+  ACCOUNT_EMAIL_VERIFICATION: none
+  ACCOUNT_EMAIL_CONFIRMATION_EMAIL: 'False'
+  ACCOUNT_EMAIL_CONFIRMATION_REQUIRED: 'False'
+  ACCOUNT_AUTHENTICATION_METHOD: username_email
+  AUTO_ASSIGN_REGISTERED_MEMBERS_TO_REGISTERED_MEMBERS_GROUP_NAME: 'True'
+
+  # OAuth2
+  # TODO (mwall) implement OAUTH2
+  OAUTH2_API_KEY:
+  OAUTH2_CLIENT_ID:
+  OAUTH2_CLIENT_SECRET:
+
+  DJANGO_SETTINGS_MODULE: geonode.settings
+  DEFAULT_BACKEND_DATASTORE: datastore
+  DEFAULT_BACKEND_UPLOADER: geonode.importer
+
+  TIME_ENABLED: 'True'
+  MOSAIC_ENABLED: 'False'
+
+  HAYSTACK_SEARCH: {{ .Values.geonode.haystack.search | quote }}
+  HAYSTACK_ENGINE_URL: {{ .Values.geonode.haystack.engine_url | quote }}
+  HAYSTACK_ENGINE_INDEX_NAME: {{ .Values.geonode.haystack.engine_index_name | quote }}
+  HAYSTACK_SEARCH_RESULTS_PER_PAGE: {{ .Values.geonode.haystack.search_results_per_page | quote }}
+
+  MEMCACHED_ENABLED: {{ .Values.geonode.memcached.enabled | quote }}
+  MEMCACHED_BACKEND: django.core.cache.backends.memcached.MemcachedCache
+  MEMCACHED_LOCATION: {{ .Release.Name }}-memcached
+  MEMCACHED_LOCK_EXPIRE: {{ .Values.geonode.memcached.lock_expire | quote }}
+  MEMCACHED_LOCK_TIMEOUT: {{ .Values.geonode.memcached.lock_timeout | quote }}
+
+  # Monitoring
+  MONITORING_ENABLED: {{ .Values.geonode.monitoring.enabled | quote }}
+  MONITORING_DATA_TTL: {{ .Values.geonode.monitoring.data_tls | quote }}
+  USER_ANALYTICS_ENABLED: {{ .Values.geonode.monitoring.user_analytics_enabled | quote }}
+  USER_ANALYTICS_GZIP: {{ .Values.geonode.monitoring.user_analytics_gzip | quote }}
+  CENTRALIZED_DASHBOARD_ENABLED: {{ .Values.geonode.monitoring.centralized_dashboard_enabled | quote }}
+  MONITORING_SERVICE_NAME: {{ .Release.Name }}-geonode-monitoring
+  MONITORING_HOST_NAME: {{ .Release.Name }}-geonode-monitoring
+
+  # Other Options/Contribs
+  MODIFY_TOPICCATEGORY: 'True'
+  AVATAR_GRAVATAR_SSL: 'True'
+  AVATAR_DEFAULT_URL: /geonode/img/avatar.png
+  EXIF_ENABLED: 'True'
+  CREATE_LAYER: 'True'
+  FAVORITE_ENABLED: 'True'
