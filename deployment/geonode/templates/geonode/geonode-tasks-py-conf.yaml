@@ -428,8 +428,7 @@ data:
                     print("Found datastore \"{}\" on geoserver, no need to create another ... ".format(GEOSERVER_STORE_NAME))
                     return
         except:
-            print("could not get datastore information from geoserver, skipping creation ...")
-            return
+            print("could not get datastore information from geoserver, trying to create ...")
 
 
         print("setup new datastore ...")

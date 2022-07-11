@@ -9,6 +9,7 @@ spec:
     matchLabels:
       org.geonode.instance: {{ .Release.Name }}-geonode
   serviceName: {{ .Release.Name }}-geonode
+  replicas: {{ .Values.geonode.replicaCount }}
   template:
     metadata:
       annotations:
@@ -65,10 +66,9 @@ spec:
         # DATABASE CONFIGURATION #
         ##########################
 
-        # Postgresql configuration
         {{ $postgres_operator := index .Values "postgres-operator" "enabled" }}
         {{ if (eq .Values.postgresql.enabled true) }}
-
+        # Postgresql configuration
         - name: POSTGRES_USER
           value: postgres
         - name: POSTGRES_PASSWORD
@@ -104,8 +104,8 @@ spec:
           value: {{ include "database_port" .}}
 
         {{ else if (eq $postgres_operator true) }}
-
         # patroni login credentials from
+        
         # {username}.{team}-{clustername}.credentials.postgresql.acid.zalan.do
         # requires to be variables
         # geogenode database

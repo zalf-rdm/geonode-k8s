@@ -53,7 +53,7 @@ spec:
         #   - -f
         #   - /dev/null
         ports:
-        - containerPort: 8080
+        - containerPort: {{ include "geoserver_port" . }}
         envFrom:
           - configMapRef:
               name: {{ .Release.Name }}-geoserver-env
@@ -63,13 +63,13 @@ spec:
           subPath: geoserver-data-dir
         readinessProbe:
           tcpSocket:
-            port: 8080
+            port: {{ include "geoserver_port" . }}
           initialDelaySeconds: 60
           periodSeconds: 5
           failureThreshold: 15
         livenessProbe:
           tcpSocket:
-            port: 8080
+            port: {{ include "geoserver_port" . }}
           initialDelaySeconds: 180
           periodSeconds: 5
           failureThreshold: 15

@@ -13,6 +13,11 @@
 5432
 {{- end -}}
 
+{{- define "geoserver_port" -}}
+8080
+{{- end -}}
+
+
 {{- define "rabbit_host" -}}
 {{ .Release.Name }}-rabbitmq:5672
 {{- end -}}

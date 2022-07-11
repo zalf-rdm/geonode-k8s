@@ -20,4 +20,4 @@ spec:
     port: 5555
     name: celery
   {{ end }}
-  type: LoadBalancer
+  type: ClusterIP

@@ -1,57 +1,151 @@
 
 
 global:
+  # -- storageClass used by helm dependencies pvc
   storageClass: 
-  # Will be used by this and all subcharts
+  # -- storage access mode used by helm dependency pvc
   accessMode: ReadWriteMany
 
-#####################
-# STS CONFIGURATION #
-#####################
-
-# CONFIGURATION FOR GEONODE DEPLOYMENT
+# geonode configuration
 geonode:
+  # -- number of geonode replicas (! not working properly yet)
+  replicaCount: 1
+  
   persistant:
+    # -- size of persistant geonode storage
     storageSize: 2Gi
   image:
+    # -- used geonode image
     name: zalf/geonode
-    tag: '4.x'
+    # -- tag of used geonode image
+    tag: 'latest'
   
   ingress:
+    # -- enables external access 
     enabled: True
+    # -- define kubernetes ingress class for geonode ingress
     ingressClassName:
+    # -- external ingress schema. if set to https ingress tls is used. Loading tls certificate via tls-secret options Available options: (http|https)
     externalScheme: http
+    # -- external ingress hostname 
     externalDomain: geonode
+    # -- external ingress port
     externalPort: 80
-  
+    # -- tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/. is used when geonode.ingress.externalScheme is set to https
+    tlsSecret: geonode-tls-secret
+
   general:
+    # -- max upload document size in MB
     max_document_size: 10
+    # -- to describe
     api_limit_per_page: 1000
+    # -- django debug mode
     debug: False
+    
     superUser:
+      # -- admin panel password
       password: geonode
+      # -- admin user password
       email: support@example.com
 
   mail:
+    # -- enables mail configuration for geonode
     enabled: False
+    # -- set mail backend in geonode settings
     backend: "django.core.mail.backends.smtp.EmailBackend"
+    # -- set mail host for genode mail
     host: smtp.gmail.com
+    # -- mail port fo geonode mail
     port: '587'
+    # -- activate tls for geonode mail (only tls or ssl can be true not both)
     tls: true
+    # -- enable ssl for geonode mail (only tls or ssl can be true not both)
     use_ssl: False
+    # -- define mail user to send mails from
     user: "changeme"
+    # -- set password for mailuser in geonode
     password: "changeme"
+    # -- define from mail-addr 
     from: "changeme@web.de"
+  
+  ldap:
+    # -- enable ldap AUTHENTICATION_BACKENDS in DJANGO Geonode
+    enabled: False
+    # -- ldap uri
+    uri: ldap://example.com
+    # -- ldap user bind dn
+    bind_dn: "CN=Users,DC=ad,DC=example,DC=com"
+    # -- ldap password
+    bind_password: password
+    # -- ldap user search dn
+    user_search_dn: "OU=User,DC=ad,DC=example,DC=com"
+    # -- ldap user filterstr
+    user_search_filterstr: "(sAMAccountName=%(user)s)"
+    # -- Mirror groups with ldap (see https://docs.geonode.org/en/master/advanced/contrib/index.html)
+    mirror_groups: True
+    # -- always update local user database from ldap
+    always_update_user: True
+    # -- TODO ADD mirror groups_except AUTH_LDAP_MIRROR_GROUPS_EXCEPT
+    # mirror_groups_except: 
+    # -- ldap group search dn
+    group_search_dn: "OU=Groups,DC=ad,DC=example,DC=com"
+    # -- ldap group filterstr
+    group_search_filterstr: "(objectClass=group)"
+    # -- given name attribute used from ldap
+    attr_map_first_name: "givenName"
+    # -- last name attribute used from ldap
+    attr_map_last_name: "sn"
+    # -- email attribute used from ldap 
+    attr_map_email_addr: mailPrimaryAddress
+
+  # -- Find docs for register values under:
+  # - https://docs.geonode.org/en/3.3.x/basic/settings/index.html 
+  # - https://github.com/pinax/django-user-accounts/blob/master/docs/settings.rst | 
+  # - https://django-allauth.readthedocs.io/en/latest/configuration.html
+  register:
+    # -- allow user registration on geonode
+    # Default: True
+    # If True, creation of new accounts is allowed. When the signup view is called, the template account/signup.html will be displayed, usually showing a form to collect the new user data.
+    # If False, creation of new accounts is disabled. When the signup view is called, the template account/signup_closed.html will be displayed.
+    open_signup: True
+    # -- set email as required for registration
+    email_required: True
+    # -- approve given email with registration
+    approval_required: False
+    # -- send confirm email on get
+    confirm_email_on_get: True
+    # -- enable email verification
+    # Determines the e-mail verification method during signup – choose one of "mandatory", "optional", or "none".
+    # Setting this to “mandatory” requires email_required to be True
+    # When set to “mandatory” the user is blocked from logging in until the email address is verified. Choose “optional” or “none” to allow logins with an unverified e-mail address. In case of “optional”, the e-mail verification mail is still sent, whereas in case of “none” no e-mail verification mails are sent.
+    email_verification: "mandatory"
+    # -- If True, new user accounts will be created as inactive. The user must use the activation link to activate his account.
+    conformation_required: True
+    # -- Specifies the login method to use – whether the user logs in by entering their username, e-mail address, or either one of both. Setting this to “email” requires email_required=True
+    authentication_method: "user_email"
+    # -- group name to add new registered users to, requires auto_assign_registered_members_to_registered: True. 
+    registered_members_group_name: 
+    # -- if set to True new registered user will be add to defined group in registered_members_group_name
+    auto_assign_registered_members_to_registered: True
+
   # TODO add haystack chart
   haystack:
+    # -- enable hystack
     enabled: False
+    # -- hystack url
     engine_url: http://elasticsearch:9200/
+    # -- hystack index name
     engine_index_name: haystack
+    # -- hystack results per page
     search_results_per_page: '200'
-  # TODO add memcached chart
+
+  # TODO DEBUG  
   memcached:
+    # -- enable memcache, this will spawn a seperate memcache container(s) and configure django geonode repsectivly. Required if django geonode runs replicas
     enabled: False
+    # -- memcached lock expire time
     lock_expire: '3600'
+    # -- memcached lock timeout
     lock_timeout: '10'
   
   monitoring:
@@ -63,6 +157,10 @@ geonode:
   celery:
     enabled: False
 
+  # configuration for postgres-operator manifest
+  postgresdb:
+    replicaCount: 1
+  
   # TODO (mwall) rethink this part
   extraConf: |
     EXTRA_BASE_LAYERS = [
@@ -132,24 +230,35 @@ geonode:
 # CONFIGURATION FOR GEOSERVER DEPLOYMENT
 geoserver:
   image:
+    # -- geoserver image docker image (default in zalf namespace because geonode one was not up to date)
     name: zalf/geoserver
+    # -- geoserver docker image tag
     tag: '2.19.6' 
   
+  # -- geoserver admin password
   admin_password: "geoserver"
-  # A list of one-line custom EPSGs to add to GeoServer
+  # - A list of one-line custom EPSGs to add to GeoServer
   # see https://docs.geoserver.org/stable/en/user/configuration/crshandling/customcrs.html
   customEPSGs:
     - 1=PROJCS["TM_Rwanda",GEOGCS["GCS_ITRF_2005",DATUM["D_ITRF_2005",SPHEROID["GRS_1980",6378137.0,298.257222101]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Transverse_Mercator"],PARAMETER["False_Easting",500000.0],PARAMETER["False_Northing",5000000.0],PARAMETER["Central_Meridian",30.0],PARAMETER["Scale_Factor",0.9999],PARAMETER["Latitude_Of_Origin",0.0],UNIT["Meter",1.0]]
   extraCustomEPSGs: []
 
 
+# MEMCACHED CONFIGURATION
+# https://artifacthub.io/packages/helm/bitnami/memcached
+memcached:
+  # -- memcached replica. Loadbalanaced via kubernetes. (only one entry in django settings.py) im memcached is activated under geonode.memcached.enabled this takes place
+  replicaCount: 1
+
 # CONFIGURATION FOR NGINX DEPLOYMENT
 # MAY MOVE TO CHART
 nginx:
-  serviceType: LoadBalancer
-  replicas: 1
+  # -- nginx container replicas
+  replicaCount: 1
   image:
+    # -- nginx docker image
     name: nginx
+    # -- nginx docker image tag
     tag: '1.20'
 
 ########################
@@ -160,26 +269,31 @@ nginx:
 
 # TODO (mwall) make all configurations available in manifest
 postgres-operator:
-  operatorApiUrl: "http://{{ .Release.Name }}-postgres-operator:8080"
+  # -- enable postgres-operator (this or postgresql.enabled NOT both )
   enabled: true
+  # -- ???
+  operatorApiUrl: "http://{{ .Release.Name }}-postgres-operator:8080"
   configLoggingRestApi:
-  # REST API listener listens to this port
+  # --  REST API listener listens to this port
   api_port: 8080
+  # -- Database storage size
   storageSize: 3Gi
+  # -- postgress pv storageclass
   storageClass: 
+  # -- number of database instances
   numberOfInstances: 1
+  # -- ???
+  enable_master_load_balancer: true
 
-# VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml
+# -- VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml
 postgres-operator-ui:
   enabled: true
-
-  # replicaCount tested and not working ...
   replicaCount: 1
   envs:
   operatorApiUrl: "http://{{ $.Release.Name }}-postgres-operator:8080"
 
   service:
-    type: LoadBalancer
+    type: ClusterIP
     port: 80
   
   ingress:
@@ -189,11 +303,11 @@ postgres-operator-ui:
       - host: postgres-ui
         paths: [""]
 
-# VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/postgresql/values.yaml
+# -- VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/postgresql/values.yaml
 postgresql:
   enabled: False
   
-  # The usernames will be the same as the database names
+  # -- The usernames will be the same as the database names
   geonodeDb: geonode
   geodataDb: geonode_data
   password: # PLS SET IF ACTICATED 
@@ -208,7 +322,7 @@ postgresql:
   initdbScriptsSecret: '{{ .Release.Name }}-postgres-init'
 
 
-# VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml
+# -- VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml
 rabbitmq:
   enabled: true
   auth:

@@ -1,6 +1,6 @@
-  # nginx stateful set
+
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: {{ .Release.Name }}-nginx
   namespace: {{ .Release.Namespace }}
@@ -8,8 +8,8 @@ spec:
   selector:
     matchLabels:
       org.geonode.instance: {{ .Release.Name }}-nginx
-  serviceName: {{ .Release.Name }}-nginx
-  replicas: {{ .Values.nginx.replicas }}
+  #serviceName: {{ .Release.Name }}-nginx
+  replicas: {{ .Values.nginx.replicaCount }}
   template:
     metadata:
       labels:
