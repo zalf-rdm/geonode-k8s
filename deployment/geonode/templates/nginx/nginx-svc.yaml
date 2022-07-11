@@ -10,4 +10,4 @@ spec:
   ports:
   - targetPort: 80
     port: 80
-  type: {{ .Values.nginx.serviceType }}
+  type: ClusterIP

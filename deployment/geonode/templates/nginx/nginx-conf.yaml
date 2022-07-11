@@ -58,7 +58,7 @@ data:
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
 
-        proxy_pass http://{{ .Release.Name }}-geoserver:8080;
+        proxy_pass http://{{ .Release.Name }}-geoserver:{{ include "geoserver_port" . }};
       }
 
       # GeoNode
@@ -110,7 +110,7 @@ data:
       location / {
         # FIXME: Work around /proxy sometimes using a mix of public/internal URL to geonode...
         rewrite_log on;
-        #rewrite ^/proxy/(.*)url=http?://{{ .Values.geonode.ingress.externalDomain  }}(:\d+)?/geoserver(.*) /proxy/$1url=http://geoserver:8080$3 last;
+        #rewrite ^/proxy/(.*)url=http?://{{ .Values.geonode.ingress.externalDomain  }}(:\d+)?/geoserver(.*) /proxy/$1url=http://geoserver:{{ include "geoserver_port" . }}$3 last;
 
         if ($request_method = OPTIONS) {
           add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, OPTIONS";
