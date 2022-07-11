@@ -14,9 +14,7 @@ stringData:
     CREATE DATABASE "{{ .Values.postgresql.geonodeDb }}" OWNER "{{ .Values.postgresql.geonodeDb }}";
     \c "{{ .Values.postgresql.geonodeDb }}"
     CREATE EXTENSION postgis;
-    CREATE EXTENSION postgis_topology;
 
     CREATE DATABASE "{{ .Values.postgresql.geodataDb }}" OWNER "{{ .Values.postgresql.geodataDb }}";
     \c "{{ .Values.postgresql.geodataDb }}"
     CREATE EXTENSION postgis;
-    CREATE EXTENSION postgis_topology;

@@ -9,6 +9,7 @@ spec:
     matchLabels:
       org.geonode.instance: {{ .Release.Name }}-geonode
   serviceName: {{ .Release.Name }}-geonode
+  replicas: {{ .Values.geonode.replicaCount }}
   template:
     metadata:
       annotations:
@@ -56,18 +57,18 @@ spec:
           dockerize -stdout /var/log/geonode.log /usr/local/bin/uwsgi --ini /usr/src/geonode/uwsgi.ini
         ports:
         - containerPort: 8000
-        - containerPort: 8001
+        # - containerPort: 8001
+        envFrom:
+          - configMapRef:
+              name: {{ .Release.Name }}-geonode-env
         env:
-        {{ include "env_general" . | nindent 8 }}
-
         ##########################
         # DATABASE CONFIGURATION #
         ##########################
 
-        # Postgresql configuration
         {{ $postgres_operator := index .Values "postgres-operator" "enabled" }}
         {{ if (eq .Values.postgresql.enabled true) }}
-
+        # Postgresql configuration
         - name: POSTGRES_USER
           value: postgres
         - name: POSTGRES_PASSWORD
@@ -103,8 +104,8 @@ spec:
           value: {{ include "database_port" .}}
 
         {{ else if (eq $postgres_operator true) }}
-
         # patroni login credentials from
+        
         # {username}.{team}-{clustername}.credentials.postgresql.acid.zalan.do
         # requires to be variables
         # geogenode database
@@ -181,6 +182,8 @@ spec:
           subPath: data
         - name: cache-volume
           mountPath: /tmp
+        
+        # geonode-k8s updated task-py
         - name: task-py
           mountPath: "/usr/src/geonode/tasks.py"
           subPath: tasks.py
@@ -194,7 +197,7 @@ spec:
         #     cpu: 1000m
         # livenessProbe:
         #   tcpSocket:
-        #     port: 8000
+        #     port: 8001
         #   initialDelaySeconds: 1200
         #   periodSeconds: 10
         #   failureThreshold: 15
@@ -204,12 +207,12 @@ spec:
       
       - name: celery
         image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
+        envFrom:
+          - configMapRef:
+            name: {{ .Release.Name }}-geonode-env        
         env:
-        {{ include "env_general" . | nindent 8 }}
         - name: IS_CELERY
           value: 'True'
-        - name: DOCKERIZE_VERSION
-          value: v0.6.1
         command:
         - bash
         - -c

@@ -4,8 +4,14 @@ metadata:
   name: {{ .Release.Name }}-nginx-ingress
 spec:
   ingressClassName: {{ .Values.geonode.ingress.ingressClassName }}
+  {{ if (eq .Values.geonode.ingress.externalScheme "https") }}
+  tls:
+  - hosts:
+    -  {{ .Values.geonode.ingress.externalDomain }}
+    secretName: {{ .Values.geonode.ingress.tlsSecret }}
+  {{ end }}
   rules:
-  - host: {{ .Values.geonode.ingress.hostname }}
+  - host: {{ .Values.geonode.ingress.externalDomain }}
     http:
       paths:
       - pathType: Prefix

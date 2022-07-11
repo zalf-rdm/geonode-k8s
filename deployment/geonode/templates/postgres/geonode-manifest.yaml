@@ -6,7 +6,7 @@ spec:
   teamId: "geonode"
   volume:
     size: 3Gi
-  numberOfInstances: 1
+  numberOfInstances: {{ .Values.geonode.postgresdb.replicaCount }}
   users:
     postgres:
     - superuser
