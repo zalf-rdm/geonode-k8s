@@ -5,8 +5,8 @@ metadata:
 spec:
   teamId: "geonode"
   volume:
-    size: 3Gi
-  numberOfInstances: {{ .Values.geonode.postgresdb.replicaCount }}
+    size: {{ .Values.postgres_operator_manifest.storageSize }}
+  numberOfInstances: {{ int .Values.postgres_operator_manifest.numberOfInstances }}
   users:
     postgres:
     - superuser
@@ -35,4 +35,4 @@ spec:
         pg_partman: public
         postgis: public
   postgresql:
-    version: "13"
+    version: {{ .Values.postgres_operator_manifest.postgres_version | quote }}
