@@ -12,18 +12,13 @@ spec:
   replicas: {{ .Values.geonode.replicaCount }}
   template:
     metadata:
-      annotations:
-        # Add a checksum to force the re-creation of the pods on every config update
-        checksum/conf: {{ .Values.geonode.extraConf | sha256sum }}
-        checksum/conf2: {{ .Values.geonode.extraConf2 | sha256sum }}
-        co.elastic.logs/enabled: "true"
       labels:
         org.geonode.instance: {{ .Release.Name }}-geonode
     spec:
       terminationGracePeriodSeconds: 3
       initContainers:
       # Wait for Postgres and rabbit
-      - name: wait-db
+      - name: geonode-wait-for-db-and-rabbit
         image: jwilder/dockerize
         imagePullPolicy: IfNotPresent
         args:
@@ -105,9 +100,8 @@ spec:
 
         {{ else if (eq $postgres_operator true) }}
         # patroni login credentials from
-        
         # {username}.{team}-{clustername}.credentials.postgresql.acid.zalan.do
-        # requires to be variables
+        
         # geogenode database
         - name: DATABASE_HOST
           value: "$(GEONODE_POSTGRESQL_SERVICE_HOST)"
@@ -126,10 +120,7 @@ spec:
               name: postgres.geonode-postgresql.credentials.postgresql.acid.zalan.do
               key: password
 
-        # TODO REMOVE THIS FROM wait-for-databases.sh
-        #
         # DATABASE CREDENTIALS USED BY DJANGO
-        #
         # geonode database/user
         - name: GEONODE_DATABASE
           valueFrom:
@@ -144,9 +135,8 @@ spec:
               key: password
         - name: DATABASE_URL
           value: "postgis://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"
-        #
+
         # GEODATABASE CREDENTIALS USED BY GEOSERVER
-        #
         # geogeonode database/user
         - name: GEONODE_GEODATABASE
           valueFrom:
@@ -165,9 +155,6 @@ spec:
         {{ end }}
 
         volumeMounts:
-        - name: geonode-local-settings-extra
-          mountPath: /usr/src/geonode/geonode/local_settings.py
-          subPath: local_settings.py
         - name: persistence
           mountPath: /mnt/volumes/statics
           subPath: statics
@@ -182,12 +169,14 @@ spec:
           subPath: data
         - name: cache-volume
           mountPath: /tmp
-        
+
         # geonode-k8s updated task-py
         - name: task-py
           mountPath: "/usr/src/geonode/tasks.py"
           subPath: tasks.py
           readOnly: true
+
+        # TODO FIX ISSUE WITH RESSOURCES
         # resources:
         #   requests:
         #     memory: 3Gi
@@ -202,14 +191,14 @@ spec:
         #   periodSeconds: 10
         #   failureThreshold: 15
       # # Celery is the task worker
-      
+
       {{ if (eq .Values.geonode.celery.enabled true) }}
       
       - name: celery
         image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
         envFrom:
           - configMapRef:
-            name: {{ .Release.Name }}-geonode-env        
+            name: {{ .Release.Name }}-geonode-env
         env:
         - name: IS_CELERY
           value: 'True'
@@ -260,9 +249,6 @@ spec:
         {{ end }}
 
       volumes:
-      - name: geonode-local-settings-extra
-        configMap:
-          name: {{ .Release.Name }}-geonode-local-settings-extra
       - name: persistence
         persistentVolumeClaim:
           claimName: pvc-{{ .Release.Name }}-geonode

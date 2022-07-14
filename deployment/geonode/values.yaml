@@ -127,6 +127,9 @@ geonode:
     registered_members_group_name: 
     # -- if set to True new registered user will be add to defined group in registered_members_group_name
     auto_assign_registered_members_to_registered: True
+    # -- show email addr in profile view
+    show_profile_email: True
+
 
   # TODO add haystack chart
   haystack:
@@ -139,9 +142,9 @@ geonode:
     # -- hystack results per page
     search_results_per_page: '200'
 
-  # TODO DEBUG  
+  # configure memcached as django cache. .Values.memcached.... to configure memcached replicas, architecture and so on (see https://docs.djangoproject.com/en/4.0/topics/cache/)
   memcached:
-    # -- enable memcache, this will spawn a seperate memcache container(s) and configure django geonode repsectivly. Required if django geonode runs replicas
+    # -- enable memcache, this will spawn one or more seperate memcache container(s) and configure django geonode repsectivly. Dynamic caching (see https://docs.djangoproject.com/en/4.0/topics/cache/)
     enabled: False
     # -- memcached lock expire time
     lock_expire: '3600'
@@ -160,72 +163,6 @@ geonode:
   # configuration for postgres-operator manifest
   postgresdb:
     replicaCount: 1
-  
-  # TODO (mwall) rethink this part
-  extraConf: |
-    EXTRA_BASE_LAYERS = [
-      {
-        "type": "tileprovider",
-        "title": "OpenStreetMap Terrain",
-        "thumbURL": "https://a.tile-cyclosm.openstreetmap.fr/cyclosm/10/594/518.png",
-        "provider": "custom",
-        "name": "cyclosm",
-        "group": "background",
-        "visibility": False,
-        "url": "https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png",
-        "options": {
-          "subdomains": [ "a", "b", "c" ]
-        }
-      },
-      {
-        "type": "tileprovider",
-        "title": "OpenStreetMap B&W",
-        "thumbURL": "https://tiles.wmflabs.org/bw-mapnik/0/0/0.png",
-        "provider": "OpenStreetMap.BlackAndWhite",
-        "name": "osmbw",
-        "group": "background",
-        "visibility": False
-      },
-      {
-        "type": "tileprovider",
-        "title": "CartoDB Light",
-        "thumbURL": "https://a.basemaps.cartocdn.com/light_all/0/0/0.png",
-        "provider": "CartoDB.Positron",
-        "name": "cartol",
-        "group": "background",
-        "visibility": False
-      },
-      {
-        "type": "tileprovider",
-        "title": "Stamen Watercolor",
-        "provider": "Stamen.Watercolor",
-        "name": "Stamen.Watercolor",
-        "source": "Stamen",
-        "group": "background",
-        "thumbURL": "https://stamen-tiles-c.a.ssl.fastly.net/watercolor/0/0/0.jpg",
-        "visibility": False
-      }
-    ]
-
-    MAPSTORE_BASELAYERS =  EXTRA_BASE_LAYERS + MAPSTORE_BASELAYERS
-  extraConf2: |
-    # Add Google provider
-    SOCIALACCOUNT_PROVIDERS['google'] = {
-      'SCOPE': [
-        'profile',
-        'email',
-      ],
-      'AUTH_PARAMS': {
-        'access_type': 'online',
-      }
-    }
-
-    if os.getenv('AUTH_DOMAIN'):
-      SOCIALACCOUNT_PROVIDERS['google']['AUTH_PARAMS']['hd'] = os.getenv('AUTH_DOMAIN')
-
-    INSTALLED_APPS += ('allauth.socialaccount.providers.google',)
-    SOCIALACCOUNT_PROFILE_EXTRACTORS['google'] = "geonode.people.profileextractors.OpenIDExtractor"
-
 
 # CONFIGURATION FOR GEOSERVER DEPLOYMENT
 geoserver:
@@ -248,6 +185,7 @@ geoserver:
 # https://artifacthub.io/packages/helm/bitnami/memcached
 memcached:
   # -- memcached replica. Loadbalanaced via kubernetes. (only one entry in django settings.py) im memcached is activated under geonode.memcached.enabled this takes place
+  architecture: high-availability
   replicaCount: 1
 
 # CONFIGURATION FOR NGINX DEPLOYMENT
@@ -276,14 +214,20 @@ postgres-operator:
   configLoggingRestApi:
   # --  REST API listener listens to this port
   api_port: 8080
-  # -- Database storage size
-  storageSize: 3Gi
   # -- postgress pv storageclass
   storageClass: 
-  # -- number of database instances
-  numberOfInstances: 1
   # -- ???
   enable_master_load_balancer: true
+
+# -- configuration for postgres operator database manifest
+postgres_operator_manifest:
+  # -- Database storage size
+  storageSize: 3Gi
+  # -- number of database instances
+  numberOfInstances: 3
+  # -- postgres version
+  postgres_version: 13
+
 
 # -- VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml
 postgres-operator-ui:
@@ -325,9 +269,10 @@ postgresql:
 # -- VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml
 rabbitmq:
   enabled: true
+  replicaCount: 1
   auth:
     username: rabbituser
-    password: # PLS SET
+    password: rabbitpassword
     erlangCookie: jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu
   persistence:
     enabled:  False
