@@ -1,0 +1,59 @@
+
+geonode:
+  replicaCount: 1 # not working yet
+
+  persistant:
+    storageSize: 2Gi
+  
+  image:
+    name: zalf/geonode
+    tag: 'latest'
+
+  ingress:
+    enabled: False
+    externalScheme: http
+    externalDomain: geonode
+    externalPort: 80
+
+  superUser:
+    password: geonode
+
+  mail:
+    enabled: False
+  
+  ldap:
+    enabled: False
+
+  register:
+    open_signup: True
+    email_verification: "False"
+    authentication_method: username_email
+
+  memcached:
+    enabled: True
+    lock_expire: '3600'
+    lock_timeout: '10'
+
+postgres-operator-ui:
+  enabled: False
+
+postgres-operator:
+  enabled: True
+
+postgres_operator_manifest:
+  storageSize: 3Gi
+  numberOfInstances: 1
+  postgres_version: 13
+
+rabbitmq:
+  replicaCount: 1
+  auth:
+    username: rabbituser
+    password: rabbit_password
+
+nginx:
+  serviceType: LoadBalancer
+  replicaCount: 1
+
+memcached:
+  replicaCount: 1
