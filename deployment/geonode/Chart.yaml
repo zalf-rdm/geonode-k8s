@@ -1,6 +1,6 @@
 apiVersion: v2
-name: geonode
-version: 0.1.0
+name: geonode-k8s
+version: 1.0.0
 description: Helm Chart for Geonode
 home: https://github.com/zalf-rdm/geonode-k8s
 sources:
@@ -9,11 +9,11 @@ dependencies:
   - name: postgres-operator-ui
     version: ~1.8.0
     repository: https://opensource.zalando.com/postgres-operator/charts/postgres-operator-ui/
-    condition: global.postgres-operator-ui.enabled
+    condition: postgres-operator-ui.enabled
   - name: postgres-operator
     version: ~1.8.0
     repository: https://opensource.zalando.com/postgres-operator/charts/postgres-operator/
-    condition: global.postgres-operator.enabled
+    condition: postgres-operator.enabled
   - name: postgresql
     version: 11.x.x
     repository: https://charts.bitnami.com/bitnami
