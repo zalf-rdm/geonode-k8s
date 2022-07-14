@@ -8,6 +8,7 @@ Table of Contents
 - [GeoWhat?](#Geonode)
 - [Geonode-k8s](#geonode-k8s)
 - [Install Guilde](#install)
+
 **Homepage:** <https://github.com/zalf-rdm/geonode-k8s>
 
 Geonode
@@ -22,15 +23,15 @@ You can find the Sourcecode and more information about geonode under:
 - Github: https://github.com/GeoNode/geonode
 - Docs: https://docs.geonode.org
 
-Due to growing needs for high availability and scalability this repository aims at running geonode with all required services in a cloud based manner. To due so we use Kubernetes (https://kubernetes.io/), a cloud management software, which runs on public and private clouds. As the Kubernetes echosystem can be confusing for people getting new to this field, there are packages for most services which are able to run on top of kubernetes. This packages are managed via helm (https://helm.sh/).
+Due to growing needs for high availability and scalability this repository aims at running Geonode with all required services in a cloud based manner. To due so we use Kubernetes (https://kubernetes.io/), a cloud management software, which runs on public and private clouds. As the Kubernetes echosystem can be confusing for people getting new to this field, there are packages for most services which are able to run on top of kubernetes. This packages are managed via helm (https://helm.sh/).
 
 Geonode-k8s
 -----------
 
-This repository provides a helm chart for geonode(4.x) including additional services as:
+This repository provides a helm chart for **geonode(4.x)** including additional services as:
 - geoserver: source server for sharing geospatial data  (https://geoserver.org/)
 - rabbitmq: message broker (scalable)
-- postgresql database: using zalando postgres-operator for distributed database for geonode and postgis db for geoserver (scalable)
+- postgresql database: using zalando postgres-operator for distributed database for geonode and postgis db for geoserver (https://github.com/zalando/postgres-operator) (scalable)
 - memcached (optional): as django cache (scalable)
 - nginx: webserver to deliver static content (scalable)
 
@@ -52,9 +53,12 @@ Install
 * [Helm](https://helm.sh/)
 
 The chart will automatically install required dependencies, i.e. a RabbitMQ broker and a Postgres database with `postgis` extensions installed, and link them up.
-This helm chart now supports geonode v4.0. Its an early version and requires a lot of refectoring to make it usable for a wide range of users.
+This helm chart now supports geonode v4.0.
 
 ## Install chart dependencies
+
+Update helm dependencies via:
+
 ```bash
 helm dependency update deployment/geonode
 ```
