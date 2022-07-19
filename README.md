@@ -37,7 +37,7 @@ This repository provides a helm chart for **geonode(4.x)** including additional 
 
 This helm chart provides the possibility to run most of the services redundant to increase performance on the one hand and increase fail safe on the other hand.
 
-To get an overview of the available configuration check out the values [docs](deployment/geonode/README.md). If you want to run the helm chart first on a minicube cluster check out the [minicube](docs/minicube-installation.md) guide. Also check the minicube-values.yaml for basic configuration. 
+To get an overview of the available configuration check out the values [docs](deployment/geonode/README.md). If you want to run the helm chart first on a minikube cluster check out the [minikube](docs/minikube-installation.md) guide. Also check the minikube-values.yaml for basic configuration. 
 
 If you want to go straight for a production installation follow the [installation](#install) guide.
 
@@ -49,7 +49,7 @@ Install
 
 ## Prerequisites
 
-* A Kubernetes cluster (or [minicube](docs/minicube-installation.md))
+* A Kubernetes cluster (or [minikube](docs/minikube-installation.md))
 * [Helm](https://helm.sh/)
 
 The chart will automatically install required dependencies, i.e. a RabbitMQ broker and a Postgres database with `postgis` extensions installed, and link them up.
