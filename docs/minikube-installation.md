@@ -2,7 +2,7 @@
 
 ## Install Minicube
 
-To install minicube itself follow the instruction on https://kubernetes.io/de/docs/tasks/tools/install-minikube/
+To install minikube itself follow the instruction on https://kubernetes.io/de/docs/tasks/tools/install-minikube/
 
 ## Install chart dependencies
 
@@ -14,7 +14,7 @@ helm dependency update deployment/geonode
 
 ## Edit Minicube values
 
-View and edit the predefined minicube values under /minicube-values.yaml
+View and edit the predefined minikube values under /minikube-values.yaml
 
 ## Run Installation
 
@@ -109,13 +109,13 @@ Find the ip addr of the geonode-nginx service. and add an entry to your hosts fi
 10.109.145.161   geonode
 ```
 
-After that the service has to be exposed form minicube. I prefer to use minicube tunnel. Start it via, it will require root access:
+After that the service has to be exposed form minikube. I prefer to use minikube tunnel. Start it via, it will require root access:
 
 ```bash
 mincube tunnel
 ```
 
-There are several ways to expose services from minicube, find information in the minikube docs under: https://minikube.sigs.k8s.io/docs/handbook/accessing/
+There are several ways to expose services from minikube, find information in the minikube docs under: https://minikube.sigs.k8s.io/docs/handbook/accessing/
 
 Now you are able to access the geonode installation by opening your browser and open http://geonode for geonode and http://geonode/geoserver for geoserver
 
