@@ -8,6 +8,8 @@ global:
 
 # geonode configuration
 geonode:
+  # -- pod name
+  container_name: geonode
   # -- number of geonode replicas (! not working properly yet)
   replicaCount: 1
   
@@ -166,12 +168,16 @@ geonode:
 
 # CONFIGURATION FOR GEOSERVER DEPLOYMENT
 geoserver:
+  container_name: geoserver
   image:
     # -- geoserver image docker image (default in zalf namespace because geonode one was not up to date)
-    name: zalf/geoserver
+    name: geonode/geoserver
     # -- geoserver docker image tag
-    tag: '2.19.6' 
+    tag: '2.19.6'
   
+  port: 8080
+  # -- geoserver admin username
+  admin_username: admin
   # -- geoserver admin password
   admin_password: "geoserver"
   # - A list of one-line custom EPSGs to add to GeoServer
@@ -199,16 +205,40 @@ nginx:
     # -- nginx docker image tag
     tag: '1.20'
 
+
+postgres:
+  # -- container name for postgres containers == teamID for mainifest
+  container_name: postgresql
+  # -- postgres username
+  username: postgres
+  # -- database schema
+  schema: public
+  # -- geonode database name
+  geonodedatabase: geonode
+  # -- geoserver database name
+  geodatabasename: geogeonode
+  # database passwords are set randomly 
+  # infos @ https://postgres-operator.readthedocs.io/en/refactoring-sidecars/user/
+  # get password after creation via: kubectl get secret {{ .Release.name }}.{{ .Release.name }}-{{ container_name }}.credentials -o 'jsonpath={.data.password}' | base64 -d
+
+  # -- configuration for postgres operator database manifest
+  operator_manifest:
+    # -- Database storage size
+    storageSize: 3Gi
+    # -- number of database instances
+    numberOfInstances: 3
+    # -- postgres version
+    postgres_version: 13
+
+
 ########################
 # CHART CONFIGURATIONS #
 ########################
 
 # VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator/values.yaml
-
-# TODO (mwall) make all configurations available in manifest
 postgres-operator:
   # -- enable postgres-operator (this or postgresql.enabled NOT both )
-  enabled: true
+  enabled: True
   # -- ???
   operatorApiUrl: "http://{{ .Release.Name }}-postgres-operator:8080"
   configLoggingRestApi:
@@ -219,15 +249,6 @@ postgres-operator:
   # -- ???
   enable_master_load_balancer: true
 
-# -- configuration for postgres operator database manifest
-postgres_operator_manifest:
-  # -- Database storage size
-  storageSize: 3Gi
-  # -- number of database instances
-  numberOfInstances: 3
-  # -- postgres version
-  postgres_version: 13
-
 
 # -- VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml
 postgres-operator-ui:
@@ -235,36 +256,15 @@ postgres-operator-ui:
   replicaCount: 1
   envs:
   operatorApiUrl: "http://{{ $.Release.Name }}-postgres-operator:8080"
-
   service:
     type: ClusterIP
     port: 80
-  
   ingress:
     enabled: False
     ingressClassName: nginx
     hosts:
       - host: postgres-ui
         paths: [""]
-
-# -- VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/postgresql/values.yaml
-postgresql:
-  enabled: False
-  
-  # -- The usernames will be the same as the database names
-  geonodeDb: geonode
-  geodataDb: geonode_data
-  password: # PLS SET IF ACTICATED 
-
-  # TODO: support external db
-  # For now we only support a db installed with a subchart
-
-  # Standard postgres chart values
-  # See https://artifacthub.io/packages/helm/bitnami/postgresql for docs
-  # Override this!
-  postgresqlPassword: admin
-  initdbScriptsSecret: '{{ .Release.Name }}-postgres-init'
-
 
 # -- VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml
 rabbitmq:

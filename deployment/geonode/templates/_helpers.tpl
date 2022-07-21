@@ -1,22 +1,20 @@
 
-# # check if multiple database backends are active
-{{ $postgres_operator := index .Values "postgres-operator" "enabled" }}
-{{- if and (eq .Values.postgresql.enabled true) ( eq $postgres_operator true ) }}
-  {{- fail "Error, two Database backends enabled ..." }}
-{{- end }}
+# define container names (equal service names)
+{{- define "geoserver_container_name" -}}
+{{ .Release.Name }}-{{ .Values.geoserver.container_name }}
+{{- end -}}
 
-{{- define "database_host" -}}
-{{ .Release.Name }}-postgresql
+{{- define "geonode_container_name" -}}
+{{ .Release.Name }}-{{ .Values.geonode.container_name }}
+{{- end -}}
+
+{{- define "postgres_container_name" -}}
+{{ .Release.Name }}-{{ .Values.postgres.container_name }}
 {{- end -}}
 
 {{- define "database_port" -}}
 5432
 {{- end -}}
-
-{{- define "geoserver_port" -}}
-8080
-{{- end -}}
-
 
 {{- define "rabbit_host" -}}
 {{ .Release.Name }}-rabbitmq:5672

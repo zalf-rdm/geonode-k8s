@@ -15,7 +15,6 @@ Helm Chart for Geonode
 | Repository | Name | Version |
 |------------|------|---------|
 | https://charts.bitnami.com/bitnami | memcached | ~6.x.x |
-| https://charts.bitnami.com/bitnami | postgresql | 11.x.x |
 | https://charts.bitnami.com/bitnami | rabbitmq | ~10.1.7 |
 | https://opensource.zalando.com/postgres-operator/charts/postgres-operator-ui/ | postgres-operator-ui | ~1.8.0 |
 | https://opensource.zalando.com/postgres-operator/charts/postgres-operator/ | postgres-operator | ~1.8.0 |
@@ -25,6 +24,7 @@ Helm Chart for Geonode
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | geonode.celery.enabled | bool | `false` |  |
+| geonode.container_name | string | `"geonode"` | pod name |
 | geonode.general.api_limit_per_page | int | `1000` | to describe |
 | geonode.general.debug | bool | `false` | django debug mode |
 | geonode.general.max_document_size | int | `10` | max upload document size in MB |
@@ -87,10 +87,13 @@ Helm Chart for Geonode
 | geonode.register.show_profile_email | bool | `true` | show email addr in profile view |
 | geonode.replicaCount | int | `1` | number of geonode replicas (! not working properly yet) |
 | geoserver.admin_password | string | `"geoserver"` | geoserver admin password |
+| geoserver.admin_username | string | `"admin"` | geoserver admin username |
+| geoserver.container_name | string | `"geoserver"` |  |
 | geoserver.customEPSGs[0] | string | `"1=PROJCS[\"TM_Rwanda\",GEOGCS[\"GCS_ITRF_2005\",DATUM[\"D_ITRF_2005\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000.0],PARAMETER[\"False_Northing\",5000000.0],PARAMETER[\"Central_Meridian\",30.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]"` |  |
 | geoserver.extraCustomEPSGs | list | `[]` |  |
-| geoserver.image.name | string | `"zalf/geoserver"` | geoserver image docker image (default in zalf namespace because geonode one was not up to date) |
+| geoserver.image.name | string | `"geonode/geoserver"` | geoserver image docker image (default in zalf namespace because geonode one was not up to date) |
 | geoserver.image.tag | string | `"2.19.6"` | geoserver docker image tag |
+| geoserver.port | int | `8080` |  |
 | global.accessMode | string | `"ReadWriteMany"` | storage access mode used by helm dependency pvc |
 | global.storageClass | string | `nil` | storageClass used by helm dependencies pvc |
 | memcached.architecture | string | `"high-availability"` | memcached replica. Loadbalanaced via kubernetes. (only one entry in django settings.py) im memcached is activated under geonode.memcached.enabled this takes place |
@@ -105,12 +108,15 @@ Helm Chart for Geonode
 | postgres-operator.enabled | bool | `true` | enable postgres-operator (this or postgresql.enabled NOT both ) |
 | postgres-operator.operatorApiUrl | string | `"http://{{ .Release.Name }}-postgres-operator:8080"` | ??? |
 | postgres-operator.storageClass | string | `nil` | postgress pv storageclass |
-| postgres_operator_manifest | object | `{"numberOfInstances":3,"postgres_version":13,"storageSize":"3Gi"}` | configuration for postgres operator database manifest |
-| postgres_operator_manifest.numberOfInstances | int | `3` | number of database instances |
-| postgres_operator_manifest.postgres_version | int | `13` | postgres version |
-| postgres_operator_manifest.storageSize | string | `"3Gi"` | Database storage size |
-| postgresql | object | `{"enabled":false,"geodataDb":"geonode_data","geonodeDb":"geonode","initdbScriptsSecret":"{{ .Release.Name }}-postgres-init","password":null,"postgresqlPassword":"admin"}` | VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/postgresql/values.yaml |
-| postgresql.geonodeDb | string | `"geonode"` | The usernames will be the same as the database names |
+| postgres.container_name | string | `"postgresql"` | container name for postgres containers == teamID for mainifest |
+| postgres.geodatabasename | string | `"geogeonode"` | geoserver database name |
+| postgres.geonodedatabase | string | `"geonode"` | geonode database name |
+| postgres.operator_manifest | object | `{"numberOfInstances":3,"postgres_version":13,"storageSize":"3Gi"}` | configuration for postgres operator database manifest |
+| postgres.operator_manifest.numberOfInstances | int | `3` | number of database instances |
+| postgres.operator_manifest.postgres_version | int | `13` | postgres version |
+| postgres.operator_manifest.storageSize | string | `"3Gi"` | Database storage size |
+| postgres.schema | string | `"public"` | database schema |
+| postgres.username | string | `"postgres"` | postgres username |
 | rabbitmq | object | `{"auth":{"erlangCookie":"jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu","password":"rabbitpassword","username":"rabbituser"},"enabled":true,"persistence":{"enabled":false},"replicaCount":1}` | VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml |
 
 ----------------------------------------------
