@@ -4,14 +4,13 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-geonode-env
+  name: {{ include "geonode_container_name" . }}-env
   namespace: {{ .Release.Namespace }}
 data:
   IS_CELERY: "False"
   DOCKERIZE_VERSION: "v0.6.1"
   DEBUG: {{ include "boolean2str" .Values.geonode.general.debug | quote }}
   CLIENT_RESULTS_LIMIT: '25'
-  SOCIALACCOUNT_WITH_GEONODE_LOCAL_SINGUP: "True"
   C_FORCE_ROOT: '1'
   MAX_DOCUMENT_SIZE:  {{ .Values.geonode.general.max_document_size | quote }}
   API_LIMIT_PER_PAGE: {{ .Values.geonode.general.api_limit_per_page | quote }}
@@ -29,7 +28,6 @@ data:
   ASYNC_SIGNALS: 'False'
   CACHE_BUSTING_STATIC_ENABLED: 'False'
   CACHE_BUSTING_MEDIA_ENABLED: 'False'
-  DOCKER_ENV: production
 
   GEONODE_INSTANCE_NAME: {{ .Release.Name }}
   GEONODE_LB_HOST_IP: {{ .Values.geonode.ingress.externalDomain | quote }}
@@ -90,6 +88,8 @@ data:
   {{ end }}
   AUTO_ASSIGN_REGISTERED_MEMBERS_TO_REGISTERED_MEMBERS_GROUP_NAME: {{ include "boolean2str"  .Values.geonode.register.auto_assign_registered_members_to_registered | quote }}
   SHOW_PROFILE_EMAIL: {{  include "boolean2str" .Values.geonode.register.show_profile_email | quote }}
+  SOCIALACCOUNT_WITH_GEONODE_LOCAL_SINGUP: "True"
+
   # SOCIAL CONNECTOR
   # SOCIALACCOUNT_AUTO_SIGNUP: "False"
 
@@ -108,7 +108,6 @@ data:
   LDAP_USER_ATTR_MAP_FIRST_NAME: {{ .Values.geonode.ldap.attr_map_first_name | quote }}
   LDAP_USER_ATTR_MAP_LAST_NAME: {{ .Values.geonode.ldap.attr_map_last_name | quote }}
   LDAP_USER_ATTR_MAP_EMAIL_ADDR: {{ .Values.geonode.ldap.attr_map_email_addr | quote }}
-
 
   # OAuth2
   # TODO (mwall) implement OAUTH2
@@ -155,8 +154,8 @@ data:
   GEOSERVER_WEB_UI_LOCATION: "{{ include "public_url" . }}/geoserver/"
   GEOSERVER_PUBLIC_LOCATION: "{{ include "public_url" . }}/geoserver/"
   GEOSERVER_PUBLIC_SCHEMA: {{ .Values.geonode.ingress.externalScheme | quote }}
-  GEOSERVER_LOCATION: "http://{{ .Release.Name }}-geoserver:{{ include "geoserver_port" . }}/geoserver/"
-  GEOSERVER_ADMIN_USER: "admin"
+  GEOSERVER_LOCATION: "http://{{ include "geoserver_container_name" . }}:{{ .Values.geoserver.port }}/geoserver/"
+  GEOSERVER_ADMIN_USER: {{ .Values.geoserver.admin_username | quote }}
   GEOSERVER_ADMIN_PASSWORD: {{ .Values.geoserver.admin_password | quote }}
 
   OGC_REQUEST_TIMEOUT: '30'

@@ -1,38 +1,38 @@
 apiVersion: "acid.zalan.do/v1"
 kind: postgresql
 metadata:
-  name: geonode-postgresql
+  name: "{{ include "postgres_container_name" . }}"
 spec:
-  teamId: "geonode"
+  teamId: {{ .Release.Name | quote }}
   volume:
-    size: {{ .Values.postgres_operator_manifest.storageSize }}
-  numberOfInstances: {{ int .Values.postgres_operator_manifest.numberOfInstances }}
+    size: {{ .Values.postgres.operator_manifest.storageSize }}
+  numberOfInstances: {{ int .Values.postgres.operator_manifest.numberOfInstances }}
   users:
-    postgres:
+    {{ .Values.postgres.username }}:
     - superuser
-    geonode:
+    {{ .Values.postgres.geonodedatabase }}:
     - superuser
     - createdb
     - login
-    geogeonode:
+    {{ .Values.postgres.geodatabasename }}:
     - superuser
     - createdb
     - login
   databases:
-    geonode: geonode
-    geogeonode: geogeonode
+    {{ .Values.postgres.geonodedatabase }}: {{ .Values.postgres.geonodedatabase }}
+    {{ .Values.postgres.geodatabasename }}: {{ .Values.postgres.geodatabasename }}
   preparedDatabases:
-    geogeonode:
+    {{ .Values.postgres.geodatabasename }}:
       schemas:
-        public: {}
+        {{ .Values.postgres.schema }}: {}
       extensions:
-        pg_partman: public
-        postgis: public
-    geonode:
+        pg_partman: {{ .Values.postgres.schema }}
+        postgis: {{ .Values.postgres.schema }}
+    {{ .Values.postgres.geonodedatabase }}:
       schemas:
-        public: {}
+        {{ .Values.postgres.schema }}: {}
       extensions:
-        pg_partman: public
-        postgis: public
+        pg_partman: {{ .Values.postgres.schema }}
+        postgis: {{ .Values.postgres.schema }}
   postgresql:
     version: {{ .Values.postgres_operator_manifest.postgres_version | quote }}

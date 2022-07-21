@@ -2,18 +2,18 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Release.Name }}-geonode
+  name: "{{ include "geonode_container_name" . }}"
   namespace: {{ .Release.Namespace }}
 spec:
   selector:
     matchLabels:
-      org.geonode.instance: {{ .Release.Name }}-geonode
-  serviceName: {{ .Release.Name }}-geonode
+      org.geonode.instance: "{{ include "geonode_container_name" . }}"
+  serviceName: "{{ include "geonode_container_name" . }}"
   replicas: {{ .Values.geonode.replicaCount }}
   template:
     metadata:
       labels:
-        org.geonode.instance: {{ .Release.Name }}-geonode
+        org.geonode.instance: "{{ include "geonode_container_name" . }}"
     spec:
       terminationGracePeriodSeconds: 3
       initContainers:
@@ -24,7 +24,7 @@ spec:
         args:
         - -timeout=120s
         - -wait
-        - tcp://{{ include "database_host" .}}:{{ include "database_port" .}}
+        - tcp://{{ include "postgres_container_name" . }}:{{ include "database_port" .}}
         - -wait
         - tcp://{{ include "rabbit_host" .}}
       containers:
@@ -55,104 +55,61 @@ spec:
         # - containerPort: 8001
         envFrom:
           - configMapRef:
-              name: {{ .Release.Name }}-geonode-env
+              name: {{ include "geonode_container_name" . }}-env
         env:
         ##########################
         # DATABASE CONFIGURATION #
         ##########################
 
-        {{ $postgres_operator := index .Values "postgres-operator" "enabled" }}
-        {{ if (eq .Values.postgresql.enabled true) }}
-        # Postgresql configuration
-        - name: POSTGRES_USER
-          value: postgres
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Release.Name }}-secrets
-              key: POSTGRES_PASSWORD
-        - name: GEONODE_DATABASE
-          value: {{ .Values.postgresql.geonodeDb | quote }}
-        - name: GEONODE_DATABASE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Release.Name }}-secrets
-              key: GEONODE_DATABASE_PASSWORD
-        - name: GEONODE_GEODATABASE
-          value: {{ .Values.postgresql.geodataDb | quote }}
-        - name: GEONODE_GEODATABASE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Release.Name }}-secrets
-              key: GEONODE_GEODATABASE_PASSWORD
-        - name: GEONODE_DATABASE_SCHEMA
-          value: public
-        - name: GEONODE_GEODATABASE_SCHEMA
-          value: public
-        - name: DATABASE_URL
-          value: postgis://{{ .Values.postgresql.geonodeDb }}:{{ .Values.postgresql.password }}@{{ include "database_host" .}}:{{ include "database_port" .}}/{{ .Values.postgresql.geonodeDb }}
-        - name: GEODATABASE_URL
-          value: postgis://{{ .Values.postgresql.geodataDb }}:{{ .Values.postgresql.password }}@{{ include "database_host" .}}:{{ include "database_port" .}}/{{ .Values.postgresql.geodataDb }}
+        # HOST CONFIGURATION
         - name: DATABASE_HOST
-          value: {{ include "database_host" .}}
+          value: "{{ include "postgres_container_name" . }}"
         - name: DATABASE_PORT
-          value: {{ include "database_port" .}}
+          value: "{{ include "database_port" .}}"
 
-        {{ else if (eq $postgres_operator true) }}
         # patroni login credentials from
         # {username}.{team}-{clustername}.credentials.postgresql.acid.zalan.do
-        
-        # geogenode database
-        - name: DATABASE_HOST
-          value: "$(GEONODE_POSTGRESQL_SERVICE_HOST)"
-        - name: DATABASE_PORT
-          value: "$(GEONODE_POSTGRESQL_SERVICE_PORT)"
 
-        # Postgres superuser
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: postgres.geonode-postgresql.credentials.postgresql.acid.zalan.do
-              key: username
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres.geonode-postgresql.credentials.postgresql.acid.zalan.do
-              key: password
-
-        # DATABASE CREDENTIALS USED BY DJANGO
-        # geonode database/user
-        - name: GEONODE_DATABASE
-          valueFrom:
-            secretKeyRef:
-              name: geonode.geonode-postgresql.credentials.postgresql.acid.zalan.do
-              key: username
         # geonode user password
         - name: GEONODE_DATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: geonode.geonode-postgresql.credentials.postgresql.acid.zalan.do
+              name:  {{ .Values.postgres.geonodedatabase }}.{{ include "postgres_container_name" . }}.credentials.postgresql.acid.zalan.do
               key: password
-        - name: DATABASE_URL
-          value: "postgis://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"
 
-        # GEODATABASE CREDENTIALS USED BY GEOSERVER
-        # geogeonode database/user
-        - name: GEONODE_GEODATABASE
-          valueFrom:
-            secretKeyRef:
-              name: geogeonode.geonode-postgresql.credentials.postgresql.acid.zalan.do
-              key: username
-        # geonode user password
+        # geogeodatabase password
         - name: GEONODE_GEODATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: geogeonode.geonode-postgresql.credentials.postgresql.acid.zalan.do
+              name: {{ .Values.postgres.geodatabasename }}.{{ include "postgres_container_name" . }}.credentials.postgresql.acid.zalan.do
               key: password
+
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.postgres.username }}.{{ include "postgres_container_name" . }}.credentials.postgresql.acid.zalan.do
+              key: password
+
+        - name: POSTGRES_USER
+          value: {{ .Values.postgres.username }}
+
+        - name: GEONODE_DATABASE
+          value: {{ .Values.postgres.geonodedatabase | quote }}
+
+        - name: GEONODE_GEODATABASE
+          value: {{ .Values.postgres.geodatabasename | quote }}
+
+        - name: GEONODE_DATABASE_SCHEMA
+          value: {{ .Values.postgres.schema }}
+
+        - name: GEONODE_GEODATABASE_SCHEMA
+          value: {{ .Values.postgres.schema }}
+
         - name: GEODATABASE_URL
           value: "postgis://$(GEONODE_GEODATABASE):$(GEONODE_GEODATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_GEODATABASE)"
 
-        {{ end }}
+        - name: DATABASE_URL
+          value: "postgis://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"
 
         volumeMounts:
         - name: persistence
@@ -169,36 +126,21 @@ spec:
           subPath: data
         - name: cache-volume
           mountPath: /tmp
-
         # geonode-k8s updated task-py
         - name: task-py
           mountPath: "/usr/src/geonode/tasks.py"
           subPath: tasks.py
           readOnly: true
 
-        # TODO FIX ISSUE WITH RESSOURCES
-        # resources:
-        #   requests:
-        #     memory: 3Gi
-        #     cpu: 100m
-        #   limits:
-        #     memory: 4Gi
-        #     cpu: 1000m
-        # livenessProbe:
-        #   tcpSocket:
-        #     port: 8001
-        #   initialDelaySeconds: 1200
-        #   periodSeconds: 10
-        #   failureThreshold: 15
-      # # Celery is the task worker
 
+      # Celery is the task worker
       {{ if (eq .Values.geonode.celery.enabled true) }}
-      
-      - name: celery
+
+      - name: {{ include "geonode_container_name" . }}-celery
         image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
         envFrom:
           - configMapRef:
-            name: {{ .Release.Name }}-geonode-env
+            name: {{ include "geonode_container_name" . }}-env
         env:
         - name: IS_CELERY
           value: 'True'
@@ -210,7 +152,7 @@ spec:
           wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-          
+
           # Add host alias since the scripts hardcode the db host as 'db' @##@?
           # echo "db {{ .Release.Name }}-postgresql" > /etc/host.aliases
           # export HOSTALIASES=/etc/host.aliases
@@ -238,14 +180,7 @@ spec:
           mountPath: /tmp
         ports:
         - containerPort: 5555
-        # healthcheck: curl --fail --silent --write-out 'HTTP CODE : %{http_code}\n' --output /dev/null http://127.0.0.1:8001/
-        # resources:
-        #   requests:
-        #     memory: 1Gi
-        #     cpu: 100m
-        #   limits:
-        #     memory: 2Gi
-        #     cpu: 400m
+
         {{ end }}
 
       volumes:

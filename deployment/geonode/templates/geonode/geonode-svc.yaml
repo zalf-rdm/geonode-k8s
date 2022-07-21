@@ -2,11 +2,11 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ .Release.Name }}-geonode
+  name: "{{ include "geonode_container_name" . }}"
   namespace: {{ .Release.Namespace }}
 spec:
   selector:
-    org.geonode.instance: {{ .Release.Name }}-geonode
+    org.geonode.instance: "{{ include "geonode_container_name" . }}"
   ports:
   - targetPort: 8000
     port: 8000

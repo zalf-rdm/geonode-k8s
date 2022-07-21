@@ -14,10 +14,6 @@ dependencies:
     version: ~1.8.0
     repository: https://opensource.zalando.com/postgres-operator/charts/postgres-operator/
     condition: postgres-operator.enabled
-  - name: postgresql
-    version: 11.x.x
-    repository: https://charts.bitnami.com/bitnami
-    condition: postgresql.enabled
   - name: rabbitmq
     version: ~10.1.7
     repository: https://charts.bitnami.com/bitnami
