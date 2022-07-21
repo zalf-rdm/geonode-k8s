@@ -2,13 +2,13 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ .Release.Name }}-geoserver
+  name: "{{ include "geoserver_container_name" . }}"
   namespace: {{ .Release.Namespace }}
 spec:
   selector:
-    org.geonode.instance: {{ .Release.Name }}-geoserver
+    org.geonode.instance: "{{ include "geoserver_container_name" . }}"
   ports:
-  - targetPort: 8080
+  - targetPort: {{ .Values.geoserver.port }}
     port: 8080
     name: http
   type: ClusterIP

@@ -2,18 +2,18 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Release.Name }}-geoserver
+  name: "{{ include "geoserver_container_name" . }}"
   namespace: {{ .Release.Namespace }}
 spec:
   selector:
     matchLabels:
-      org.geonode.instance: {{ .Release.Name }}-geoserver
-  serviceName: {{ .Release.Name }}-geoserver
-  replicas: {{ .Values.nginx.replicas }}
+      org.geonode.instance: "{{ include "geoserver_container_name" . }}"
+  serviceName: "{{ include "geoserver_container_name" . }}"
+  replicas: 1
   template:
     metadata:
       labels:
-        org.geonode.instance: {{ .Release.Name }}-geoserver
+        org.geonode.instance: "{{ include "geoserver_container_name" . }}"
     spec:
       terminationGracePeriodSeconds: 3
       initContainers:
@@ -53,23 +53,31 @@ spec:
         #   - -f
         #   - /dev/null
         ports:
-        - containerPort: {{ include "geoserver_port" . }}
+        - containerPort: {{ .Values.geoserver.port }}
         envFrom:
           - configMapRef:
-              name: {{ .Release.Name }}-geoserver-env
+              name:  {{ include "geoserver_container_name" . }}-env
+        env:
+          # read auto generated password from secret
+          - name: GEONODE_GEODATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.postgres.geodatabasename }}.{{ include "postgres_container_name" . }}.credentials.postgresql.acid.zalan.do
+                key: password
+                
         volumeMounts:
         - name: persistence
           mountPath: /geoserver_data/data
           subPath: geoserver-data-dir
         readinessProbe:
           tcpSocket:
-            port: {{ include "geoserver_port" . }}
+            port: {{ .Values.geoserver.port }}
           initialDelaySeconds: 60
           periodSeconds: 5
           failureThreshold: 15
         livenessProbe:
           tcpSocket:
-            port: {{ include "geoserver_port" . }}
+            port: {{ .Values.geoserver.port }}
           initialDelaySeconds: 180
           periodSeconds: 5
           failureThreshold: 15

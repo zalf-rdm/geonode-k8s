@@ -74,7 +74,7 @@ data:
         geodb_url = _update_geodb_connstring()
         service_ready = False
         while not service_ready:
-            geonode_host = '{{ .Release.Name }}-geonode'
+            geonode_host = '{{ include "geonode_container_name" . }}'
             print("wating for host {} ...".format(geonode_host))
             try:
                 socket.gethostbyname(geonode_host)
@@ -97,7 +97,7 @@ data:
         envs = {
             "local_settings": str(_localsettings()),
             "siteurl": os.environ.get('SITEURL', siteurl),
-            "geonode_docker_host": str(socket.gethostbyname('{{ .Release.Name }}-geonode')),
+            "geonode_docker_host": str(socket.gethostbyname('{{ include "geonode_container_name" . }}')),
             "public_protocol": pub_protocol,
             "public_fqdn": str(pub_ip) + str(f':{pub_port}' if pub_port else ''),
             "public_host": str(pub_ip),
@@ -117,7 +117,7 @@ data:
             "db_url": os.environ.get('DATABASE_URL', 'postgis://geonode:geonode@db:5432/geonode'),
             "geodb_url": os.environ.get('GEODATABASE_URL', 'postgis://geonode:geonode@db:5432/geonode_data'),
             "geonode_db": os.environ.get('GEONODE_DATABASE', 'geonode'),
-            "gs_loc": os.environ.get('GEOSERVER_LOCATION', 'http://{{ .Release.Name }}-geoserver:8080/geoserver/'),
+            "gs_loc": os.environ.get('GEOSERVER_LOCATION', 'http://{{ include "geoserver_container_name" . }}:{{ .Values.geoserver.port }}/geoserver/'),
             "gs_web_ui_loc": os.environ.get('GEOSERVER_WEB_UI_LOCATION', gs_pub_loc),
             "gs_pub_loc": os.environ.get('GEOSERVER_PUBLIC_LOCATION', gs_pub_loc),
             "gs_admin_pwd": os.environ.get('GEOSERVER_ADMIN_PASSWORD', 'geoserver'),
@@ -126,11 +126,11 @@ data:
         try:
             current_allowed = ast.literal_eval(
                 os.getenv('ALLOWED_HOSTS') or
-                "['{public_fqdn}', '{public_host}', 'localhost', 'django', '{{ .Release.Name }}-geonode',]".format(**envs))
+                "['{public_fqdn}', '{public_host}', 'localhost', 'django', '{{ include "geonode_container_name" . }}',]".format(**envs))
         except ValueError:
             current_allowed = []
         current_allowed.extend([str(pub_ip), f'{pub_ip}:{pub_port}'])
-        allowed_hosts = [str(c) for c in current_allowed] + ['"{{ .Release.Name }}-geonode"', '"django"']
+        allowed_hosts = [str(c) for c in current_allowed] + ['"{{ include "geonode_container_name" . }}"', '"django"']
 
         ctx.run("echo export DJANGO_SETTINGS_MODULE=\
     {local_settings} >> {override_fn}".format(**envs), pty=True)
@@ -542,11 +542,11 @@ data:
         pub_port = _geonode_public_port()
         print(f"Public PORT is {pub_port}")
         try:
-            geonode_ip = socket.gethostbyname('{{ .Release.Name }}-geonode')
+            geonode_ip = socket.gethostbyname('{{ include "geonode_container_name" . }}')
         except Exception:
             geonode_ip = pub_ip
         try:
-            geoserver_ip = socket.gethostbyname('{{ .Release.Name }}-geoserver')
+            geoserver_ip = socket.gethostbyname('{{ include "geoserver_container_name" . }}')
         except Exception:
             geoserver_ip = pub_ip
         d = '1970-01-01 00:00:00'
@@ -614,7 +614,7 @@ data:
             {
                 "fields": {
                     "name": "default-geoserver",
-                    "url": "http://{{ .Release.Name }}-geoserver:8080/geoserver/",
+                    "url": "http://{{ include "geoserver_container_name" . }}:{{ .Values.geoserver.port }}/geoserver/",
                     "notes": "",
                     "last_check": d,
                     "active": True,
