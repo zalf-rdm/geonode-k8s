@@ -131,7 +131,10 @@ spec:
           mountPath: "/usr/src/geonode/tasks.py"
           subPath: tasks.py
           readOnly: true
-
+        resources:
+          requests:
+            memory: {{ .Values.geonode.resources.requests.memory }}
+            cpu: {{ .Values.geonode.resources.requests.cpu }}
 
       # Celery is the task worker
       {{ if (eq .Values.geonode.celery.enabled true) }}
