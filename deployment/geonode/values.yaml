@@ -1,5 +1,4 @@
 
-
 global:
   # -- storageClass used by helm dependencies pvc
   storageClass: 
@@ -12,16 +11,24 @@ geonode:
   container_name: geonode
   # -- number of geonode replicas (! not working properly yet)
   replicaCount: 1
-  
+
   persistant:
     # -- size of persistant geonode storage
     storageSize: 2Gi
+
   image:
     # -- used geonode image
     name: zalf/geonode
     # -- tag of used geonode image
     tag: 'latest'
-  
+
+  resources:
+    requests:
+      # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "4096Mi"
+      # -- requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: 2
+
   ingress:
     # -- enables external access 
     enabled: True
@@ -43,7 +50,7 @@ geonode:
     api_limit_per_page: 1000
     # -- django debug mode
     debug: False
-    
+
     superUser:
       # -- admin panel password
       password: geonode
@@ -69,7 +76,7 @@ geonode:
     password: "changeme"
     # -- define from mail-addr 
     from: "changeme@web.de"
-  
+
   ldap:
     # -- enable ldap AUTHENTICATION_BACKENDS in DJANGO Geonode
     enabled: False
@@ -144,6 +151,7 @@ geonode:
     # -- hystack results per page
     search_results_per_page: '200'
 
+
   # configure memcached as django cache. .Values.memcached.... to configure memcached replicas, architecture and so on (see https://docs.djangoproject.com/en/4.0/topics/cache/)
   memcached:
     # -- enable memcache, this will spawn one or more seperate memcache container(s) and configure django geonode repsectivly. Dynamic caching (see https://docs.djangoproject.com/en/4.0/topics/cache/)
@@ -152,7 +160,8 @@ geonode:
     lock_expire: '3600'
     # -- memcached lock timeout
     lock_timeout: '10'
-  
+
+
   monitoring:
     enabled: False
     data_tls: 365
@@ -162,9 +171,11 @@ geonode:
   celery:
     enabled: False
 
+
   # configuration for postgres-operator manifest
   postgresdb:
     replicaCount: 1
+
 
 # CONFIGURATION FOR GEOSERVER DEPLOYMENT
 geoserver:
@@ -174,7 +185,7 @@ geoserver:
     name: geonode/geoserver
     # -- geoserver docker image tag
     tag: '2.19.6'
-  
+  # -- geoserver port
   port: 8080
   # -- geoserver admin username
   admin_username: admin
@@ -193,6 +204,7 @@ memcached:
   # -- memcached replica. Loadbalanaced via kubernetes. (only one entry in django settings.py) im memcached is activated under geonode.memcached.enabled this takes place
   architecture: high-availability
   replicaCount: 1
+
 
 # CONFIGURATION FOR NGINX DEPLOYMENT
 # MAY MOVE TO CHART
@@ -221,6 +233,7 @@ postgres:
   # infos @ https://postgres-operator.readthedocs.io/en/refactoring-sidecars/user/
   # get password after creation via: kubectl get secret {{ .Release.name }}.{{ .Release.name }}-{{ container_name }}.credentials -o 'jsonpath={.data.password}' | base64 -d
 
+
   # -- configuration for postgres operator database manifest
   operator_manifest:
     # -- Database storage size
@@ -229,7 +242,6 @@ postgres:
     numberOfInstances: 3
     # -- postgres version
     postgres_version: 13
-
 
 ########################
 # CHART CONFIGURATIONS #
@@ -246,8 +258,6 @@ postgres-operator:
   api_port: 8080
   # -- postgress pv storageclass
   storageClass: 
-  # -- ???
-  enable_master_load_balancer: true
 
 
 # -- VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml

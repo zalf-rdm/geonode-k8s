@@ -43,6 +43,7 @@ If you want to go straight for a production installation follow the [installatio
 
 Furhter docs:
 - [https-ingress](docs/https-ingress.md)
+- [access-geonode-database-from-outside-of-kubernetes](docs/external-database-access.md)
 
 Install
 -------
