@@ -171,11 +171,9 @@ geonode:
   celery:
     enabled: False
 
-
   # configuration for postgres-operator manifest
   postgresdb:
     replicaCount: 1
-
 
 # CONFIGURATION FOR GEOSERVER DEPLOYMENT
 geoserver:
@@ -271,7 +269,7 @@ postgres-operator-ui:
     port: 80
   ingress:
     enabled: False
-    ingressClassName: nginx
+    ingressClassName:
     hosts:
       - host: postgres-ui
         paths: [""]
