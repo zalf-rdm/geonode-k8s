@@ -171,11 +171,9 @@ geonode:
   celery:
     enabled: False
 
-
   # configuration for postgres-operator manifest
   postgresdb:
     replicaCount: 1
-
 
 # CONFIGURATION FOR GEOSERVER DEPLOYMENT
 geoserver:
@@ -184,7 +182,7 @@ geoserver:
     # -- geoserver image docker image (default in zalf namespace because geonode one was not up to date)
     name: geonode/geoserver
     # -- geoserver docker image tag
-    tag: '2.19.6'
+    tag: '2.20.6'
   # -- geoserver port
   port: 8080
   # -- geoserver admin username
@@ -271,7 +269,7 @@ postgres-operator-ui:
     port: 80
   ingress:
     enabled: False
-    ingressClassName: nginx
+    ingressClassName:
     hosts:
       - host: postgres-ui
         paths: [""]
