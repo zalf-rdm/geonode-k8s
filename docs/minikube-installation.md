@@ -20,7 +20,7 @@ View and edit the predefined minikube values under /minikube-values.yaml
 
 To run the installation on minikube run:
 ```bash
-helm upgrade --cleanup-on-fail   --install --namespace geonode --create-namespace --values my-values.yaml geonode deployment/geonode
+helm upgrade --cleanup-on-fail   --install --namespace geonode --create-namespace --values minikube-values.yaml geonode deployment/geonode
 ```
 
 You can check the installtion process with:
@@ -112,7 +112,7 @@ Find the ip addr of the geonode-nginx service. and add an entry to your hosts fi
 After that the service has to be exposed form minikube. I prefer to use minikube tunnel. Start it via, it will require root access:
 
 ```bash
-mincube tunnel
+minkube tunnel
 ```
 
 There are several ways to expose services from minikube, find information in the minikube docs under: https://minikube.sigs.k8s.io/docs/handbook/accessing/
