@@ -301,7 +301,7 @@ postgres-operator-ui:
   enabled: true
   replicaCount: 1
   envs:
-  operatorApiUrl: "http://{{ $.Release.Name }}-postgres-operator:8080"
+    operatorApiUrl: "http://{{ $.Release.Name }}-postgres-operator:8080"
   service:
     type: ClusterIP
     port: 80
