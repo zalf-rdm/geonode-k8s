@@ -43,6 +43,16 @@ geonode:
     # -- tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/. is used when geonode.ingress.externalScheme is set to https
     tlsSecret: geonode-tls-secret
 
+  sentry:
+    # -- enable sentry integration for geonode
+    enabled: True
+    # -- sentry dsn url
+    dsn: ""
+    # -- sentry environment
+    environment: "development"
+    # -- sentry build number
+    build_number: 0
+
   general:
     # -- max upload document size in MB
     max_document_size: 10
@@ -50,12 +60,37 @@ geonode:
     api_limit_per_page: 1000
     # -- django debug mode
     debug: False
+    # FREETEXT_KEYWORDS_READONLY Make Free-Text Keywords writable from users. Or read-only when set to False.
+    freetext_keywords_readonly: False
 
     superUser:
       # -- admin panel password
       password: geonode
       # -- admin user password
       email: support@example.com
+
+    publishing:
+      # -- RESOURCE_PUBLISHING By default, the GeoNode application allows GeoNode staff members to publish/unpublish resources. 
+      # By default, resources are published when created. When this setting is set to True the staff members will be able to unpublish
+      # a resource (and eventually publish it back).
+      resource_publishing_by_staff: false
+      # -- ADMIN_MODERATE_UPLOADS When this variable is set to True, every uploaded resource must be approved before becoming visible to the public users.
+      # Until a resource is in PENDING APPROVAL state, only the superusers, owner and group members can access it, unless specific edit permissions have been set for other users or groups.
+      # A Group Manager can approve the resource, but he cannot publish it whenever the setting RESOURCE_PUBLISHING is set to True. Otherwise,
+      # if RESOURCE_PUBLISHING (helm: resource_publishing_by_staff) is set to False, the resource becomes accessible as soon as it is approved.
+      admin_moderate_uploads: false
+
+    display:
+      # -- DISPLAY_RATINGS If set to False ratings are hidden.
+      rating: true
+      # -- DISPLAY_COMMENTS If set to False comments are hidden.
+      comments: true
+      # -- DISPLAY_SOCIAL If set to False social sharing is hidden.
+      social: true
+      # -- DISPLAY_WMS_LINKS If set to False direct WMS link to GeoServer is hidden.
+      wms_link: true
+      # -- DISPLAY_ORIGINAL_DATASET_LINK If set to False original dataset download is hidden.
+      dataset_link: true
 
   mail:
     # -- enables mail configuration for geonode
@@ -256,6 +291,8 @@ postgres-operator:
   api_port: 8080
   # -- postgress pv storageclass
   storageClass: 
+  podServiceAccount:
+    name: "{{ .Release.Name }}-postgres-pod"
 
 
 # -- VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml
