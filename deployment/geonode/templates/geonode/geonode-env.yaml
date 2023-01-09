@@ -50,19 +50,18 @@ data:
   ADMIN_EMAIL: {{ .Values.geonode.general.superUser.email | quote }}
   ADMIN_PASSWORD: {{ .Values.geonode.general.superUser.password | quote }}
 
-
   # General settings
   FREETEXT_KEYWORDS_READONLY: {{ include "boolean2str" .Values.geonode.general.freetext_keywords_readonly | quote }}
-    # PUBLISHING
-    RESOURCE_PUBLISHING: {{ include "boolean2str" .Values.geonode.general.publishing.resource_publishing_by_staff | quote }}
-    ADMIN_MODERATE_UPLOADS: {{ include "boolean2str" .Values.geonode.general.publishing.admin_moderate_uploads | quote }}
+  # PUBLISHING
+  RESOURCE_PUBLISHING: {{ include "boolean2str" .Values.geonode.general.publishing.resource_publishing_by_staff | quote }}
+  ADMIN_MODERATE_UPLOADS: {{ include "boolean2str" .Values.geonode.general.publishing.admin_moderate_uploads | quote }}
 
-    # DISPLAY
-    DISPLAY_RATINGS: {{ include "boolean2str" .Values.geonode.general.display.rating | quote }}
-    DISPLAY_COMMENTS: {{ include "boolean2str" .Values.geonode.general.display.comments | quote }}
-    DISPLAY_SOCIAL: {{ include "boolean2str" .Values.geonode.general.display.social | quote }}
-    DISPLAY_WMS_LINKS: {{ include "boolean2str" .Values.geonode.general.display.wms_link | quote }}
-    DISPLAY_ORIGINAL_DATASET_LINK: {{ include "boolean2str" .Values.geonode.general.display.dataset_link | quote }}
+  # DISPLAY
+  DISPLAY_RATINGS: {{ include "boolean2str" .Values.geonode.general.display.rating | quote }}
+  DISPLAY_COMMENTS: {{ include "boolean2str" .Values.geonode.general.display.comments | quote }}
+  DISPLAY_SOCIAL: {{ include "boolean2str" .Values.geonode.general.display.social | quote }}
+  DISPLAY_WMS_LINKS: {{ include "boolean2str" .Values.geonode.general.display.wms_link | quote }}
+  DISPLAY_ORIGINAL_DATASET_LINK: {{ include "boolean2str" .Values.geonode.general.display.dataset_link | quote }}
 
 
   # EMAIL Notifications
