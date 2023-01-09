@@ -34,8 +34,8 @@ Helm Chart for Geonode
 | geonode.general.display.wms_link | bool | `true` | DISPLAY_WMS_LINKS If set to False direct WMS link to GeoServer is hidden. |
 | geonode.general.freetext_keywords_readonly | bool | `false` |  |
 | geonode.general.max_document_size | int | `10` | max upload document size in MB |
-| geonode.general.publishing.admin_moderate_uploads | bool | `false` | ADMIN_MODERATE_UPLOADS When this variable is set to True, every uploaded resource must be approved before becoming visible to the public users. Until a resource is in PENDING APPROVAL state, only the superusers, owner and group members can access it, unless specific edit permissions have been set for other users or groups. A Group Manager can approve the resource, but he cannot publish it whenever the setting RESOURCE_PUBLISHING is set to True. Otherwise,  if RESOURCE_PUBLISHING (helm: resource_publishing_by_staff) is set to False, the resource becomes accessible as soon as it is approved. |
-| geonode.general.publishing.resource_publishing_by_staff | bool | `false` | RESOURCE_PUBLISHING By default, the GeoNode application allows GeoNode staff members to publish/unpublish resources.  By default, resources are published when created. When this setting is set to True the staff members will be able to unpublish  a resource (and eventually publish it back). |
+| geonode.general.publishing.admin_moderate_uploads | bool | `false` | ADMIN_MODERATE_UPLOADS When this variable is set to True, every uploaded resource must be approved before becoming visible to the public users. Until a resource is in PENDING APPROVAL state, only the superusers, owner and group members can access it, unless specific edit permissions have been set for other users or groups. A Group Manager can approve the resource, but he cannot publish it whenever the setting RESOURCE_PUBLISHING is set to True. Otherwise, if RESOURCE_PUBLISHING (helm: resource_publishing_by_staff) is set to False, the resource becomes accessible as soon as it is approved. |
+| geonode.general.publishing.resource_publishing_by_staff | bool | `false` | RESOURCE_PUBLISHING By default, the GeoNode application allows GeoNode staff members to publish/unpublish resources.  By default, resources are published when created. When this setting is set to True the staff members will be able to unpublish a resource (and eventually publish it back). |
 | geonode.general.superUser.email | string | `"support@example.com"` | admin user password |
 | geonode.general.superUser.password | string | `"geonode"` | admin panel password |
 | geonode.haystack.enabled | bool | `false` | enable hystack |
@@ -120,7 +120,7 @@ Helm Chart for Geonode
 | postgres-operator.configLoggingRestApi | string | `nil` |  |
 | postgres-operator.enabled | bool | `true` | enable postgres-operator (this or postgresql.enabled NOT both ) |
 | postgres-operator.operatorApiUrl | string | `"http://{{ .Release.Name }}-postgres-operator:8080"` | ??? |
-| postgres-operator.podServiceAccount.name | string | `"{{ .Release.Name }}-postgres-pod"` |  |
+| postgres-operator.podServiceAccount | object | `{"name":""}` | not setting the podServiceAccount name will leed to generation of this name. This allows to run multiple postgres-operators in a single kubernetes cluster. just seperating them by namespace. |
 | postgres-operator.storageClass | string | `nil` | postgress pv storageclass |
 | postgres.container_name | string | `"postgresql"` | container name for postgres containers == teamID for mainifest |
 | postgres.geodatabasename | string | `"geogeonode"` | geoserver database name |
