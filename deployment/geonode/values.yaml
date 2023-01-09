@@ -61,7 +61,7 @@ geonode:
     # -- django debug mode
     debug: False
     # FREETEXT_KEYWORDS_READONLY Make Free-Text Keywords writable from users. Or read-only when set to False.
-    freetext_keywords_readonly: False
+    freetext_keywords_readonly: false
 
     superUser:
       # -- admin panel password
@@ -291,8 +291,9 @@ postgres-operator:
   api_port: 8080
   # -- postgress pv storageclass
   storageClass: 
+  # -- not setting the podServiceAccount name will leed to generation of this name. This allows to run multiple postgres-operators in a single kubernetes cluster. just seperating them by namespace.
   podServiceAccount:
-    name: "{{ .Release.Name }}-postgres-pod"
+    name: ""
 
 
 # -- VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml
