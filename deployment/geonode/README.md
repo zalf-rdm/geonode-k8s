@@ -27,7 +27,15 @@ Helm Chart for Geonode
 | geonode.container_name | string | `"geonode"` | pod name |
 | geonode.general.api_limit_per_page | int | `1000` | to describe |
 | geonode.general.debug | bool | `false` | django debug mode |
+| geonode.general.display.comments | bool | `true` | DISPLAY_COMMENTS If set to False comments are hidden. |
+| geonode.general.display.dataset_link | bool | `true` | DISPLAY_ORIGINAL_DATASET_LINK If set to False original dataset download is hidden. |
+| geonode.general.display.rating | bool | `true` | DISPLAY_RATINGS If set to False ratings are hidden. |
+| geonode.general.display.social | bool | `true` | DISPLAY_SOCIAL If set to False social sharing is hidden. |
+| geonode.general.display.wms_link | bool | `true` | DISPLAY_WMS_LINKS If set to False direct WMS link to GeoServer is hidden. |
+| geonode.general.freetext_keywords_readonly | bool | `false` |  |
 | geonode.general.max_document_size | int | `10` | max upload document size in MB |
+| geonode.general.publishing.admin_moderate_uploads | bool | `false` | ADMIN_MODERATE_UPLOADS When this variable is set to True, every uploaded resource must be approved before becoming visible to the public users. Until a resource is in PENDING APPROVAL state, only the superusers, owner and group members can access it, unless specific edit permissions have been set for other users or groups. A Group Manager can approve the resource, but he cannot publish it whenever the setting RESOURCE_PUBLISHING is set to True. Otherwise,  if RESOURCE_PUBLISHING (helm: resource_publishing_by_staff) is set to False, the resource becomes accessible as soon as it is approved. |
+| geonode.general.publishing.resource_publishing_by_staff | bool | `false` | RESOURCE_PUBLISHING By default, the GeoNode application allows GeoNode staff members to publish/unpublish resources.  By default, resources are published when created. When this setting is set to True the staff members will be able to unpublish  a resource (and eventually publish it back). |
 | geonode.general.superUser.email | string | `"support@example.com"` | admin user password |
 | geonode.general.superUser.password | string | `"geonode"` | admin panel password |
 | geonode.haystack.enabled | bool | `false` | enable hystack |
@@ -86,14 +94,20 @@ Helm Chart for Geonode
 | geonode.register.registered_members_group_name | string | `nil` | group name to add new registered users to, requires auto_assign_registered_members_to_registered: True.  |
 | geonode.register.show_profile_email | bool | `true` | show email addr in profile view |
 | geonode.replicaCount | int | `1` | number of geonode replicas (! not working properly yet) |
+| geonode.resources.requests.cpu | int | `2` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| geonode.resources.requests.memory | string | `"4096Mi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| geonode.sentry.build_number | int | `0` | sentry build number |
+| geonode.sentry.dsn | string | `""` | sentry dsn url |
+| geonode.sentry.enabled | bool | `true` | enable sentry integration for geonode |
+| geonode.sentry.environment | string | `"development"` | sentry environment |
 | geoserver.admin_password | string | `"geoserver"` | geoserver admin password |
 | geoserver.admin_username | string | `"admin"` | geoserver admin username |
 | geoserver.container_name | string | `"geoserver"` |  |
 | geoserver.customEPSGs[0] | string | `"1=PROJCS[\"TM_Rwanda\",GEOGCS[\"GCS_ITRF_2005\",DATUM[\"D_ITRF_2005\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000.0],PARAMETER[\"False_Northing\",5000000.0],PARAMETER[\"Central_Meridian\",30.0],PARAMETER[\"Scale_Factor\",0.9999],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]"` |  |
 | geoserver.extraCustomEPSGs | list | `[]` |  |
 | geoserver.image.name | string | `"geonode/geoserver"` | geoserver image docker image (default in zalf namespace because geonode one was not up to date) |
-| geoserver.image.tag | string | `"2.19.6"` | geoserver docker image tag |
-| geoserver.port | int | `8080` |  |
+| geoserver.image.tag | string | `"2.20.6"` | geoserver docker image tag |
+| geoserver.port | int | `8080` | geoserver port |
 | global.accessMode | string | `"ReadWriteMany"` | storage access mode used by helm dependency pvc |
 | global.storageClass | string | `nil` | storageClass used by helm dependencies pvc |
 | memcached.architecture | string | `"high-availability"` | memcached replica. Loadbalanaced via kubernetes. (only one entry in django settings.py) im memcached is activated under geonode.memcached.enabled this takes place |
@@ -101,12 +115,12 @@ Helm Chart for Geonode
 | nginx.image.name | string | `"nginx"` | nginx docker image |
 | nginx.image.tag | string | `"1.20"` | nginx docker image tag |
 | nginx.replicaCount | int | `1` | nginx container replicas |
-| postgres-operator-ui | object | `{"enabled":true,"envs":null,"ingress":{"enabled":false,"hosts":[{"host":"postgres-ui","paths":[""]}],"ingressClassName":"nginx"},"operatorApiUrl":"http://{{ $.Release.Name }}-postgres-operator:8080","replicaCount":1,"service":{"port":80,"type":"ClusterIP"}}` | VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml |
+| postgres-operator-ui | object | `{"enabled":true,"envs":null,"ingress":{"enabled":false,"hosts":[{"host":"postgres-ui","paths":[""]}],"ingressClassName":null},"operatorApiUrl":"http://{{ $.Release.Name }}-postgres-operator:8080","replicaCount":1,"service":{"port":80,"type":"ClusterIP"}}` | VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml |
 | postgres-operator.api_port | int | `8080` | REST API listener listens to this port |
 | postgres-operator.configLoggingRestApi | string | `nil` |  |
-| postgres-operator.enable_master_load_balancer | bool | `true` | ??? |
 | postgres-operator.enabled | bool | `true` | enable postgres-operator (this or postgresql.enabled NOT both ) |
 | postgres-operator.operatorApiUrl | string | `"http://{{ .Release.Name }}-postgres-operator:8080"` | ??? |
+| postgres-operator.podServiceAccount.name | string | `"{{ .Release.Name }}-postgres-pod"` |  |
 | postgres-operator.storageClass | string | `nil` | postgress pv storageclass |
 | postgres.container_name | string | `"postgresql"` | container name for postgres containers == teamID for mainifest |
 | postgres.geodatabasename | string | `"geogeonode"` | geoserver database name |
