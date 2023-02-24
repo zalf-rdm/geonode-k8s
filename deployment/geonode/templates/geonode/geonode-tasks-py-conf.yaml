@@ -74,7 +74,7 @@ data:
         geodb_url = _update_geodb_connstring()
         service_ready = False
         while not service_ready:
-            geonode_host = '{{ include "geonode_container_name" . }}'
+            geonode_host = '{{ include "geonode_pod_name" . }}'
             print("wating for host {} ...".format(geonode_host))
             try:
                 socket.gethostbyname(geonode_host)
@@ -97,7 +97,7 @@ data:
         envs = {
             "local_settings": str(_localsettings()),
             "siteurl": os.environ.get('SITEURL', siteurl),
-            "geonode_docker_host": str(socket.gethostbyname('{{ include "geonode_container_name" . }}')),
+            "geonode_docker_host": str(socket.gethostbyname('{{ include "geonode_pod_name" . }}')),
             "public_protocol": pub_protocol,
             "public_fqdn": str(pub_ip) + str(f':{pub_port}' if pub_port else ''),
             "public_host": str(pub_ip),
@@ -117,7 +117,7 @@ data:
             "db_url": os.environ.get('DATABASE_URL', 'postgis://geonode:geonode@db:5432/geonode'),
             "geodb_url": os.environ.get('GEODATABASE_URL', 'postgis://geonode:geonode@db:5432/geonode_data'),
             "geonode_db": os.environ.get('GEONODE_DATABASE', 'geonode'),
-            "gs_loc": os.environ.get('GEOSERVER_LOCATION', 'http://{{ include "geoserver_container_name" . }}:{{ .Values.geoserver.port }}/geoserver/'),
+            "gs_loc": os.environ.get('GEOSERVER_LOCATION', 'http://{{ include "geoserver_pod_name" . }}:{{ .Values.geoserver.port }}/geoserver/'),
             "gs_web_ui_loc": os.environ.get('GEOSERVER_WEB_UI_LOCATION', gs_pub_loc),
             "gs_pub_loc": os.environ.get('GEOSERVER_PUBLIC_LOCATION', gs_pub_loc),
             "gs_admin_pwd": os.environ.get('GEOSERVER_ADMIN_PASSWORD', 'geoserver'),
@@ -126,11 +126,11 @@ data:
         try:
             current_allowed = ast.literal_eval(
                 os.getenv('ALLOWED_HOSTS') or
-                "['{public_fqdn}', '{public_host}', 'localhost', 'django', '{{ include "geonode_container_name" . }}',]".format(**envs))
+                "['{public_fqdn}', '{public_host}', 'localhost', 'django', '{{ include "geonode_pod_name" . }}',]".format(**envs))
         except ValueError:
             current_allowed = []
         current_allowed.extend([str(pub_ip), f'{pub_ip}:{pub_port}'])
-        allowed_hosts = [str(c) for c in current_allowed] + ['"{{ include "geonode_container_name" . }}"', '"django"']
+        allowed_hosts = [str(c) for c in current_allowed] + ['"{{ include "geonode_pod_name" . }}"', '"django"']
 
         ctx.run("echo export DJANGO_SETTINGS_MODULE=\
     {local_settings} >> {override_fn}".format(**envs), pty=True)
@@ -205,17 +205,14 @@ data:
         except Exception:
             pass
 
-
     @task
     def statics(ctx):
         print("**************************statics*******************************")
         ctx.run('mkdir -p /mnt/volumes/statics/{static,uploads}')
         ctx.run(f"python manage.py collectstatic --noinput --settings={_localsettings()}", pty=True)
 
-
     @task
     def prepare(ctx):
-        print("**********************prepare fixture***************************")
         ctx.run("rm -rf /tmp/default_oauth_apps_docker.json", pty=True)
         _prepare_oauth_fixture()
         ctx.run("rm -rf /tmp/default_site.json", pty=True)
@@ -273,10 +270,9 @@ data:
         _prepare_monitoring_fixture()
         try:
             ctx.run(f"django-admin.py loaddata /tmp/default_monitoring_apps_docker.json \
-    --settings={_localsettings()}", pty=True)
+            --settings={_localsettings()}", pty=True)
         except Exception as e:
             logger.error(f"ERROR installing monitoring fixture: {str(e)}")
-
 
     @task
     def updategeoip(ctx):
@@ -307,6 +303,16 @@ data:
     def initialized(ctx):
         print("**************************init file********************************")
         ctx.run('date > /mnt/volumes/statics/geonode_init.lock')
+
+    @task
+    def prescript(ctx):
+        print("**********************geonode-k8s pre ***************************")
+        {{ .Values.geonode.tasks_pre_script }}
+
+    @task
+    def postscript(ctx):
+        print("**********************geonode-k8s post ***************************")
+        {{ .Values.geonode.tasks_post_script }}
 
 
     def _docker_host_ip():
@@ -408,57 +414,6 @@ data:
             gn_pub_port = None
         return gn_pub_port
 
-
-
-    # added by mwall for https://github.com/zalf-rdm/geonode-k8s
-    def _set_geoserver_database_store():
-        ''' checks if a db store is already created in geoserver, if not create one '''
-        print("Check if geoserver store is already set up ...")
-        geoserver_base_url = os.getenv('GEOSERVER_LOCATION', 'geonode-geoserver:8080/geoserver')
-        geoserver_password = os.getenv('GEOSERVER_ADMIN_PASSWORD', 'geoserver')
-        url = '{}rest/workspaces/{}/datastores/'.format(geoserver_base_url,GEOSERVER_WORKSPACE_NAME)
-        headers = {'Content-Type': 'text/xml'}
-        auth = (GEOSERVER_USERNAME, geoserver_password)
-
-        try:
-            r = requests.get(url, headers=headers, auth=auth)
-            data = r.json()
-            for datastore in data["dataStores"]["dataStore"]:
-                if datastore["name"] == GEOSERVER_STORE_NAME:
-                    print("Found datastore \"{}\" on geoserver, no need to create another ... ".format(GEOSERVER_STORE_NAME))
-                    return
-        except:
-            print("could not get datastore information from geoserver, trying to create ...")
-
-
-        print("setup new datastore ...")
-        db_user = database = os.getenv('GEONODE_GEODATABASE', 'geogeonode')
-        db_password = os.getenv('GEONODE_GEODATABASE_PASSWORD', 'geogeonode')
-        db_host = os.getenv('DATABASE_HOST', 'geonode-postgresql')
-
-        url = '{}rest/workspaces/{}/datastores'.format(geoserver_base_url,GEOSERVER_WORKSPACE_NAME)
-        data = """
-              <dataStore>
-                <name>{}</name>
-                <connectionParameters>
-                  <host>{}</host>
-                  <port>5432</port>
-                  <database>{}</database>
-                  <user>{}</user>
-                  <passwd>{}</passwd>
-                  <dbtype>postgis</dbtype>
-                </connectionParameters>
-              </dataStore>
-            """.format(GEOSERVER_STORE_NAME, db_host, database, db_user, db_password)
-
-        try:
-            r = requests.post(url, headers=headers, auth=auth,data=data)
-            print("created ...")
-        except:
-            print("something went wrong while performing datastore creating, skipping ...")
-            return
-
-
     def _geoserver_info_provision(url):
         from django.conf import settings
         from geoserver.catalog import Catalog
@@ -542,11 +497,11 @@ data:
         pub_port = _geonode_public_port()
         print(f"Public PORT is {pub_port}")
         try:
-            geonode_ip = socket.gethostbyname('{{ include "geonode_container_name" . }}')
+            geonode_ip = socket.gethostbyname('{{ include "geonode_pod_name" . }}')
         except Exception:
             geonode_ip = pub_ip
         try:
-            geoserver_ip = socket.gethostbyname('{{ include "geoserver_container_name" . }}')
+            geoserver_ip = socket.gethostbyname('{{ include "geoserver_pod_name" . }}')
         except Exception:
             geoserver_ip = pub_ip
         d = '1970-01-01 00:00:00'
@@ -614,7 +569,7 @@ data:
             {
                 "fields": {
                     "name": "default-geoserver",
-                    "url": "http://{{ include "geoserver_container_name" . }}:{{ .Values.geoserver.port }}/geoserver/",
+                    "url": "http://{{ include "geoserver_pod_name" . }}:{{ .Values.geoserver.port }}/geoserver/",
                     "notes": "",
                     "last_check": d,
                     "active": True,
@@ -656,3 +611,52 @@ data:
         ]
         with open('/tmp/django_admin_docker.json', 'w') as fixturefile:
             json.dump(default_fixture, fixturefile)
+
+    ##############################################################
+    # added by mwall for https://github.com/zalf-rdm/geonode-k8s #
+    ##############################################################
+
+    def _set_geoserver_database_store():
+        ''' checks if a db store is already created in geoserver, if not create one '''
+        print("Check if geoserver store is already set up ...")
+        geoserver_base_url = os.getenv('GEOSERVER_LOCATION', 'geonode-geoserver:8080/geoserver')
+        geoserver_password = os.getenv('GEOSERVER_ADMIN_PASSWORD', 'geoserver')
+        url = '{}rest/workspaces/{}/datastores/'.format(geoserver_base_url,GEOSERVER_WORKSPACE_NAME)
+        headers = {'Content-Type': 'text/xml'}
+        auth = (GEOSERVER_USERNAME, geoserver_password)
+
+        try:
+            r = requests.get(url, headers=headers, auth=auth)
+            data = r.json()
+            for datastore in data["dataStores"]["dataStore"]:
+                if datastore["name"] == GEOSERVER_STORE_NAME:
+                    print("Found datastore \"{}\" on geoserver, no need to create another ... ".format(GEOSERVER_STORE_NAME))
+                    return
+        except:
+            print("could not get datastore information from geoserver, trying to create ...")
+
+        print("setup new datastore ...")
+        db_user = database = os.getenv('GEONODE_GEODATABASE', 'geogeonode')
+        db_password = os.getenv('GEONODE_GEODATABASE_PASSWORD', 'geogeonode')
+        db_host = os.getenv('DATABASE_HOST', 'geonode-postgresql')
+
+        url = '{}rest/workspaces/{}/datastores'.format(geoserver_base_url,GEOSERVER_WORKSPACE_NAME)
+        data = """
+              <dataStore>
+                <name>{}</name>
+                <connectionParameters>
+                  <host>{}</host>
+                  <port>5432</port>
+                  <database>{}</database>
+                  <user>{}</user>
+                  <passwd>{}</passwd>
+                  <dbtype>postgis</dbtype>
+                </connectionParameters>
+              </dataStore>
+            """.format(GEOSERVER_STORE_NAME, db_host, database, db_user, db_password)
+        try:
+            r = requests.post(url, headers=headers, auth=auth,data=data)
+            print("created ...")
+        except:
+            print("something went wrong while performing datastore creating, skipping ...")
+            return
