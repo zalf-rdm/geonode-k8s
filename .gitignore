@@ -3,3 +3,4 @@ my-values.yaml
 **/Chart.lock
 deployment/geonode/charts/*.tgz
 deployment/geonode/Chart.lock
+.vscode
