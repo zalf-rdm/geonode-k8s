@@ -4,12 +4,16 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "geonode_container_name" . }}-env
+  name: {{ include "geonode_pod_name" . }}-env
   namespace: {{ .Release.Namespace }}
 data:
   IS_CELERY: "False"
+  CELERY_BEAT_SCHEDULER: "celery.beat:PersistentScheduler"
+
   DOCKERIZE_VERSION: "v0.6.1"
   DEBUG: {{ include "boolean2str" .Values.geonode.general.debug | quote }}
+  DEBUG_STATIC: {{ include "boolean2str" .Values.geonode.general.debug_static | quote }}
+
   CLIENT_RESULTS_LIMIT: '25'
   C_FORCE_ROOT: '1'
   MAX_DOCUMENT_SIZE:  {{ .Values.geonode.general.max_document_size | quote }}
@@ -17,7 +21,7 @@ data:
   # GeoNode APIs
   API_LOCKDOWN: 'False'
   TASTYPIE_APIKEY: ""
-  # TODO (mwall) set this automatically with helm magics
+  # TODO (mwall) set this automatically with helm magics not fully implemented
   {{ if  ( eq .Release.Revision 1 )}}
   IS_FIRST_START: 'True'
   {{ else }}
@@ -25,7 +29,7 @@ data:
   {{ end }}
   FORCE_REINIT: 'False'
   # set this to true breaks upload
-  ASYNC_SIGNALS: 'False'
+  ASYNC_SIGNALS: 'True'
   CACHE_BUSTING_STATIC_ENABLED: 'False'
   CACHE_BUSTING_MEDIA_ENABLED: 'False'
 
@@ -45,8 +49,7 @@ data:
   PROXY_ALLOWED_HOSTS: 'localhost,django,geonode,geoserver,spatialreference.org,nominatim.openstreetmap.org,dev.openlayers.org'
 
   # Admin Settings
-  ADMIN_USERNAME: admin
-  # admin password in secret
+  ADMIN_USERNAME: {{ .Values.geonode.general.superUser.username | quote }}
   ADMIN_EMAIL: {{ .Values.geonode.general.superUser.email | quote }}
   ADMIN_PASSWORD: {{ .Values.geonode.general.superUser.password | quote }}
 
@@ -62,7 +65,6 @@ data:
   DISPLAY_SOCIAL: {{ include "boolean2str" .Values.geonode.general.display.social | quote }}
   DISPLAY_WMS_LINKS: {{ include "boolean2str" .Values.geonode.general.display.wms_link | quote }}
   DISPLAY_ORIGINAL_DATASET_LINK: {{ include "boolean2str" .Values.geonode.general.display.dataset_link | quote }}
-
 
   # EMAIL Notifications
   EMAIL_ENABLE:  {{  include "boolean2str" .Values.geonode.mail.enabled | quote }}
@@ -88,6 +90,8 @@ data:
   SESSION_EXPIRED_CONTROL_ENABLED: 'True'
   DEFAULT_ANONYMOUS_VIEW_PERMISSION: 'True'
   DEFAULT_ANONYMOUS_DOWNLOAD_PERMISSION: 'True'
+  DEFAULT_MAX_PARALLEL_UPLOADS_PER_USER: '100'
+  DEFAULT_MAX_UPLOAD_SIZE: '5368709120'
 
   # Users Registration
   ACCOUNT_OPEN_SIGNUP: {{ include "boolean2str" .Values.geonode.register.open_signup | quote }}
@@ -168,11 +172,11 @@ data:
   GEOSERVER_WEB_UI_LOCATION: "{{ include "public_url" . }}/geoserver/"
   GEOSERVER_PUBLIC_LOCATION: "{{ include "public_url" . }}/geoserver/"
   GEOSERVER_PUBLIC_SCHEMA: {{ .Values.geonode.ingress.externalScheme | quote }}
-  GEOSERVER_LOCATION: "http://{{ include "geoserver_container_name" . }}:{{ .Values.geoserver.port }}/geoserver/"
+  GEOSERVER_LOCATION: "http://{{ include "geoserver_pod_name" . }}:{{ .Values.geoserver.port }}/geoserver/"
   GEOSERVER_ADMIN_USER: {{ .Values.geoserver.admin_username | quote }}
   GEOSERVER_ADMIN_PASSWORD: {{ .Values.geoserver.admin_password | quote }}
 
-  OGC_REQUEST_TIMEOUT: '30'
+  OGC_REQUEST_TIMEOUT: {{ .Values.geonode.general.ogc_request_timeout | quote }}
   OGC_REQUEST_MAX_RETRIES: '1'
   OGC_REQUEST_BACKOFF_FACTOR: '0.3'
   OGC_REQUEST_POOL_MAXSIZE: '10'
@@ -185,3 +189,13 @@ data:
   SENTRY_DSN:  {{ .Values.geonode.sentry.dsn | quote }}
   BUILD_NUMBER: {{ .Values.geonode.sentry.build_number | quote }}
   SENTRY_ENVIRONMENT: {{ .Values.geonode.sentry.environment | quote }}
+
+  # Database Settings
+  DATABASE_HOST: "{{ include "postgres_pod_name" . }}"
+  DATABASE_PORT: "{{ include "database_port" .}}"
+
+  POSTGRES_USER: {{ .Values.postgres.username }}
+  GEONODE_DATABASE: {{ .Values.postgres.geonodedatabase | quote }}
+  GEONODE_GEODATABASE: {{ .Values.postgres.geodatabasename | quote }}
+  GEONODE_DATABASE_SCHEMA: {{ .Values.postgres.schema }}
+  GEONODE_GEODATABASE_SCHEMA: {{ .Values.postgres.schema }}
