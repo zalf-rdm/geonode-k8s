@@ -2,11 +2,11 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ .Release.Name }}-nginx
+  name: "{{ include "nginx_pod_name" . }}"
   namespace: {{ .Release.Namespace }}
 spec:
   selector:
-    org.geonode.instance: {{ .Release.Name }}-nginx
+    org.geonode.instance: "{{ include "nginx_pod_name" . }}"
   ports:
   - targetPort: 80
     port: 80

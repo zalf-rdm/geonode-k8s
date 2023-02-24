@@ -2,31 +2,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-nginx
+  name: "{{ include "nginx_pod_name" . }}"
   namespace: {{ .Release.Namespace }}
 spec:
   selector:
     matchLabels:
-      org.geonode.instance: {{ .Release.Name }}-nginx
-  #serviceName: {{ .Release.Name }}-nginx
+      org.geonode.instance: "{{ include "nginx_pod_name" . }}"
   replicas: {{ .Values.nginx.replicaCount }}
   template:
     metadata:
       labels:
-        org.geonode.instance: {{ .Release.Name }}-nginx
+        org.geonode.instance: "{{ include "nginx_pod_name" . }}"
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/nginx/nginx-conf.yaml") . | sha256sum }}
     spec:
       terminationGracePeriodSeconds: 3
+
       containers:
-      - name: nginx
+      - name: {{ .Values.nginx.container_name }}
         image: "{{ .Values.nginx.image.name }}:{{ .Values.nginx.image.tag }}"
+
         ports:
         # TODO (mwall) may respect {{ .Values.geonode.ingress.externalPort | quote }}
         - containerPort: 80
           name: http
         - containerPort: 443
           name: https
+
         volumeMounts:
-        - name: persistence
+        - name: "{{ include "persistant_volume_name" . }}"
           mountPath: /mnt/volumes/statics
           subPath: statics
         - name: geonode-favicon
@@ -34,13 +38,15 @@ spec:
           subPath: favicon.ico
         - name: nginx-confd
           mountPath: /etc/nginx/conf.d
+
         resources:
           requests:
-            memory: 128Mi
-            cpu: 100m
+            memory: {{ .Values.nginx.resources.requests.memory }}
+            cpu: {{ .Values.nginx.resources.requests.cpu }}
           limits:
-            memory: 256Mi
-            cpu: 200m        
+            memory: {{ .Values.nginx.resources.limits.memory }}
+            cpu: {{ .Values.nginx.resources.limits.cpu }}
+
       volumes:
       - name: nginx-confd
         configMap:
@@ -48,6 +54,6 @@ spec:
       - name: geonode-favicon
         configMap:
           name: {{ .Release.Name }}-geonode-favicon
-      - name: persistence
+      - name: "{{ include "persistant_volume_name" . }}"
         persistentVolumeClaim:
           claimName: pvc-{{ .Release.Name }}-geonode
