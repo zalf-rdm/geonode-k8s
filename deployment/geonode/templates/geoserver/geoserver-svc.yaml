@@ -2,11 +2,11 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: "{{ include "geoserver_container_name" . }}"
+  name: "{{ include "geoserver_pod_name" . }}"
   namespace: {{ .Release.Namespace }}
 spec:
   selector:
-    org.geonode.instance: "{{ include "geoserver_container_name" . }}"
+    org.geonode.instance: "{{ include "geoserver_pod_name" . }}"
   ports:
   - targetPort: {{ .Values.geoserver.port }}
     port: 8080
