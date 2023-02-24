@@ -1,17 +1,29 @@
 
-# define container names (equal service names)
-{{- define "geoserver_container_name" -}}
-{{ .Release.Name }}-{{ .Values.geoserver.container_name }}
+# define pod names (equal service names)
+{{- define "geoserver_pod_name" -}}
+{{ .Release.Name }}-{{ .Values.geoserver.pod_name }}
 {{- end -}}
 
-{{- define "geonode_container_name" -}}
-{{ .Release.Name }}-{{ .Values.geonode.container_name }}
+{{- define "geonode_pod_name" -}}
+{{ .Release.Name }}-{{ .Values.geonode.pod_name }}
 {{- end -}}
 
-{{- define "postgres_container_name" -}}
-{{ .Release.Name }}-{{ .Values.postgres.container_name }}
+{{- define "postgres_pod_name" -}}
+{{ .Release.Name }}-{{ .Values.postgres.pod_name }}
 {{- end -}}
 
+{{- define "nginx_pod_name" -}}
+{{ .Release.Name }}-{{ .Values.nginx.pod_name }}
+{{- end -}}
+
+
+# Volume names
+{{- define "persistant_volume_name" -}}
+persistence
+{{- end -}}
+
+
+# ports and endpoints
 {{- define "database_port" -}}
 5432
 {{- end -}}
@@ -24,10 +36,6 @@
 amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@{{ include "rabbit_host" . }}/
 {{- end -}}
 
-{{- define "boolean2str" -}}
-{{ . | ternary "True" "False" }}
-{{- end -}}
-
 {{- define "external_port" -}}
 {{- if or (eq (toString .Values.geonode.ingress.externalPort) "80") (eq (toString .Values.geonode.ingress.externalPort) "443") -}}
 {{- else -}}
@@ -37,5 +45,11 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
 
 {{- define "public_url" -}}
 {{ .Values.geonode.ingress.externalScheme }}://{{ .Values.geonode.ingress.externalDomain }}{{ include "external_port" . }}
+{{- end -}}
+
+
+# function
+{{- define "boolean2str" -}}
+{{ . | ternary "True" "False" }}
 {{- end -}}
 
