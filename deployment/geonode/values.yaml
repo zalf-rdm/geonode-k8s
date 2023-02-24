@@ -1,39 +1,55 @@
 
 global:
   # -- storageClass used by helm dependencies pvc
-  storageClass: 
+  storageClass:
   # -- storage access mode used by helm dependency pvc
   accessMode: ReadWriteMany
 
 # geonode configuration
 geonode:
   # -- pod name
+  pod_name: geonode
+  # -- container name
   container_name: geonode
   # -- number of geonode replicas (! not working properly yet)
   replicaCount: 1
 
   persistant:
     # -- size of persistant geonode storage
-    storageSize: 2Gi
+    storageSize: 10Gi
 
   image:
     # -- used geonode image
-    name: zalf/geonode
+    name: mwall2bitflow/geonode
     # -- tag of used geonode image
-    tag: 'latest'
+    tag: '4.0.3'
+
+  # -- additions to tasks.py init script, must be additional code written in python
+  tasks_pre_script: |
+    print("tasks_pre_script not defined ...")
+  # -- additions to tasks.py script at the beginning of the tasks.py, must be additional code written in python
+  tasks_post_script: |
+    print("tasks_post_script not defined ...")
 
   resources:
     requests:
       # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
-      memory: "4096Mi"
+      memory: "2Gi"
       # -- requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: 2
+    limits:
+      # -- limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "4Gi"
+      # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: 4
 
   ingress:
     # -- enables external access 
     enabled: True
     # -- define kubernetes ingress class for geonode ingress
     ingressClassName:
+    # -- adds ingress annotations for nginx ingress class to increase uploadsize and timeout time
+    addNginxIngressAnnotation: false
     # -- external ingress schema. if set to https ingress tls is used. Loading tls certificate via tls-secret options Available options: (http|https)
     externalScheme: http
     # -- external ingress hostname 
@@ -53,6 +69,42 @@ geonode:
     # -- sentry build number
     build_number: 0
 
+  # -- geonode uwsgi configuration
+  uwsgi:
+    # --  the max size of a request (request-body excluded)
+    buffer_size: 32768
+    # -- forcefully kill workers after 60 seconds (MOSTLY REASON FOR TIMEOUTS WHILE UPLOAD)
+    harakiri: 800
+    # -- Restart workers after this many requests
+    max_requests: 1000
+    # -- Restart workers after this many seconds
+    max_worker_lifetime: 3600
+    # -- Restart workers after this much resident memory
+    reload_on_rss: 2048
+    # -- How long to wait before forcefully killing workers
+    worker_reload_mercy: 60
+
+    # -- Maximum number of workers allowed
+    processes: 128
+    # -- Minimum number of workers allowed
+    cheaper: 8
+    # -- Workers created at startup
+    cheaper_initial: 16
+    # -- Length of a cycle in seconds
+    cheaper_overload: 1
+    # -- How many workers to spawn at a time
+    cheaper_step: 16
+    # -- How many cycles to wait before killing workers
+    cheaper_busyness_multiplier: 30
+    # -- Below this threshold, kill workers (if stable for multiplier cycles)
+    cheaper_busyness_min: 20
+    # -- Above this threshold, spawn new workers
+    cheaper_busyness_max: 70
+    # -- Spawn emergency workers if more than this many requests are waiting in the queue
+    cheaper_busyness_backlog_alert: 16
+    # -- How many emergency workers to create if there are too many requests in the queue
+    cheaper_busyness_backlog_step: 2
+
   general:
     # -- max upload document size in MB
     max_document_size: 10
@@ -60,17 +112,32 @@ geonode:
     api_limit_per_page: 1000
     # -- django debug mode
     debug: False
-    # FREETEXT_KEYWORDS_READONLY Make Free-Text Keywords writable from users. Or read-only when set to False.
+    # -- enable django static debug
+    debug_static: False
+
+    # -- FREETEXT_KEYWORDS_READONLY Make Free-Text Keywords writable from users. Or read-only when set to False.
     freetext_keywords_readonly: false
+    # -- OGC_REQUEST_TIMEOUT
+    ogc_request_timeout: 600
+    # -- OGC_REQUEST_MAX_RETRIES
+    ogc_request_max_retries: 1
+    # -- OGC_REQUEST_BACKOFF_FACTOR
+    ogc_request_backoff_factor: 0.3
+    # -- OGC_REQUEST_POOL_MAXSIZE
+    ogc_request_pool_maxsize: 10
+    # -- OGC_REQUEST_POOL_CONNECTIONS
+    ogc_request_pool_connections: 10
 
     superUser:
+      # -- admin username
+      username: admin
       # -- admin panel password
       password: geonode
       # -- admin user password
       email: support@example.com
 
     publishing:
-      # -- RESOURCE_PUBLISHING By default, the GeoNode application allows GeoNode staff members to publish/unpublish resources. 
+      # -- RESOURCE_PUBLISHING By default, the GeoNode application allows GeoNode staff members to publish/unpublish resources.
       # By default, resources are published when created. When this setting is set to True the staff members will be able to unpublish
       # a resource (and eventually publish it back).
       resource_publishing_by_staff: false
@@ -144,7 +211,7 @@ geonode:
 
   # -- Find docs for register values under:
   # - https://docs.geonode.org/en/3.3.x/basic/settings/index.html 
-  # - https://github.com/pinax/django-user-accounts/blob/master/docs/settings.rst | 
+  # - https://github.com/pinax/django-user-accounts/blob/master/docs/settings.rst
   # - https://django-allauth.readthedocs.io/en/latest/configuration.html
   register:
     # -- allow user registration on geonode
@@ -167,8 +234,8 @@ geonode:
     conformation_required: True
     # -- Specifies the login method to use – whether the user logs in by entering their username, e-mail address, or either one of both. Setting this to “email” requires email_required=True
     authentication_method: "user_email"
-    # -- group name to add new registered users to, requires auto_assign_registered_members_to_registered: True. 
-    registered_members_group_name: 
+    # -- group name to add new registered users to, requires auto_assign_registered_members_to_registered: True.
+    registered_members_group_name:
     # -- if set to True new registered user will be add to defined group in registered_members_group_name
     auto_assign_registered_members_to_registered: True
     # -- show email addr in profile view
@@ -190,7 +257,7 @@ geonode:
   # configure memcached as django cache. .Values.memcached.... to configure memcached replicas, architecture and so on (see https://docs.djangoproject.com/en/4.0/topics/cache/)
   memcached:
     # -- enable memcache, this will spawn one or more seperate memcache container(s) and configure django geonode repsectivly. Dynamic caching (see https://docs.djangoproject.com/en/4.0/topics/cache/)
-    enabled: False
+    enabled: True
     # -- memcached lock expire time
     lock_expire: '3600'
     # -- memcached lock timeout
@@ -203,21 +270,36 @@ geonode:
     user_analytics_enabled: True
     user_analytics_gzip: True
     centralized_dashboard_enabled: False
+
   celery:
-    enabled: False
+    container_name: celery
+    resources:
+      requests:
+        # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+        memory: "2Gi"
+        # -- requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+        cpu: 1
+      limits:
+        # -- limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+        memory: "2Gi"
+        # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+        cpu: 2
 
   # configuration for postgres-operator manifest
   postgresdb:
     replicaCount: 1
 
-# CONFIGURATION FOR GEOSERVER DEPLOYMENT
+# -- CONFIGURATION FOR GEOSERVER DEPLOYMENT
 geoserver:
+  # -- geoserver pod name
+  pod_name: geoserver
+  # -- geoserver container name
   container_name: geoserver
   image:
     # -- geoserver image docker image (default in zalf namespace because geonode one was not up to date)
     name: geonode/geoserver
     # -- geoserver docker image tag
-    tag: '2.20.6'
+    tag: '2.20.7'
   # -- geoserver port
   port: 8080
   # -- geoserver admin username
@@ -227,9 +309,21 @@ geoserver:
   # - A list of one-line custom EPSGs to add to GeoServer
   # see https://docs.geoserver.org/stable/en/user/configuration/crshandling/customcrs.html
   customEPSGs:
-    - 1=PROJCS["TM_Rwanda",GEOGCS["GCS_ITRF_2005",DATUM["D_ITRF_2005",SPHEROID["GRS_1980",6378137.0,298.257222101]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Transverse_Mercator"],PARAMETER["False_Easting",500000.0],PARAMETER["False_Northing",5000000.0],PARAMETER["Central_Meridian",30.0],PARAMETER["Scale_Factor",0.9999],PARAMETER["Latitude_Of_Origin",0.0],UNIT["Meter",1.0]]
+  - 1=PROJCS["TM_Rwanda",GEOGCS["GCS_ITRF_2005",DATUM["D_ITRF_2005",SPHEROID["GRS_1980",6378137.0,298.257222101]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Transverse_Mercator"],PARAMETER["False_Easting",500000.0],PARAMETER["False_Northing",5000000.0],PARAMETER["Central_Meridian",30.0],PARAMETER["Scale_Factor",0.9999],PARAMETER["Latitude_Of_Origin",0.0],UNIT["Meter",1.0]]
   extraCustomEPSGs: []
 
+  # -- geoserver kube resources
+  resources:
+    requests:
+      # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "2Gi"
+      # -- requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: 2
+    limits:
+      # -- limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "16Gi"
+      # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: 4
 
 # MEMCACHED CONFIGURATION
 # https://artifacthub.io/packages/helm/bitnami/memcached
@@ -242,6 +336,10 @@ memcached:
 # CONFIGURATION FOR NGINX DEPLOYMENT
 # MAY MOVE TO CHART
 nginx:
+  # -- nginx pod name
+  pod_name: nginx
+  # -- nginx container name
+  container_name: nginx
   # -- nginx container replicas
   replicaCount: 1
   image:
@@ -249,11 +347,46 @@ nginx:
     name: nginx
     # -- nginx docker image tag
     tag: '1.20'
+  # -- max file upload size
+  maxClientBodySize: 2G
 
+  resources:
+    requests:
+      # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "1Gi"
+      # -- requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: "500m"
+    limits:
+      # -- limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "2Gi"
+      # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: "1000m"
+
+# -- VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml
+rabbitmq:
+  enabled: true
+  replicaCount: 1
+  auth:
+    username: rabbituser
+    password: rabbitpassword
+    erlangCookie: jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu
+  persistence:
+    enabled: False
+
+  requests:
+    # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+    memory: "2Gi"
+    # -- requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+    cpu: "1000m"
+  limits:
+    # -- limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+    memory: "2Gi"
+    # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+    cpu: "1000m"
 
 postgres:
-  # -- container name for postgres containers == teamID for mainifest
-  container_name: postgresql
+  # -- pod name for postgres containers == teamID for mainifest
+  pod_name: postgresql
   # -- postgres username
   username: postgres
   # -- database schema
@@ -290,7 +423,7 @@ postgres-operator:
   # --  REST API listener listens to this port
   api_port: 8080
   # -- postgress pv storageclass
-  storageClass: 
+  storageClass:
   # -- not setting the podServiceAccount name will leed to generation of this name. This allows to run multiple postgres-operators in a single kubernetes cluster. just seperating them by namespace.
   podServiceAccount:
     name: ""
@@ -298,7 +431,7 @@ postgres-operator:
 
 # -- VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml
 postgres-operator-ui:
-  enabled: true
+  enabled: False
   replicaCount: 1
   envs:
     operatorApiUrl: "http://{{ $.Release.Name }}-postgres-operator:8080"
@@ -309,16 +442,5 @@ postgres-operator-ui:
     enabled: False
     ingressClassName:
     hosts:
-      - host: postgres-ui
-        paths: [""]
-
-# -- VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml
-rabbitmq:
-  enabled: true
-  replicaCount: 1
-  auth:
-    username: rabbituser
-    password: rabbitpassword
-    erlangCookie: jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu
-  persistence:
-    enabled:  False
+    - host: postgres-ui
+      paths: [""]

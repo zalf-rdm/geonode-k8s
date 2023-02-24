@@ -2,35 +2,42 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: "{{ include "geonode_container_name" . }}"
+  name: "{{ include "geonode_pod_name" . }}"
   namespace: {{ .Release.Namespace }}
 spec:
   selector:
     matchLabels:
-      org.geonode.instance: "{{ include "geonode_container_name" . }}"
-  serviceName: "{{ include "geonode_container_name" . }}"
+      org.geonode.instance: "{{ include "geonode_pod_name" . }}"
+  serviceName: "{{ include "geonode_pod_name" . }}"
   replicas: {{ .Values.geonode.replicaCount }}
   template:
     metadata:
       labels:
-        org.geonode.instance: "{{ include "geonode_container_name" . }}"
+        org.geonode.instance: "{{ include "geonode_pod_name" . }}"
+      annotations:
+        checksum/geonode-env: {{ include (print $.Template.BasePath "/geonode/geonode-env.yaml") . | sha256sum }}
+        checksum/geonode-local-settings: {{ include (print $.Template.BasePath "/geonode/geonode-local-settings.yaml") . | sha256sum }}
+        checksum/geonode-uwsig: {{ include (print $.Template.BasePath "/geonode/geonode-uwsgi-ini-conf.yaml") . | sha256sum }}
     spec:
       terminationGracePeriodSeconds: 3
+
       initContainers:
       # Wait for Postgres and rabbit
       - name: geonode-wait-for-db-and-rabbit
         image: jwilder/dockerize
         imagePullPolicy: IfNotPresent
         args:
-        - -timeout=120s
+        - -timeout=60s
         - -wait
-        - tcp://{{ include "postgres_container_name" . }}:{{ include "database_port" .}}
+        - tcp://{{ include "postgres_pod_name" . }}:{{ include "database_port" .}}
         - -wait
         - tcp://{{ include "rabbit_host" .}}
+
       containers:
       # This is the django app server
-      - name: geonode
+      - name: {{ .Values.geonode.container_name }}
         image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
+
         command:
         - bash
         - -c
@@ -40,8 +47,17 @@ spec:
             && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
+          {{ if .Values.geonode.ldap.enabled }}
+          # install geonode ldap contrib if ldap enabled. it would be better to have a base model with ldap included,
+          # but this way we can build the vanilla Dockerfile from geonode/geonode
+
+          cd /usr/src; git clone https://github.com/GeoNode/geonode-contribs.git -b master
+          cd /usr/src/geonode-contribs/ldap; pip install --upgrade  -e .
+          cd /usr/src/geonode/
+          {{ end }}
+
           # Add config overrides
-          cat /usr/src/geonode/geonode/local_settings.py >> /usr/src/geonode/geonode/settings.py
+          cat /usr/src/geonode/geonode/geonode-k8s-settings.py >> /usr/src/geonode/geonode/settings.py
 
           # Setup
           touch /usr/src/geonode/invoke.log
@@ -50,103 +66,79 @@ spec:
           # Run web server
           touch /var/log/geonode.log
           dockerize -stdout /var/log/geonode.log /usr/local/bin/uwsgi --ini /usr/src/geonode/uwsgi.ini
+
         ports:
         - containerPort: 8000
-        # - containerPort: 8001
+        - containerPort: 8001
+
         envFrom:
           - configMapRef:
-              name: {{ include "geonode_container_name" . }}-env
+              name: {{ include "geonode_pod_name" . }}-env
+
         env:
-        ##########################
-        # DATABASE CONFIGURATION #
-        ##########################
-
-        # HOST CONFIGURATION
-        - name: DATABASE_HOST
-          value: "{{ include "postgres_container_name" . }}"
-        - name: DATABASE_PORT
-          value: "{{ include "database_port" .}}"
-
-        # patroni login credentials from
-        # {username}.{team}-{clustername}.credentials.postgresql.acid.zalan.do
-
-        # geonode user password
         - name: GEONODE_DATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name:  {{ .Values.postgres.geonodedatabase }}.{{ include "postgres_container_name" . }}.credentials.postgresql.acid.zalan.do
+              name:  {{ .Values.postgres.geonodedatabase }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
               key: password
-
-        # geogeodatabase password
         - name: GEONODE_GEODATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.postgres.geodatabasename }}.{{ include "postgres_container_name" . }}.credentials.postgresql.acid.zalan.do
+              name: {{ .Values.postgres.geodatabasename }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
               key: password
-
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.postgres.username }}.{{ include "postgres_container_name" . }}.credentials.postgresql.acid.zalan.do
+              name: {{ .Values.postgres.username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
               key: password
-
-        - name: POSTGRES_USER
-          value: {{ .Values.postgres.username }}
-
-        - name: GEONODE_DATABASE
-          value: {{ .Values.postgres.geonodedatabase | quote }}
-
-        - name: GEONODE_GEODATABASE
-          value: {{ .Values.postgres.geodatabasename | quote }}
-
-        - name: GEONODE_DATABASE_SCHEMA
-          value: {{ .Values.postgres.schema }}
-
-        - name: GEONODE_GEODATABASE_SCHEMA
-          value: {{ .Values.postgres.schema }}
-
         - name: GEODATABASE_URL
           value: "postgis://$(GEONODE_GEODATABASE):$(GEONODE_GEODATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_GEODATABASE)"
-
         - name: DATABASE_URL
           value: "postgis://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"
 
         volumeMounts:
-        - name: persistence
+        - name: "{{ include "persistant_volume_name" . }}"
           mountPath: /mnt/volumes/statics
           subPath: statics
-        - name: persistence
+        - name: "{{ include "persistant_volume_name" . }}"
           mountPath: /geoserver_data/data
           subPath: geoserver-data-dir
-        - name: persistence
+        - name: "{{ include "persistant_volume_name" . }}"
           mountPath: /backup_restore
           subPath: backup-restore
-        - name: persistence
+        - name: "{{ include "persistant_volume_name" . }}"
           mountPath: /data
           subPath: data
         - name: cache-volume
           mountPath: /tmp
-        # geonode-k8s updated task-py
-        - name: task-py
+        - name: tasks-py
           mountPath: "/usr/src/geonode/tasks.py"
           subPath: tasks.py
           readOnly: true
+        - name: entrypoint-sh
+          mountPath: "/usr/src/geonode/entrypoint.sh"
+          subPath: entrypoint.sh
+        - name: uwsgi-ini
+          mountPath: "/usr/src/geonode/uwsgi.ini"
+          subPath: uwsgi.ini
+          readOnly: true
+        - name: geonode-k8s-settings-py
+          mountPath: "/usr/src/geonode/geonode/geonode-k8s-settings.py"
+          subPath: geonode-k8s-settings.py
+          readOnly: true
+
         resources:
           requests:
             memory: {{ .Values.geonode.resources.requests.memory }}
             cpu: {{ .Values.geonode.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.geonode.resources.limits.memory }}
+            cpu: {{ .Values.geonode.resources.limits.cpu }}
 
       # Celery is the task worker
-      {{ if (eq .Values.geonode.celery.enabled true) }}
-
-      - name: {{ include "geonode_container_name" . }}-celery
+      - name: {{ .Values.geonode.celery.container_name }}
         image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
-        envFrom:
-          - configMapRef:
-            name: {{ include "geonode_container_name" . }}-env
-        env:
-        - name: IS_CELERY
-          value: 'True'
+
         command:
         - bash
         - -c
@@ -156,46 +148,117 @@ spec:
             && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
-          # Add host alias since the scripts hardcode the db host as 'db' @##@?
-          # echo "db {{ .Release.Name }}-postgresql" > /etc/host.aliases
-          # export HOSTALIASES=/etc/host.aliases
+          {{ if .Values.geonode.ldap.enabled }}
+          # install geonode ldap contrib if ldap enabled. it would be better to have a base model with ldap included,
+          # but this way we can build the vanilla Dockerfile from geonode/geonode.
+          
+          cd /usr/src; git clone https://github.com/GeoNode/geonode-contribs.git -b master
+          cd /usr/src/geonode-contribs/ldap; pip install --upgrade  -e .
+          cd /usr/src/geonode/
+          {{ end }}
+
+          # Add config overrides
+          cat /usr/src/geonode/geonode/geonode-k8s-settings.py >> /usr/src/geonode/geonode/settings.py
 
           # Setup
-          touch /usr/src/app/invoke.log
-          dockerize -stdout /usr/src/app/invoke.log /usr/src/app/entrypoint.sh
+          touch /usr/src/geonode/invoke.log
+          dockerize -stdout /usr/src/geonode/invoke.log /usr/src/geonode/entrypoint.sh celery-cmd
 
-          # Run celery
-          celery -A geonode.celery_app:app worker -B -E --statedb=/mnt/volumes/statics/worker.state -s /mnt/volumes/statics/celerybeat-schedule --loglevel=INFO --concurrency=10 -n worker1@%h
+        envFrom:
+          - configMapRef:
+              name: {{ include "geonode_pod_name" . }}-env
+
+        env:
+        - name: IS_CELERY
+          value: 'True'
+        - name: GEONODE_DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name:  {{ .Values.postgres.geonodedatabase }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
+              key: password
+        - name: GEONODE_GEODATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.postgres.geodatabasename }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
+              key: password
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.postgres.username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
+              key: password
+        - name: GEODATABASE_URL
+          value: "postgis://$(GEONODE_GEODATABASE):$(GEONODE_GEODATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_GEODATABASE)"
+        - name: DATABASE_URL
+          value: "postgis://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"        
+
+        ports:
+        - containerPort: 5555
+
         volumeMounts:
-        - name: persistence
+        - name: "{{ include "persistant_volume_name" . }}"
           mountPath: /mnt/volumes/statics
           subPath: statics
-        - name: persistence
+        - name: "{{ include "persistant_volume_name" . }}"
           mountPath: /geoserver_data/data
           subPath: geoserver-data-dir
-        - name: persistence
+        - name: "{{ include "persistant_volume_name" . }}"
           mountPath: /backup_restore
           subPath: backup-restore
-        - name: persistence
+        - name: "{{ include "persistant_volume_name" . }}"
           mountPath: /data
           subPath: data
         - name: cache-volume
           mountPath: /tmp
-        ports:
-        - containerPort: 5555
-
-        {{ end }}
+        - name: entrypoint-sh
+          mountPath: "/usr/src/geonode/entrypoint.sh"
+          subPath: entrypoint.sh
+        - name: tasks-py
+          mountPath: "/usr/src/geonode/tasks.py"
+          subPath: tasks.py
+          readOnly: true
+        - name: geonode-k8s-settings-py
+          mountPath: "/usr/src/geonode/geonode/geonode-k8s-settings.py"
+          subPath: geonode-k8s-settings.py
+          readOnly: true
+        resources:
+          requests:
+            memory: {{ .Values.geonode.celery.resources.requests.memory }}
+            cpu: {{ .Values.geonode.celery.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.geonode.celery.resources.limits.memory }}
+            cpu: {{ .Values.geonode.celery.resources.limits.cpu }}
 
       volumes:
-      - name: persistence
-        persistentVolumeClaim:
-          claimName: pvc-{{ .Release.Name }}-geonode
-      - name: task-py
-        configMap:
-          name: {{ .Release.Name }}-geonode-tasks-py
-          items:
-          - key: tasks.py
-            path: "tasks.py"
-      # Using an emptyDir to cache compiled statics... it will survive container crashes, but not pod restarts
-      - name: cache-volume
-        emptyDir: {}
+        - name: "{{ include "persistant_volume_name" . }}"
+          persistentVolumeClaim:
+            claimName: pvc-{{ .Release.Name }}-geonode
+        - name: tasks-py
+          configMap:
+            name: {{ .Release.Name }}-geonode-tasks-py
+            items:
+            - key: tasks.py
+              path: "tasks.py"
+        - name: entrypoint-sh
+          configMap:
+            name: {{ .Release.Name }}-geonode-entrypoint-sh
+            defaultMode: 0744
+            items:
+            - key: entrypoint.sh
+              path: "entrypoint.sh"
+        - name: uwsgi-ini
+          configMap:
+            name: {{ .Release.Name }}-geonode-uwsgi-ini
+            defaultMode: 0744
+            items:
+            - key: uwsgi.ini
+              path: "uwsgi.ini"
+        - name: geonode-k8s-settings-py
+          configMap:
+            name: {{ .Release.Name }}-geonode-k8s-settings-py
+            defaultMode: 0744
+            items:
+            - key: geonode-k8s-settings.py
+              path: "geonode-k8s-settings.py"
+        # Using an emptyDir to cache compiled statics... it will survive container crashes, but not pod restarts
+        - name: cache-volume
+          emptyDir: {}
