@@ -53,17 +53,19 @@ data:
 
       # GeoServer
       location /geoserver {
+        client_max_body_size {{ .Values.nginx.maxClientBodySize }};
+
         proxy_set_header Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-
-        proxy_pass http://{{ include "geoserver_container_name" . }}:{{ .Values.geoserver.port }};
+        proxy_pass http://{{ include "geoserver_pod_name" . }}:{{ .Values.geoserver.port }};
       }
 
       # GeoNode
       location /static/ {
         alias /mnt/volumes/statics/static/;
+        client_max_body_size {{ .Values.nginx.maxClientBodySize }};
 
         location ~* \.(?:html|js|jpg|jpeg|gif|png|css|tgz|gz|rar|bz2|doc|pdf|ppt|tar|wav|bmp|ttf|rtf|swf|ico|flv|txt|woff|woff2|svg|xml)$ {
           gzip_static always;
@@ -76,8 +78,9 @@ data:
 
       # GeoNode Upload
       location /uploaded/ {
-        alias /mnt/volumes/statics/uploaded/;
+        client_max_body_size {{ .Values.nginx.maxClientBodySize }};
 
+        alias /mnt/volumes/statics/uploaded/;
         location ~* \.(?:html|js|jpg|jpeg|gif|png|css|tgz|gz|rar|bz2|doc|pdf|ppt|tar|wav|bmp|ttf|rtf|swf|ico|flv|txt|woff|woff2|svg|xml)$ {
           gzip_static always;
           expires 30d;
@@ -90,7 +93,7 @@ data:
       location ~ ^/celery-monitor/? {
         # Using a variable is a trick to let Nginx start even if upstream host is not up yet
         # (see https://sandro-keil.de/blog/2017/07/24/let-nginx-start-if-upstream-host-is-unavailable-or-down/)
-        set $upstream {{ .Release.Name }}-geonode:5555;
+        set $upstream {{ include "geonode_pod_name" . }}:5555;
 
         rewrite ^/celery-monitor/?(.*)$ /$1 break;
 
@@ -108,6 +111,8 @@ data:
       }
 
       location / {
+        client_max_body_size {{ .Values.nginx.maxClientBodySize }};
+
         # FIXME: Work around /proxy sometimes using a mix of public/internal URL to geonode...
         rewrite_log on;
         #rewrite ^/proxy/(.*)url=http?://{{ .Values.geonode.ingress.externalDomain  }}(:\d+)?/geoserver(.*) /proxy/$1url=http://geoserver:{{ .Values.geoserver.port }}$3 last;
@@ -126,10 +131,10 @@ data:
         add_header Access-Control-Allow-Headers "Content-Type, Accept, Authorization, Origin, User-Agent";
         add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, OPTIONS";
 
-        proxy_connect_timeout       600;
-        proxy_send_timeout          600;
-        proxy_read_timeout          600;
-        send_timeout                600;
+        proxy_connect_timeout       600s;
+        proxy_send_timeout          600s;
+        proxy_read_timeout          600s;
+        send_timeout                600s;
         proxy_redirect              off;
         proxy_set_header            Host $host;
         proxy_set_header            X-Real-IP $remote_addr;
@@ -141,8 +146,8 @@ data:
         include /etc/nginx/uwsgi_params;
 
         # proxy_pass http://$upstream;
-        uwsgi_pass {{ .Release.Name }}-geonode:8000;
-
+        uwsgi_pass {{ include "geonode_pod_name" . }}:8000;
+        uwsgi_read_timeout 300s;
         # when a client closes the connection then keep the channel to uwsgi open. Otherwise uwsgi throws an IOError
         uwsgi_ignore_client_abort on;
 

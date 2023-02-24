@@ -1,7 +1,15 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Release.Name }}-nginx-ingress
+  name:  "{{ include "nginx_pod_name" . }}-ingress"
+  {{ if ( .Values.geonode.ingress.addNginxIngressAnnotation) }}
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "2g"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+
+  {{ end }}
 spec:
   ingressClassName: {{ .Values.geonode.ingress.ingressClassName }}
   {{ if (eq .Values.geonode.ingress.externalScheme "https") }}
@@ -18,6 +26,6 @@ spec:
         path: "/"
         backend:
           service:
-            name: {{ .Release.Name }}-nginx
+            name:  "{{ include "nginx_pod_name" . }}"
             port: 
               number: {{ .Values.geonode.ingress.externalPort }}
