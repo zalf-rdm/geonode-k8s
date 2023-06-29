@@ -405,9 +405,9 @@ postgres:
     # -- Database storage size
     storageSize: 3Gi
     # -- number of database instances
-    numberOfInstances: 3
+    numberOfInstances: 1
     # -- postgres version
-    postgres_version: 13
+    postgres_version: 14
 
 ########################
 # CHART CONFIGURATIONS #
