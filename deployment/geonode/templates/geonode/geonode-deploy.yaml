@@ -156,6 +156,9 @@ spec:
           cd /usr/src/geonode-contribs/ldap; pip install --upgrade  -e .
           cd /usr/src/geonode/
           {{ end }}
+          {{ if .Values.geonode.sentry.enabled }}
+          pip install sentry-sdk
+          {{ end }}
 
           # Add config overrides
           cat /usr/src/geonode/geonode/geonode-k8s-settings.py >> /usr/src/geonode/geonode/settings.py
