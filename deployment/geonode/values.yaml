@@ -22,7 +22,7 @@ geonode:
     # -- used geonode image
     name: mwall2bitflow/geonode
     # -- tag of used geonode image
-    tag: '4.0.3'
+    tag: '4.0.x'
 
   # -- additions to tasks.py init script, must be additional code written in python
   tasks_pre_script: |
@@ -61,7 +61,7 @@ geonode:
 
   sentry:
     # -- enable sentry integration for geonode
-    enabled: True
+    enabled: False
     # -- sentry dsn url
     dsn: ""
     # -- sentry environment
