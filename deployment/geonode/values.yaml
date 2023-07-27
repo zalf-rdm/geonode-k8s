@@ -316,14 +316,6 @@ geoserver:
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: 2
 
-# MEMCACHED CONFIGURATION
-# https://artifacthub.io/packages/helm/bitnami/memcached
-memcached:
-  # -- memcached replica. Loadbalanaced via kubernetes. (only one entry in django settings.py) im memcached is activated under geonode.memcached.enabled this takes place
-  architecture: high-availability
-  replicaCount: 1
-
-
 # CONFIGURATION FOR NGINX DEPLOYMENT
 # MAY MOVE TO CHART
 nginx:
@@ -353,9 +345,139 @@ nginx:
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: "800m"
 
+pycsw:
+  # -- enable single pycsw pod
+  enabled: True
+  # -- pycsw pod name
+  pod_name: pysw
+  # -- pycsw container replicas
+  replicaCount: 1
+  # -- pycsw container name
+  container_name: pycsw
+  image:
+    # -- pycsw docker image
+    name: geopython/pycsw
+    # -- pycsw docker image tag
+    tag: '2.6.0'
+  # -- pycsw endpoint port
+  port: 8000
+  # -- pycsw url below geonode.ingress.externalDomain
+  endpoint: /catalogue/csw_test
+  resources:
+    requests:
+      # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "1Gi"
+      # -- requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: "500m"
+    limits:
+      # -- limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "1Gi"
+      # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: "500m"
+
+  config:
+    server:
+      home: /home/pycsw
+      mimetype: application/xml; charset=UTF-8
+      encoding: UTF-8
+      language: en-US
+      maxrecords: 10
+      loglevel: DEBUG
+      # logfile: " "
+      # ogc_schemas_base: http://foo
+      # federatedcatalogues: http://catalog.data.gov/csw
+      # pretty_print: true
+      # gzip_compresslevel: 8
+      # domainquerytype: range
+      # domaincounts: true
+      # spatial_ranking: true
+      profiles: apiso
+      # workers: 2
+      timeout: 30
+    manager:
+      transactions: "false"
+      # allowed_ips: 127.0.0.1
+      # csw_harvest_pagesize: 10
+    metadata:
+      identification_title: GeoNode pycsw Geospatial Catalogue
+      identification_abstract: GeoNode-k8s pycsw Geospatial Catalogue
+      identification_keywords: catalogue,discovery,metadata, geonode
+      identification_keywords_type: theme
+      identification_fees: None
+      identification_accessconstraints: None
+      provider_name: GeoNode Kubernetes
+      provider_url: https://pycsw.org/
+      contact_name: Lastname, Firstname
+      contact_position: Position Title
+      contact_address: Mailing Address
+      contact_city: City
+      contact_stateorprovince: Administrative Area
+      contact_postalcode: Zip or Postal Code
+      contact_country: Country
+      contact_phone: +xx-xxx-xxx-xxxx
+      contact_fax: +xx-xxx-xxx-xxxx
+      contact_email: Email Address
+      contact_url: Contact URL
+      contact_hours: Hours of Service
+      contact_instructions: During hours of service.  Off on weekends.
+      contact_role: pointOfContact
+
+    repository:
+      table: base_resourcebase
+      mappings: /etc/pycsw/mappings.py
+      # filter: type = 'http://purl.org/dc/dcmitype/Dataset'
+
+    inspire:
+      enabled: "true"
+      languages_supported: eng,gre
+      default_language: eng
+      date: YYYY-MM-DD
+      gemet_keywords: Utility and governmental services
+      conformity_service: notEvaluated
+      contact_name: Organization Name
+      contact_email: Email Address
+      temp_extent: YYYY-MM-DD/YYYY-MM-DD
+
+
+postgres:
+  # -- pod name for postgres containers == teamID for mainifest
+  pod_name: postgresql
+  # -- postgres username
+  username: postgres
+  # -- database schema
+  schema: public
+  # -- geonode database name
+  geonodedatabase: geonode
+  # -- geoserver database name
+  geodatabasename: geogeonode
+  # database passwords are set randomly 
+  # infos @ https://postgres-operator.readthedocs.io/en/refactoring-sidecars/user/
+  # get password after creation via: kubectl get secret {{ .Release.name }}.{{ .Release.name }}-{{ container_name }}.credentials -o 'jsonpath={.data.password}' | base64 -d
+
+  # -- configuration for postgres operator database manifest
+  operator_manifest:
+    # -- Database storage size
+    storageSize: 3Gi
+    # -- number of database instances
+    numberOfInstances: 1
+    # -- postgres version
+    postgres_version: 15
+
+########################
+# CHART CONFIGURATIONS #
+########################
+
+# MEMCACHED CONFIGURATION
+# https://artifacthub.io/packages/helm/bitnami/memcached
+memcached:
+  # -- memcached replica. Loadbalanaced via kubernetes. (only one entry in django settings.py) im memcached is activated under geonode.memcached.enabled this takes place
+  architecture: high-availability
+  replicaCount: 1
+
 # -- VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml
 rabbitmq:
   enabled: true
+  # -- rabbitmq raplica count
   replicaCount: 1
   auth:
     username: rabbituser
@@ -375,34 +497,6 @@ rabbitmq:
     # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
     cpu: "750m"
 
-postgres:
-  # -- pod name for postgres containers == teamID for mainifest
-  pod_name: postgresql
-  # -- postgres username
-  username: postgres
-  # -- database schema
-  schema: public
-  # -- geonode database name
-  geonodedatabase: geonode
-  # -- geoserver database name
-  geodatabasename: geogeonode
-  # database passwords are set randomly 
-  # infos @ https://postgres-operator.readthedocs.io/en/refactoring-sidecars/user/
-  # get password after creation via: kubectl get secret {{ .Release.name }}.{{ .Release.name }}-{{ container_name }}.credentials -o 'jsonpath={.data.password}' | base64 -d
-
-
-  # -- configuration for postgres operator database manifest
-  operator_manifest:
-    # -- Database storage size
-    storageSize: 3Gi
-    # -- number of database instances
-    numberOfInstances: 1
-    # -- postgres version
-    postgres_version: 15
-
-########################
-# CHART CONFIGURATIONS #
-########################
 
 # VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator/values.yaml
 postgres-operator:

@@ -16,6 +16,10 @@
 {{ .Release.Name }}-{{ .Values.nginx.pod_name }}
 {{- end -}}
 
+{{- define "pycsw_pod_name" -}}
+{{ .Release.Name }}-{{ .Values.pycsw.pod_name }}
+{{- end -}}
+
 
 # Volume names
 {{- define "persistant_volume_name" -}}

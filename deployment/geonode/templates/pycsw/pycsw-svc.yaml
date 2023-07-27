@@ -1,0 +1,14 @@
+{{- if .Values.pycsw.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ include "pycsw_pod_name" . }}"
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    org.geonode.instance: "{{ include "pycsw_pod_name" . }}"
+  ports:
+  - targetPort: 8000
+    port: {{ .Values.pycsw.port }}
+    name: pycsw
+{{- end }}
