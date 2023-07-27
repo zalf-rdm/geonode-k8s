@@ -40,7 +40,7 @@ postgres-operator:
 postgres_operator_manifest:
   storageSize: 2Gi
   numberOfInstances: 1
-  postgres_version: 13
+  postgres_version: 15
 
 rabbitmq:
   replicaCount: 1
