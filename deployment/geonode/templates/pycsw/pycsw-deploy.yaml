@@ -22,6 +22,18 @@ spec:
         checksum/pycsw-mappings-py: {{ include (print $.Template.BasePath "/pycsw/pycsw-mappings-py.yaml") . | sha256sum }}
     spec:
       terminationGracePeriodSeconds: 3
+      initContainers:
+      # Wait for GeoNode to be up and running, else there can be a race conddition where pycsw creates the database table,
+      # and lets crash init process of geonode
+      - name: pycsw-wait-for-geonode
+        image: alpine/curl
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sh","-c"]
+        args: ['while [ $(curl -ksw "%{http_code}" "$GEONODE_ENDPOINT:8001" -o /dev/null) -ne 200 ]; do sleep 5; echo "health check failed . Waiting for GeoNode ($GEONODE_ENDPOINT:8001) ..."; done']
+        env:
+        - name: GEONODE_ENDPOINT
+          value: "{{ include "geonode_pod_name" . }}"
+
       containers:
       - name: {{ .Values.pycsw.container_name }}
         image: "{{ .Values.pycsw.image.name }}:{{ .Values.pycsw.image.tag }}"
@@ -56,6 +68,13 @@ spec:
           limits:
             memory: {{ .Values.pycsw.resources.limits.memory }}
             cpu: {{ .Values.pycsw.resources.limits.cpu }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.pycsw.port }}
+          initialDelaySeconds: 3
+          periodSeconds: 10
+
       volumes:
       - name: pycsw-cfg
         configMap:
