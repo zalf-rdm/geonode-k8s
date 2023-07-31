@@ -392,7 +392,7 @@ postgres:
 
 
   # -- configuration for postgres operator database manifest
-  operator_manifest:
+  postgres_operator_manifest:
     # -- Database storage size
     storageSize: 3Gi
     # -- number of database instances
@@ -411,8 +411,8 @@ postgres-operator:
   # -- ???
   operatorApiUrl: "http://{{ .Release.Name }}-postgres-operator:8080"
   configLoggingRestApi:
-  # --  REST API listener listens to this port
-  api_port: 8080
+    # --  REST API listener listens to this port
+    api_port: 8080
   # -- postgress pv storageclass
   storageClass:
   # -- not setting the podServiceAccount name will leed to generation of this name. This allows to run multiple postgres-operators in a single kubernetes cluster. just seperating them by namespace.
