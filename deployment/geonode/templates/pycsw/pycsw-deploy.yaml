@@ -25,11 +25,9 @@ spec:
       containers:
       - name: {{ .Values.pycsw.container_name }}
         image: "{{ .Values.pycsw.image.name }}:{{ .Values.pycsw.image.tag }}"
-
         envFrom:
           - configMapRef:
               name: {{ include "pycsw_pod_name" . }}-env
-        
         env:
         - name: PYCSW_SERVER_URL
           value: "{{ .Values.geonode.ingress.externalDomain}}{{ .Values.pycsw.endpoint }}"
@@ -39,20 +37,18 @@ spec:
               name:  {{ .Values.postgres.geonodedatabase }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
               key: password
         - name: PYCSW_REPOSITORY_DATABASE_URI
-          value: "postgis://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"       
-        
+          value: "postgresql://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"
         ports:
         - containerPort: {{ .Values.pycsw.port }}
-        
         volumeMounts:
-        - name: pycsw-pycsw-cfg
+        - name: pycsw-cfg
           mountPath: "/etc/pycsw/pycsw.cfg"
           subPath: pycsw.cfg
           readOnly: true
         - name: pycsw-mappings-py
           mountPath: {{ .Values.pycsw.config.repository.mappings }}
-          subPath: mappings.py
-          readOnly: true        
+          subPath: pycsw-mappings.py
+          readOnly: true
         resources:
           requests:
             memory: {{ .Values.pycsw.resources.requests.memory }}
@@ -61,18 +57,18 @@ spec:
             memory: {{ .Values.pycsw.resources.limits.memory }}
             cpu: {{ .Values.pycsw.resources.limits.cpu }}
       volumes:
-      - name: pycsw-pycsw-cfg
+      - name: pycsw-cfg
         configMap:
-          name: {{ .Release.Name }}-pycsw-pycsw-cfg
+          name: {{ .Release.Name }}-pycsw-cfg
           defaultMode: 0744
           items:
-          - key: pycsw-pycsw-cfg
-            path: "pycsw-pycsw-cfg"
+          - key: pycsw.cfg
+            path: "pycsw.cfg"
       - name: pycsw-mappings-py
         configMap:
           name: {{ .Release.Name }}-pycsw-mappings-py
           defaultMode: 0744
           items:
-          - key: pycsw-mappings-py
-            path: "pycsw-mappings-py"
+          - key: pycsw-mappings.py
+            path: "pycsw-mappings.py"
 {{ end }}
