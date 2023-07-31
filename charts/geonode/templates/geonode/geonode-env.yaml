@@ -130,10 +130,10 @@ data:
   # Configure PYCSW
   {{ if .Values.pycsw.enabled }}
   CATALOGUE_ENGINE: geonode.catalogue.backends.pycsw_http
-  CATALOGUE_URL: {{ .Values.pycsw.pod_name}}
+  CATALOGUE_URL: "{{ include "pycsw_pod_name" . }}:{{ .Values.pycsw.port }}"
   {{ else }}
   CATALOGUE_ENGINE: geonode.catalogue.backends.pycsw_local
-  {{ end }}
+  {{ end}}
   # OAuth2
   # TODO (mwall) implement OAUTH2
   OAUTH2_API_KEY: ""
