@@ -115,6 +115,15 @@ data:
       location {{ .Values.pycsw.endpoint }} {
         client_max_body_size {{ .Values.nginx.maxClientBodySize }};
 
+        # compression
+        gzip on;
+        gzip_types
+          text/xml
+          text/plain
+          application/xml
+          application/xml+rss
+          application/json;
+
         proxy_pass http://{{ include "pycsw_pod_name" . }}:{{ .Values.pycsw.port }};
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
