@@ -2,14 +2,18 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name:  "{{ include "nginx_pod_name" . }}-ingress"
-  {{ if ( .Values.geonode.ingress.addNginxIngressAnnotation) }}
   annotations:
+    description: Configures routes for external access
+    {{ if (eq .Values.geonode.acme.enabled true) }}
+    cert-manager.io/issuer: letsencrypt
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    {{ end}}
+    {{ if ( .Values.geonode.ingress.addNginxIngressAnnotation) }}
     nginx.ingress.kubernetes.io/proxy-body-size: "2g"
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-
-  {{ end }}
+    {{ end }}
 spec:
   ingressClassName: {{ .Values.geonode.ingress.ingressClassName }}
   {{ if (eq .Values.geonode.ingress.externalScheme "https") }}
@@ -29,3 +33,27 @@ spec:
             name:  "{{ include "nginx_pod_name" . }}"
             port: 
               number: {{ .Values.geonode.ingress.externalPort }}
+
+---
+
+
+{{if (eq .Values.geonode.acme.enabled true) }}
+
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt
+spec:
+  acme:
+    email: {{ .Values.geonode.acme.email }}
+    server: {{ .Values.geonode.acme.stageUrl }}
+    privateKeySecretRef:
+      name: letsencrypt
+    solvers:
+    - selector:
+        dnsNames:
+          - {{ .Values.geonode.ingress.externalDomain }}
+      http01:
+        ingress:
+          ingressClassName: {{ .Values.geonode.ingress.ingressClassName }}
+{{ end }}
