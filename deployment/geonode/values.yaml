@@ -56,8 +56,17 @@ geonode:
     externalDomain: geonode
     # -- external ingress port
     externalPort: 80
-    # -- tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/. is used when geonode.ingress.externalScheme is set to https
+    # -- tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/ (for the use of cert-manager, configure the acme section properly). is used when geonode.ingress.externalScheme is set to https
     tlsSecret: geonode-tls-secret
+
+  acme:
+    # -- enables cert-manager to do ACME challenges (aka certificates via letsencrypt)
+    enabled: False
+    # -- the email to be used to gain certificates
+    email: support@example.com
+    # -- ACME staging environment (use acme-staging to avoid running into rate limits)
+    #stageUrl: https://acme-v02.api.letsencrypt.org/directory
+    stageUrl: https://acme-staging-v02.api.letsencrypt.org/directory
 
   sentry:
     # -- enable sentry integration for geonode
