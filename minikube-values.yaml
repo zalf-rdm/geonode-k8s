@@ -31,6 +31,9 @@ geonode:
     email_verification: "False"
     authentication_method: username_email
 
+pycsw:
+  enabled: True
+
 postgres-operator-ui:
   enabled: False
 
