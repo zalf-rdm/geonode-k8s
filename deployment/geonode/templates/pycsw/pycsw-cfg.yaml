@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-pycsw-pycsw-cfg
+  name: {{ .Release.Name }}-pycsw-cfg
   namespace: {{ .Release.Namespace }}
 data:
   pycsw.cfg: |+
     [server]
     {{ if .Values.pycsw.config.server.home }}    home={{ .Values.pycsw.config.server.home }}{{ end }}
-    {{ if .Values.pycsw.config.server.url }}    url={{ .Values.pycsw.endpoint }}{{ end }}
+        url={{ .Values.geonode.ingress.externalScheme}}://{{ .Values.geonode.ingress.externalDomain}}{{ .Values.pycsw.endpoint }}
     {{ if .Values.pycsw.config.server.mimetype }}    mimetype={{ .Values.pycsw.config.server.mimetype }}{{ end }}
     {{ if .Values.pycsw.config.server.encoding }}    encoding={{ .Values.pycsw.config.server.encoding }}{{ end }}
     {{ if .Values.pycsw.config.server.language }}    language={{ .Values.pycsw.config.server.language }}{{ end }}
@@ -53,6 +53,7 @@ data:
     {{ if .Values.pycsw.config.metadata.contact_instructions }}    contact_instructions={{ .Values.pycsw.config.metadata.contact_instructions }}{{ end }}
     {{ if .Values.pycsw.config.metadata.contact_role }}    contact_role={{ .Values.pycsw.config.metadata.contact_role }}{{ end }}
     [repository]
+        database=${PYCSW_REPOSITORY_DATABASE_URI}
     {{ if .Values.pycsw.config.repository.mappings }}    mappings={{ .Values.pycsw.config.repository.mappings }}{{ end }}
     {{ if .Values.pycsw.config.repository.table }}    table={{ .Values.pycsw.config.repository.table }}{{ end }}
     {{ if .Values.pycsw.config.repository.filter }}    filter={{ .Values.pycsw.config.repository.filter }}{{ end }}
