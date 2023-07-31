@@ -5,7 +5,7 @@ metadata:
   name: {{ .Release.Name }}-pycsw-mappings-py
   namespace: {{ .Release.Namespace }}
 data:
-  mappings.py: |
+  pycsw-mappings.py: |
     # copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py
     MD_CORE_MODEL = {
       "typename": "pycsw:CoreMetadata",
