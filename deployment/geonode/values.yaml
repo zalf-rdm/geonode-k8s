@@ -345,6 +345,7 @@ nginx:
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: "800m"
 
+# -- pycsw integration is based on https://github.com/geopython/pycsw/blob/master/docker/kubernetes
 pycsw:
   # -- enable single pycsw pod
   enabled: True
@@ -362,7 +363,7 @@ pycsw:
   # -- pycsw endpoint port
   port: 8000
   # -- pycsw url below geonode.ingress.externalDomain
-  endpoint: /catalogue/csw_test
+  endpoint: /catalogue/csw
   resources:
     requests:
       # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
@@ -374,7 +375,7 @@ pycsw:
       memory: "1Gi"
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: "500m"
-
+  # -- pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/
   config:
     server:
       home: /home/pycsw
@@ -382,22 +383,11 @@ pycsw:
       encoding: UTF-8
       language: en-US
       maxrecords: 10
-      loglevel: DEBUG
-      # logfile: " "
-      # ogc_schemas_base: http://foo
-      # federatedcatalogues: http://catalog.data.gov/csw
-      # pretty_print: true
-      # gzip_compresslevel: 8
-      # domainquerytype: range
-      # domaincounts: true
-      # spatial_ranking: true
       profiles: apiso
       # workers: 2
       timeout: 30
     manager:
       transactions: "false"
-      # allowed_ips: 127.0.0.1
-      # csw_harvest_pagesize: 10
     metadata:
       identification_title: GeoNode pycsw Geospatial Catalogue
       identification_abstract: GeoNode-k8s pycsw Geospatial Catalogue
@@ -424,7 +414,7 @@ pycsw:
 
     repository:
       table: base_resourcebase
-      mappings: /etc/pycsw/mappings.py
+      mappings: /etc/pycsw/pycsw-mappings.py
       # filter: type = 'http://purl.org/dc/dcmitype/Dataset'
 
     inspire:
