@@ -16,13 +16,16 @@ Helm Chart for Geonode
 |------------|------|---------|
 | https://charts.bitnami.com/bitnami | memcached | ~6.x.x |
 | https://charts.bitnami.com/bitnami | rabbitmq | ~10.1.7 |
-| https://opensource.zalando.com/postgres-operator/charts/postgres-operator-ui/ | postgres-operator-ui | 1.9.0 |
-| https://opensource.zalando.com/postgres-operator/charts/postgres-operator/ | postgres-operator | 1.9.0 |
+| https://opensource.zalando.com/postgres-operator/charts/postgres-operator-ui/ | postgres-operator-ui | ~1.9.0 |
+| https://opensource.zalando.com/postgres-operator/charts/postgres-operator/ | postgres-operator | ~1.9.0 |
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| geonode.acme.email | string | `"support@example.com"` | the email to be used to gain certificates |
+| geonode.acme.enabled | bool | `false` | enables cert-manager to do ACME challenges (aka certificates via letsencrypt) |
+| geonode.acme.stageUrl | string | `"https://acme-staging-v02.api.letsencrypt.org/directory"` | ACME staging environment (use acme-staging to avoid running into rate limits) stageUrl: https://acme-v02.api.letsencrypt.org/directory |
 | geonode.celery.container_name | string | `"celery"` |  |
 | geonode.celery.resources.limits.cpu | int | `1` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.celery.resources.limits.memory | string | `"1Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
@@ -61,7 +64,7 @@ Helm Chart for Geonode
 | geonode.ingress.externalPort | int | `80` | external ingress port |
 | geonode.ingress.externalScheme | string | `"http"` | external ingress schema. if set to https ingress tls is used. Loading tls certificate via tls-secret options Available options: (http|https) |
 | geonode.ingress.ingressClassName | string | `nil` | define kubernetes ingress class for geonode ingress |
-| geonode.ingress.tlsSecret | string | `"geonode-tls-secret"` | tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/. is used when geonode.ingress.externalScheme is set to https |
+| geonode.ingress.tlsSecret | string | `"geonode-tls-secret"` | tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/ (for the use of cert-manager, configure the acme section properly). is used when geonode.ingress.externalScheme is set to https |
 | geonode.ldap.always_update_user | bool | `true` | always update local user database from ldap |
 | geonode.ldap.attr_map_email_addr | string | `"mailPrimaryAddress"` | email attribute used from ldap  |
 | geonode.ldap.attr_map_first_name | string | `"givenName"` | given name attribute used from ldap |
@@ -161,8 +164,7 @@ Helm Chart for Geonode
 | nginx.resources.requests.cpu | string | `"500m"` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | nginx.resources.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | postgres-operator-ui | object | `{"enabled":false,"envs":{"operatorApiUrl":"http://{{ $.Release.Name }}-postgres-operator:8080"},"ingress":{"enabled":false,"hosts":[{"host":"postgres-ui","paths":[""]}],"ingressClassName":null},"replicaCount":1,"service":{"port":80,"type":"ClusterIP"}}` | VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml |
-| postgres-operator.api_port | int | `8080` | REST API listener listens to this port |
-| postgres-operator.configLoggingRestApi | string | `nil` |  |
+| postgres-operator.configLoggingRestApi.api_port | int | `8080` | REST API listener listens to this port |
 | postgres-operator.enabled | bool | `true` | enable postgres-operator (this or postgresql.enabled NOT both ) |
 | postgres-operator.operatorApiUrl | string | `"http://{{ .Release.Name }}-postgres-operator:8080"` | ??? |
 | postgres-operator.podServiceAccount | object | `{"name":""}` | not setting the podServiceAccount name will leed to generation of this name. This allows to run multiple postgres-operators in a single kubernetes cluster. just seperating them by namespace. |
