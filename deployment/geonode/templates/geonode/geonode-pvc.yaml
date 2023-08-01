@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   accessModes:
-  - ReadWriteMany
+  - {{ .Values.global.accessMode }}
   storageClassName: {{ .Values.global.storageClass }}
   resources:
     requests:

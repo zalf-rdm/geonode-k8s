@@ -35,4 +35,4 @@ spec:
         pg_partman: {{ .Values.postgres.schema }}
         postgis: {{ .Values.postgres.schema }}
   postgresql:
-    version: {{ .Values.postgres_operator_manifest.postgres_version | quote }}
+    version: {{ .Values.postgres.operator_manifest.postgres_version | quote }}
