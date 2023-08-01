@@ -37,10 +37,11 @@ postgres-operator-ui:
 postgres-operator:
   enabled: True
 
-postgres_operator_manifest:
-  storageSize: 2Gi
-  numberOfInstances: 1
-  postgres_version: 15
+postgres:
+  operator_manifest:
+    storageSize: 2Gi
+    numberOfInstances: 1
+    postgres_version: 15
 
 rabbitmq:
   replicaCount: 1

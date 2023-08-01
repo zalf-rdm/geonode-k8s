@@ -401,7 +401,7 @@ postgres:
 
 
   # -- configuration for postgres operator database manifest
-  postgres_operator_manifest:
+  operator_manifest:
     # -- Database storage size
     storageSize: 3Gi
     # -- number of database instances
