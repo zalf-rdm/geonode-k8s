@@ -552,7 +552,7 @@ postgres:
   # get password after creation via: kubectl get secret {{ .Release.name }}.{{ .Release.name }}-{{ container_name }}.credentials -o 'jsonpath={.data.password}' | base64 -d
 
   # -- configuration for postgres operator database manifest
-  postgres_operator_manifest:
+  operator_manifest:
     # -- Database storage size
     storageSize: 3Gi
     # -- number of database instances
