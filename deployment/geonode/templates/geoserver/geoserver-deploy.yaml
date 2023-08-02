@@ -50,6 +50,13 @@ spec:
       containers:
       - name: {{ .Values.geoserver.container_name }}
         image: "{{ .Values.geoserver.image.name }}:{{ .Values.geoserver.image.tag }}"
+        # temporary overloading entry point to fix j2 template: https://github.com/GeoNode/geonode/issues/11318
+        command:
+        - sh
+        - -c
+        - |
+          {{`sed -i "s/db:5432/{{DATABASE_HOST}}:5432/g" /templates/geofence/geofence-datasource-ovr.properties.j2`}}
+          /usr/local/tomcat/tmp/entrypoint.sh
 
         ports:
         - containerPort: {{ .Values.geoserver.port }}
