@@ -31,8 +31,8 @@ spec:
         backend:
           service:
             name:  "{{ include "nginx_pod_name" . }}"
-            port: 
-              number: {{ .Values.geonode.ingress.externalPort }}
+            port:
+              number: 80
 
 ---
 
