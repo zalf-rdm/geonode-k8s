@@ -493,31 +493,6 @@ pycsw:
       contact_email: Email Address
       temp_extent: YYYY-MM-DD/YYYY-MM-DD
 
-
-postgres:
-  # -- pod name for postgres containers == teamID for mainifest
-  pod_name: postgresql
-  # -- postgres username
-  username: postgres
-  # -- database schema
-  schema: public
-  # -- geonode database name
-  geonodedatabase: geonode
-  # -- geoserver database name
-  geodatabasename: geogeonode
-  # database passwords are set randomly 
-  # infos @ https://postgres-operator.readthedocs.io/en/refactoring-sidecars/user/
-  # get password after creation via: kubectl get secret {{ .Release.name }}.{{ .Release.name }}-{{ container_name }}.credentials -o 'jsonpath={.data.password}' | base64 -d
-
-  # -- configuration for postgres operator database manifest
-  operator_manifest:
-    # -- Database storage size
-    storageSize: 3Gi
-    # -- number of database instances
-    numberOfInstances: 1
-    # -- postgres version
-    postgres_version: 15
-
 ########################
 # CHART CONFIGURATIONS #
 ########################
@@ -552,6 +527,33 @@ rabbitmq:
     # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
     cpu: "750m"
 
+postgres:
+  # -- pod name for postgres containers == teamID for mainifest
+  pod_name: postgresql
+  # -- postgres username
+  username: postgres
+  # -- database schema
+  schema: public
+  # -- geonode database name
+  geonodedatabase: geonode
+  # -- geoserver database name
+  geodatabasename: geogeonode
+  # database passwords are set randomly 
+  # infos @ https://postgres-operator.readthedocs.io/en/refactoring-sidecars/user/
+  # get password after creation via: kubectl get secret {{ .Release.name }}.{{ .Release.name }}-{{ container_name }}.credentials -o 'jsonpath={.data.password}' | base64 -d
+
+  # -- configuration for postgres operator database manifest
+  postgres_operator_manifest:
+    # -- Database storage size
+    storageSize: 3Gi
+    # -- number of database instances
+    numberOfInstances: 1
+    # -- postgres version
+    postgres_version: 15
+
+########################
+# CHART CONFIGURATIONS #
+########################
 
 # VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator/values.yaml
 postgres-operator:
@@ -560,8 +562,8 @@ postgres-operator:
   # -- ???
   operatorApiUrl: "http://{{ .Release.Name }}-postgres-operator:8080"
   configLoggingRestApi:
-  # --  REST API listener listens to this port
-  api_port: 8080
+    # --  REST API listener listens to this port
+    api_port: 8080
   # -- postgress pv storageclass
   storageClass:
   # -- not setting the podServiceAccount name will leed to generation of this name. This allows to run multiple postgres-operators in a single kubernetes cluster. just seperating them by namespace.
