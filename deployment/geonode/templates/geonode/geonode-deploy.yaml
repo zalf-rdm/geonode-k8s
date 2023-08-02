@@ -34,16 +34,18 @@ spec:
         - tcp://{{ include "rabbit_host" .}}
 
       containers:
-      # This is the django app server
+      ##############
+      # django app #
+      ##############
       - name: {{ .Values.geonode.container_name }}
         image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
-
+        imagePullPolicy: {{ .Values.geonode.image.pullPolicy }}
         command:
         - bash
         - -c
         - |
           # install dockerize...
-          wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+          wget -q https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
@@ -127,6 +129,13 @@ spec:
           subPath: geonode-k8s-settings.py
           readOnly: true
 
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 5
+
         resources:
           requests:
             memory: {{ .Values.geonode.resources.requests.memory }}
@@ -135,16 +144,18 @@ spec:
             memory: {{ .Values.geonode.resources.limits.memory }}
             cpu: {{ .Values.geonode.resources.limits.cpu }}
 
-      # Celery is the task worker
+      ##########
+      # Celery #
+      ##########
       - name: {{ .Values.geonode.celery.container_name }}
         image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
-
+        imagePullPolicy: {{ .Values.geonode.image.pullPolicy }}
         command:
         - bash
         - -c
         - |
           # install dockerize...
-          wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+          wget -q https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
@@ -164,8 +175,8 @@ spec:
           cat /usr/src/geonode/geonode/geonode-k8s-settings.py >> /usr/src/geonode/geonode/settings.py
 
           # Setup
-          touch /usr/src/geonode/invoke.log
-          dockerize -stdout /usr/src/geonode/invoke.log /usr/src/geonode/entrypoint.sh celery-cmd
+          touch /var/log/celery.log
+          dockerize -stdout /var/log/celery.log /usr/src/geonode/entrypoint.sh celery-cmd
 
         envFrom:
           - configMapRef:
