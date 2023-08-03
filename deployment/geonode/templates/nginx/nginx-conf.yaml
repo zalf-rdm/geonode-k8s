@@ -115,6 +115,12 @@ data:
       location {{ .Values.pycsw.endpoint }} {
         client_max_body_size {{ .Values.nginx.maxClientBodySize }};
 
+        gzip_static always;
+        expires 30d;
+        access_log off;
+        add_header Pragma "public";
+        add_header Cache-Control "max-age=31536000, public";
+
         # compression
         gzip on;
         gzip_types

@@ -369,7 +369,7 @@ pycsw:
     # -- pycsw docker image
     name: geopython/pycsw
     # -- pycsw docker image tag
-    tag: '2.6.0'
+    tag: '2.6.1'
   # -- pycsw endpoint port
   port: 8000
   # -- pycsw url below geonode.ingress.externalDomain

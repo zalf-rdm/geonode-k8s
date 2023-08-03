@@ -10,8 +10,6 @@ spec:
     matchLabels:
       org.geonode.instance: "{{ include "pycsw_pod_name" . }}"
   serviceName: "{{ include "pycsw_pod_name" . }}"
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
