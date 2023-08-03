@@ -5,8 +5,8 @@ metadata:
 spec:
   teamId: {{ .Release.Name | quote }}
   volume:
-    size: {{ .Values.postgres.operator_manifest.storageSize }}
-  numberOfInstances: {{ int .Values.postgres.operator_manifest.numberOfInstances }}
+    size: {{ .Values.postgres.postgres_operator_manifest.storageSize }}
+  numberOfInstances: {{ int .Values.postgres.postgres_operator_manifest.numberOfInstances }}
   users:
     {{ .Values.postgres.username }}:
     - superuser
