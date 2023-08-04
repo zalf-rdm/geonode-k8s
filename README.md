@@ -43,8 +43,9 @@ If you want to go straight for a production installation follow the [installatio
 
 Furhter docs:
 - [https-ingress](docs/https-ingress.md)
-- [access-geonode-database-from-outside-of-kubernetes](docs/external-database-access.md)
+- [access-geonode-database-from-outside-of-kubernetes](docs/access-geonode-database-from-outside.md)
 - [configure-nginx-ingress-body-size-timeout](docs/nginx-ingress-class.md)
+- [run-with-external-postgresql-database](docs/external-database.md)
 
 Install
 -------
