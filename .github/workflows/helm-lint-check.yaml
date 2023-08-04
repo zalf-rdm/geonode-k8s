@@ -1,0 +1,23 @@
+name: helm lint test
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+jobs:
+  helm-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: azure/setup-helm@v3
+      with:
+          version: '3.12.0' # default is latest (stable)
+    - name: build dependencies
+      run:  |
+        helm dependency update
+      working-directory: ./deployment/geonode/
+    - uses: actions/checkout@master
+    - name: helm-check
+      uses: igabaydulin/helm-check-action@0.1.4
+      env:
+        CHART_LOCATION: ./deployment/geonode/
+        CHART_VALUES: ./minikube-values.yaml
