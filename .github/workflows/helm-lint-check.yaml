@@ -4,18 +4,22 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
+
+permissions:
+  contents: read
+
 jobs:
   helm-check:
     runs-on: ubuntu-latest
     steps:
-    - uses: azure/setup-helm@v3
+    - name: checkout repository
+      uses: actions/checkout@v3
+    - name: install helm
+      uses: azure/setup-helm@v3
       with:
           version: '3.12.0' # default is latest (stable)
     - name: build dependencies
-      run:  |
-        helm dependency update
-      working-directory: ./deployment/geonode/
-    - uses: actions/checkout@master
+      run:  helm dependency update deployment/geonode/
     - name: helm-check
       uses: igabaydulin/helm-check-action@0.1.4
       env:
