@@ -180,8 +180,7 @@ spec:
 
           # Setup
           touch /var/log/celery.log
-          sleep 1423532423
-          # dockerize -stdout /var/log/celery.log /usr/src/geonode/entrypoint.sh celery-cmd
+          dockerize -stdout /var/log/celery.log /usr/src/geonode/entrypoint.sh celery-cmd
 
         envFrom:
           - configMapRef:
