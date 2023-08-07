@@ -17,11 +17,11 @@ jobs:
     - name: install helm
       uses: azure/setup-helm@v3
       with:
-          version: '3.12.0' # default is latest (stable)
+        version: '3.12.0' # default is latest (stable)
     - name: build dependencies
-      run:  helm dependency update deployment/geonode/
+      run: helm dependency update deployment/geonode/
     - name: helm-check
       uses: igabaydulin/helm-check-action@0.1.4
       env:
         CHART_LOCATION: ./deployment/geonode/
-        CHART_VALUES: ./minikube-values.yaml
+        CHART_VALUES: ./deployment/geonode/values.yaml
