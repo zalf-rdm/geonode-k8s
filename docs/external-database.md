@@ -1,6 +1,6 @@
 # Deploying using an external postgresql Database
 
-Geonode-k8s supports using an external postgresql database. This database requires to have postgis extension installed. If you gonna use an external [postgres-operator](https://github.com/zalando/postgres-operator), here is a template based on the one used inside this helm chart:
+Geonode-k8s supports an external postgresql database. This database **requires to have postgis extension installed**. If you gonna use an external [postgres-operator](https://github.com/zalando/postgres-operator), here is a template based on the one used inside this helm chart:
 
 ```
 # Source: geonode-k8s/templates/postgres/geonode-manifest.yaml
@@ -50,9 +50,9 @@ kubectl get secret geonode.geonode-postgresql.credentials.postgresql.acid.zalan.
 kubectl get secret geodata.geonode-postgresql.credentials.postgresql.acid.zalan.do -o 'jsonpath={.data.password}' | base64 -d
 ```
 
-But also any other postgis database can be used. Best is to use postgresql version 15.
+But also any other postgis database can be used. For GeoNode 4.1 it is required to use postgresql version 15.
 
-Now you have to configure your values.yaml to use this external database. Example below: 
+Now you have to configure your values.yaml to use this external database. You can use `minikube-values-external-db.yaml` or the example below in your values.yaml:
 
 ```
 postgres:
@@ -64,10 +64,20 @@ postgres:
     enabled: True
     hostname: my-external-postgres.com
     port: 5432
-    postgres_password: postgresuserpassword
-    geonode_password: geonodeuserpassword
-    geodata_password: geodatauserpassword
+    postgres_password: 
+    geonode_password: 
+    geodata_password: 
 
 postgres-operator:
   enabled: False
 ```
+
+To deploy run helm and give passwords as helm arguments like:
+```
+export GEONODE_K8S_POSTGRES_PASSWORD="password"
+export GEONODE_K8S_GEONODE_PASSOWRD="password"
+export GEONODE_K8S_GEODATA_PASSWORD="password"
+helm upgrade --cleanup-on-fail --install --namespace geonode --create-namespace --values minikube-values-external-db.yaml --set postgres.external_postgres.postgres_password=${GEONODE_K8S_POSTGRES_PASSWORD} --set postgres.external_postgres.geonode_password=${GEONODE_K8S_GEONODE_PASSOWRD} --set postgres.external_postgres.geodata_password=${GEONODE_K8S_GEODATA_PASSWORD} geonode deployment/geonode
+```
+
+If run on minikube follow the original [minikube docs](minikube-installation.md) for accessing the geonode installation through `minikube tunnel`.
