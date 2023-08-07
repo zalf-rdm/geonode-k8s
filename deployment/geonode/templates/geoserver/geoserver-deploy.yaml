@@ -55,7 +55,8 @@ spec:
         - sh
         - -c
         - |
-          {{`sed -i "s/db:5432/{{DATABASE_HOST}}:5432/g" /templates/geofence/geofence-datasource-ovr.properties.j2`}}
+          TMP_DB_PORT={{ include "database_port" . }}
+          {{`sed -i 's/db:5432/{{ DATABASE_HOST }}:$TMP_DB_PORT/g' /templates/geofence/geofence-datasource-ovr.properties.j2`}}
           /usr/local/tomcat/tmp/entrypoint.sh
 
         ports:
@@ -70,7 +71,7 @@ spec:
           - name: GEONODE_GEODATABASE_PASSWORD
             valueFrom:
               secretKeyRef:
-                name: {{ .Values.postgres.geodatabasename }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
+                name: {{ include "database_geodata_password_secret_key_ref" . }}
                 key: password
 
         volumeMounts:

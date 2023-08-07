@@ -191,11 +191,11 @@ data:
   SENTRY_ENVIRONMENT: {{ .Values.geonode.sentry.environment | quote }}
 
   # Database Settings
-  DATABASE_HOST: "{{ include "postgres_pod_name" . }}"
-  DATABASE_PORT: "{{ include "database_port" .}}"
+  DATABASE_HOST: {{ include "database_hostname" . | quote }}
+  DATABASE_PORT: {{ include "database_port" . | quote }}
 
-  POSTGRES_USER: {{ .Values.postgres.username }}
-  GEONODE_DATABASE: {{ .Values.postgres.geonodedatabase | quote }}
-  GEONODE_GEODATABASE: {{ .Values.postgres.geodatabasename | quote }}
+  POSTGRES_USER: {{ .Values.postgres.username | quote }}
+  GEONODE_DATABASE: {{ .Values.postgres.geonode_databasename_and_username | quote }}
+  GEONODE_GEODATABASE: {{ .Values.postgres.geodata_databasename_and_username | quote }}
   GEONODE_DATABASE_SCHEMA: {{ .Values.postgres.schema }}
   GEONODE_GEODATABASE_SCHEMA: {{ .Values.postgres.schema }}

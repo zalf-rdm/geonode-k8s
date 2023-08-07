@@ -385,29 +385,37 @@ rabbitmq:
     cpu: "750m"
 
 postgres:
-  # -- pod name for postgres containers == teamID for mainifest
-  pod_name: postgresql
   # -- postgres username
   username: postgres
   # -- database schema
   schema: public
-  # -- geonode database name
-  geonodedatabase: geonode
-  # -- geoserver database name
-  geodatabasename: geogeonode
-  # database passwords are set randomly 
-  # infos @ https://postgres-operator.readthedocs.io/en/refactoring-sidecars/user/
-  # get password after creation via: kubectl get secret {{ .Release.name }}.{{ .Release.name }}-{{ container_name }}.credentials -o 'jsonpath={.data.password}' | base64 -d
-
+  # -- geonode database name and username
+  geonode_databasename_and_username: geonode
+  # -- geoserver database name and username
+  geodata_databasename_and_username: geodata
 
   # -- configuration for postgres operator database manifest
   operator_manifest:
+    # -- pod name for postgres containers == teamID for mainifest
+    pod_name: postgresql
     # -- Database storage size
     storageSize: 3Gi
     # -- number of database instances
     numberOfInstances: 1
     # -- postgres version
     postgres_version: 15
+    # database passwords are set randomly 
+    # infos @ https://postgres-operator.readthedocs.io/en/refactoring-sidecars/user/
+    # get password after creation via: kubectl get secret {{ .Release.name }}.{{ .Release.name }}-{{ container_name }}.credentials -o 'jsonpath={.data.password}' | base64 -d
+
+  external_postgres:
+    enabled: False
+    hostname: my-external-postgres.com
+    port: 5432
+    postgres_password: postgres
+    geonode_password: geonode
+    geodata_password: geogeonode
+
 
 ########################
 # CHART CONFIGURATIONS #

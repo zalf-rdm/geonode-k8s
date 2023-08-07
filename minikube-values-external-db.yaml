@@ -1,0 +1,54 @@
+global:
+  storageClass: standard
+
+geonode:
+  replicaCount: 1 # not working yet
+
+  general:
+    debug: True
+    debug_static: True
+
+  persistant:
+    storageSize: 2Gi
+
+  ingress:
+    enabled: False
+    externalScheme: http
+    externalDomain: geonode
+    externalPort: 80
+
+  superUser:
+    password: geonode
+
+  mail:
+    enabled: False
+
+  ldap:
+    enabled: False
+
+  register:
+    open_signup: True
+    email_verification: "False"
+    authentication_method: username_email
+
+rabbitmq:
+  replicaCount: 1
+  auth:
+    username: rabbituser
+    password: rabbit_password
+
+postgres:
+  username: postgres
+  geonode_databasename_and_username: geonode
+  geodata_databasename_and_username: geodata
+
+  external_postgres:
+    enabled: True
+    hostname: "external-postgres.com"
+    port: 5432
+    postgres_password:
+    geonode_password:
+    geodata_password:
+postgres-operator:
+  enabled: False
+
