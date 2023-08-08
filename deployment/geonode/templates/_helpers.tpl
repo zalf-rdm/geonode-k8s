@@ -37,7 +37,7 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
 {{- end -}}
 
 {{- define "external_port" -}}
-{{- if or (eq (toString .Values.geonode.ingress.externalPort) "80") (eq (toString .Values.geonode.ingress.externalPort) "443") -}}
+{{- if or ( not .Values.geonode.ingress.externalPort ) (eq (toString .Values.geonode.ingress.externalPort) "80") (eq (toString .Values.geonode.ingress.externalPort) "443") -}}
 {{- else -}}
 :{{ .Values.geonode.ingress.externalPort}}
 {{- end -}}
