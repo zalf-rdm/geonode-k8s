@@ -444,3 +444,6 @@ postgres-operator-ui:
     hosts:
     - host: postgres-ui
       paths: [""]
+
+# fixture file content here
+geonodeFixtures:
