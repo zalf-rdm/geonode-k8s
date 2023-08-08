@@ -684,7 +684,7 @@ data:
         db_user = database = os.getenv('GEONODE_GEODATABASE')
         db_password = os.getenv('GEONODE_GEODATABASE_PASSWORD')
         db_host = os.getenv('DATABASE_HOST')
-        db_port = os.getenv('DATABASE_HOST')
+        db_port = os.getenv('DATABASE_PORT')
         url = '{}rest/workspaces/{}/datastores'.format(geoserver_base_url,GEOSERVER_WORKSPACE_NAME)
         data = """
               <dataStore>
