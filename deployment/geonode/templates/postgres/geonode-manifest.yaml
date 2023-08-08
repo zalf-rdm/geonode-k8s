@@ -1,3 +1,6 @@
+
+{{ $postgres_operator := index .Values "postgres-operator" "enabled" }}
+{{ if $postgres_operator }}
 apiVersion: "acid.zalan.do/v1"
 kind: postgresql
 metadata:
@@ -10,25 +13,25 @@ spec:
   users:
     {{ .Values.postgres.username }}:
     - superuser
-    {{ .Values.postgres.geonodedatabase }}:
+    {{ .Values.postgres.geonode_databasename_and_username }}:
     - superuser
     - createdb
     - login
-    {{ .Values.postgres.geodatabasename }}:
+    {{ .Values.postgres.geodata_databasename_and_username }}:
     - superuser
     - createdb
     - login
   databases:
-    {{ .Values.postgres.geonodedatabase }}: {{ .Values.postgres.geonodedatabase }}
-    {{ .Values.postgres.geodatabasename }}: {{ .Values.postgres.geodatabasename }}
+    {{ .Values.postgres.geonode_databasename_and_username }}: {{ .Values.postgres.geonode_databasename_and_username }}
+    {{ .Values.postgres.geodata_databasename_and_username }}: {{ .Values.postgres.geodata_databasename_and_username }}
   preparedDatabases:
-    {{ .Values.postgres.geodatabasename }}:
+    {{ .Values.postgres.geodata_databasename_and_username }}:
       schemas:
         {{ .Values.postgres.schema }}: {}
       extensions:
         pg_partman: {{ .Values.postgres.schema }}
         postgis: {{ .Values.postgres.schema }}
-    {{ .Values.postgres.geonodedatabase }}:
+    {{ .Values.postgres.geodata_databasename_and_username }}:
       schemas:
         {{ .Values.postgres.schema }}: {}
       extensions:
@@ -36,3 +39,4 @@ spec:
         postgis: {{ .Values.postgres.schema }}
   postgresql:
     version: {{ .Values.postgres.operator_manifest.postgres_version | quote }}
+{{ end }}

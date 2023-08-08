@@ -84,12 +84,12 @@ data:
             "monitoring_host_name": os.environ.get("MONITORING_HOST_NAME", "geonode"),
             "monitoring_service_name": os.environ.get("MONITORING_SERVICE_NAME", "local-geonode"),
             "monitoring_data_ttl": os.environ.get("MONITORING_DATA_TTL", 7),
-            "geonode_geodb_passwd": os.environ.get("GEONODE_GEODATABASE_PASSWORD", "geonode_data"),
-            "default_backend_datastore": os.environ.get("DEFAULT_BACKEND_DATASTORE", "datastore"),
-            "geonode_db_passwd": os.environ.get("GEONODE_DATABASE_PASSWORD", "geonode"),
-            "geonode_geodb": os.environ.get("GEONODE_GEODATABASE", "geonode_data"),
-            "db_url": os.environ.get("DATABASE_URL", "postgis://geonode:geonode@db:5432/geonode"),
-            "geodb_url": os.environ.get("GEODATABASE_URL", "postgis://geonode:geonode@db:5432/geonode_data"),
+            "geonode_geodb_passwd": os.environ.get("GEONODE_GEODATABASE_PASSWORD"),
+            "default_backend_datastore": os.environ.get("DEFAULT_BACKEND_DATASTORE"),
+            "geonode_db_passwd": os.environ.get("GEONODE_DATABASE_PASSWORD"),
+            "geonode_geodb": os.environ.get("GEONODE_GEODATABASE"),
+            "db_url": os.environ.get("DATABASE_URL"),
+            "geodb_url": os.environ.get("GEODATABASE_URL"),
             "geonode_db": os.environ.get("GEONODE_DATABASE"),
             "gs_loc": os.environ.get('GEOSERVER_LOCATION'),
             "gs_web_ui_loc": os.environ.get("GEOSERVER_WEB_UI_LOCATION"),
@@ -664,8 +664,8 @@ data:
     def _set_geoserver_database_store():
         ''' checks if a db store is already created in geoserver, if not create one '''
         print("Check if geoserver store is already set up ...")
-        geoserver_base_url = os.getenv('GEOSERVER_LOCATION', 'geonode-geoserver:8080/geoserver')
-        geoserver_password = os.getenv('GEOSERVER_ADMIN_PASSWORD', 'geoserver')
+        geoserver_base_url = os.getenv('GEOSERVER_LOCATION')
+        geoserver_password = os.getenv('GEOSERVER_ADMIN_PASSWORD')
         url = '{}rest/workspaces/{}/datastores/'.format(geoserver_base_url,GEOSERVER_WORKSPACE_NAME)
         headers = {'Content-Type': 'text/xml'}
         auth = (GEOSERVER_USERNAME, geoserver_password)
@@ -681,24 +681,24 @@ data:
             print("could not get datastore information from geoserver, trying to create ...")
 
         print("setup new datastore ...")
-        db_user = database = os.getenv('GEONODE_GEODATABASE', 'geogeonode')
-        db_password = os.getenv('GEONODE_GEODATABASE_PASSWORD', 'geogeonode')
-        db_host = os.getenv('DATABASE_HOST', 'geonode-postgresql')
-
+        db_user = database = os.getenv('GEONODE_GEODATABASE')
+        db_password = os.getenv('GEONODE_GEODATABASE_PASSWORD')
+        db_host = os.getenv('DATABASE_HOST')
+        db_port = os.getenv('DATABASE_PORT')
         url = '{}rest/workspaces/{}/datastores'.format(geoserver_base_url,GEOSERVER_WORKSPACE_NAME)
         data = """
               <dataStore>
                 <name>{}</name>
                 <connectionParameters>
                   <host>{}</host>
-                  <port>5432</port>
+                  <port>{}</port>
                   <database>{}</database>
                   <user>{}</user>
                   <passwd>{}</passwd>
                   <dbtype>postgis</dbtype>
                 </connectionParameters>
               </dataStore>
-            """.format(GEOSERVER_STORE_NAME, db_host, database, db_user, db_password)
+            """.format(GEOSERVER_STORE_NAME, db_host, db_port, database, db_user, db_password)
         try:
             r = requests.post(url, headers=headers, auth=auth,data=data)
             print("created ...")
