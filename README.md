@@ -93,7 +93,7 @@ Feel free to [create an issue](https://github.com/zalf-rdm/geonode-k8s/issues/ne
 ### Documentation
 
 Ensure values.yaml documentation is up-to-date. 
-The [parameter documentation](main/deployment/geonode/README.md) is generated via [`helm-docs`](https://github.com/norwoodj/helm-docs).
+The [parameter documentation](deployment/geonode/README.md) is generated via [`helm-docs`](https://github.com/norwoodj/helm-docs).
 There is a pre-commit hook configuration so please ensure you install it into your local working copy via 
 
 ```
