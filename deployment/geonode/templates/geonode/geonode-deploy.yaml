@@ -141,6 +141,11 @@ spec:
           mountPath: "/usr/src/geonode/geonode/geonode-k8s-settings.py"
           subPath: geonode-k8s-settings.py
           readOnly: true
+        {{ if .Values.geonodeFixtures }}
+        - name: geonode-fixtures
+          mountPath: "/usr/src/geonode/geonode/fixtures"
+          readOnly: true
+        {{ end }}
 
         resources:
           requests:
@@ -236,6 +241,12 @@ spec:
           mountPath: "/usr/src/geonode/geonode/geonode-k8s-settings.py"
           subPath: geonode-k8s-settings.py
           readOnly: true
+        {{ if .Values.geonodeFixtures }}
+        - name: geonode-fixtures
+          mountPath: "/usr/src/geonode/geonode/fixtures"
+          readOnly: true
+        {{ end }}
+
         resources:
           requests:
             memory: {{ .Values.geonode.celery.resources.requests.memory }}
@@ -275,6 +286,17 @@ spec:
             items:
             - key: geonode-k8s-settings.py
               path: "geonode-k8s-settings.py"
+        {{- if .Values.geonodeFixtures }}
+        - name: geonode-fixtures
+          configMap:
+            name: {{ .Release.Name }}-geonode-fixtures
+            defaultMode: 0744
+            items:
+            {{- range $key, $value := .Values.geonodeFixtures }}
+            - key: {{ $key | quote }}
+              path: {{ $key | quote }}
+            {{- end }}
+        {{- end }}
         # Using an emptyDir to cache compiled statics... it will survive container crashes, but not pod restarts
         - name: cache-volume
           emptyDir: {}
