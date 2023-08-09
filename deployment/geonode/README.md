@@ -23,6 +23,7 @@ Helm Chart for Geonode
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| favicon | string | AAABAAMAEBAAAAEAIABoBA ... AAAA== | A base64 encoded favicon |
 | geonode.acme.email | string | `"support@example.com"` | the email to be used to gain certificates |
 | geonode.acme.enabled | bool | `false` | enables cert-manager to do ACME challenges (aka certificates via letsencrypt) |
 | geonode.acme.stageUrl | string | `"https://acme-staging-v02.api.letsencrypt.org/directory"` | ACME staging environment (use acme-staging to avoid running into rate limits) stageUrl: https://acme-v02.api.letsencrypt.org/directory |
@@ -136,6 +137,7 @@ Helm Chart for Geonode
 | geonode.uwsgi.processes | int | `128` | Maximum number of workers allowed |
 | geonode.uwsgi.reload_on_rss | int | `2048` | Restart workers after this much resident memory |
 | geonode.uwsgi.worker_reload_mercy | int | `60` | How long to wait before forcefully killing workers |
+| geonodeFixtures | map of filenames plus content | `nil` | Fixture files which shall be made available under /usr/src/geonode/geonode/fixtures |
 | geoserver | object | `{"admin_password":"geoserver","admin_username":"admin","container_name":"geoserver","image":{"name":"geonode/geoserver","tag":"2.23.0"},"pod_name":"geoserver","port":8080,"resources":{"limits":{"cpu":2,"memory":"4Gi"},"requests":{"cpu":1,"memory":"1Gi"}}}` | CONFIGURATION FOR GEOSERVER DEPLOYMENT |
 | geoserver.admin_password | string | `"geoserver"` | geoserver admin password |
 | geoserver.admin_username | string | `"admin"` | geoserver admin username |
