@@ -55,7 +55,7 @@ data:
 
   # General settings
   FREETEXT_KEYWORDS_READONLY: {{ include "boolean2str" .Values.geonode.general.freetext_keywords_readonly | quote }}
-  FIXTURE_DIRS: "[ '/usr/src/geonode/fixtures' ]"
+  FIXTURE_DIRS: "[ '/usr/src/geonode/geonode/fixtures' ]"
   # PUBLISHING
   RESOURCE_PUBLISHING: {{ include "boolean2str" .Values.geonode.general.publishing.resource_publishing_by_staff | quote }}
   ADMIN_MODERATE_UPLOADS: {{ include "boolean2str" .Values.geonode.general.publishing.admin_moderate_uploads | quote }}
