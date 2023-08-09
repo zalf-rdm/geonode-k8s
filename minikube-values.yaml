@@ -15,7 +15,6 @@ geonode:
     enabled: False
     externalScheme: http
     externalDomain: geonode
-    externalPort: 80
 
   superUser:
     password: geonode

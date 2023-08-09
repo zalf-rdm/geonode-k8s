@@ -61,7 +61,6 @@ Helm Chart for Geonode
 | geonode.ingress.addNginxIngressAnnotation | bool | `false` | adds ingress annotations for nginx ingress class to increase uploadsize and timeout time |
 | geonode.ingress.enabled | bool | `true` | enables external access  |
 | geonode.ingress.externalDomain | string | `"geonode"` | external ingress hostname  |
-| geonode.ingress.externalPort | int | `80` | external ingress port |
 | geonode.ingress.externalScheme | string | `"http"` | external ingress schema. if set to https ingress tls is used. Loading tls certificate via tls-secret options Available options: (http|https) |
 | geonode.ingress.ingressClassName | string | `nil` | define kubernetes ingress class for geonode ingress |
 | geonode.ingress.tlsSecret | string | `"geonode-tls-secret"` | tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/ (for the use of cert-manager, configure the acme section properly). is used when geonode.ingress.externalScheme is set to https |
