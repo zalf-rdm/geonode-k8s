@@ -137,7 +137,7 @@ Helm Chart for Geonode
 | geonode.uwsgi.processes | int | `128` | Maximum number of workers allowed |
 | geonode.uwsgi.reload_on_rss | int | `2048` | Restart workers after this much resident memory |
 | geonode.uwsgi.worker_reload_mercy | int | `60` | How long to wait before forcefully killing workers |
-| geonodeFixtures | map of filenames plus content | `nil` | Fixture files which shall be made available under /usr/src/geonode/geonode/fixtures |
+| geonodeFixtures | map of fixture files | `{"somefixture.json":"[\n  {\n    \"pk\": 0,\n    \"model\": \"myapp.sample\"\n    \"description\": \"nice little content\"\n  }\n]\n"}` | Fixture files which shall be made available under /usr/src/geonode/geonode/fixtures (refer to https://docs.djangoproject.com/en/4.2/howto/initial-data/) |
 | geoserver | object | `{"admin_password":"geoserver","admin_username":"admin","container_name":"geoserver","image":{"name":"geonode/geoserver","tag":"2.23.0"},"pod_name":"geoserver","port":8080,"resources":{"limits":{"cpu":2,"memory":"4Gi"},"requests":{"cpu":1,"memory":"1Gi"}}}` | CONFIGURATION FOR GEOSERVER DEPLOYMENT |
 | geoserver.admin_password | string | `"geoserver"` | geoserver admin password |
 | geoserver.admin_username | string | `"admin"` | geoserver admin username |

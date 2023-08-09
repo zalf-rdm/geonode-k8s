@@ -445,8 +445,17 @@ postgres-operator-ui:
     - host: postgres-ui
       paths: [""]
 
-# -- (map of filenames plus content) Fixture files which shall be made available under /usr/src/geonode/geonode/fixtures
+# -- (map of fixture files) Fixture files which shall be made available under /usr/src/geonode/geonode/fixtures (refer to https://docs.djangoproject.com/en/4.2/howto/initial-data/)
 geonodeFixtures:
+  # @gignore
+  somefixture.json: |
+    [
+      {
+        "pk": 0,
+        "model": "myapp.sample"
+        "description": "nice little content"
+      }
+    ]
 
 # -- A base64 encoded favicon
 # @default -- AAABAAMAEBAAAAEAIABoBA ... AAAA==
