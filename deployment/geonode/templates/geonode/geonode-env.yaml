@@ -35,7 +35,6 @@ data:
 
   GEONODE_INSTANCE_NAME: {{ .Release.Name }}
   GEONODE_LB_HOST_IP: {{ .Values.geonode.ingress.externalDomain | quote }}
-  GEONODE_LB_PORT: {{ .Values.geonode.ingress.externalPort | quote }}
   GEONODE_DB_CONN_MAX_AGE: '0'
   GEONODE_DB_CONN_TOUT: '5'
 

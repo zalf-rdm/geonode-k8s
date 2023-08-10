@@ -54,8 +54,6 @@ geonode:
     externalScheme: http
     # -- external ingress hostname 
     externalDomain: geonode
-    # -- external ingress port
-    externalPort: 80
     # -- tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/ (for the use of cert-manager, configure the acme section properly). is used when geonode.ingress.externalScheme is set to https
     tlsSecret: geonode-tls-secret
 

@@ -81,15 +81,8 @@ persistence
 amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}@{{ include "rabbit_host" . }}/
 {{- end -}}
 
-{{- define "external_port" -}}
-{{- if or (eq (toString .Values.geonode.ingress.externalPort) "80") (eq (toString .Values.geonode.ingress.externalPort) "443") -}}
-{{- else -}}
-:{{ .Values.geonode.ingress.externalPort}}
-{{- end -}}
-{{- end -}}
-
 {{- define "public_url" -}}
-{{ .Values.geonode.ingress.externalScheme }}://{{ .Values.geonode.ingress.externalDomain }}{{ include "external_port" . }}
+{{ .Values.geonode.ingress.externalScheme }}://{{ .Values.geonode.ingress.externalDomain }}
 {{- end -}}
 
 

@@ -5,10 +5,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   GEONODE_LB_HOST_IP: {{ .Values.geonode.ingress.externalDomain | quote }}
-  GEONODE_LB_PORT: {{ .Values.geonode.ingress.externalPort | quote }}
   GEONODE_HOST_IP: localhost
 
-  PUBLIC_PORT: {{ .Values.geonode.ingress.externalPort | quote }}
   DJANGO_URL: http://{{ include "geonode_pod_name" .}}/
   ENABLE_JSONP: 'true'
   outFormat: text/javascript
