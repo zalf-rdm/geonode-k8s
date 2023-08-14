@@ -3,8 +3,6 @@
 
 # Helm Chart for Geonode
 
-Table of Contents
-=================
 - [GeoWhat?](#Geonode)
 - [Geonode-k8s](#geonode-k8s)
 - [Install Guilde](#install)
@@ -81,4 +79,24 @@ helm upgrade --cleanup-on-fail   --install --namespace geonode --create-namespac
 ## Delete Installation
 ```bash
 helm delete --namespace geonode geonode deployment/geonode
+```
+
+## Contribution
+
+### Create an Issue
+
+You found a bug :lady_beetle:? 
+You have an idea how to improve :bulb:?
+Feel free to [create an issue](https://github.com/zalf-rdm/geonode-k8s/issues/new/choose)!
+
+
+### Documentation
+
+Ensure values.yaml documentation is up-to-date. 
+The [parameter documentation](deployment/geonode/README.md) is generated via [`helm-docs`](https://github.com/norwoodj/helm-docs).
+There is a pre-commit hook configuration so please ensure you install it into your local working copy via 
+
+```
+pre-commit install
+pre-commit install-hooks
 ```
