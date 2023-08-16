@@ -121,6 +121,8 @@ geonode:
     debug: False
     # -- enable django static debug
     debug_static: False
+    # -- the settings module to load
+    settings_module: geonode.settings
 
     # -- FREETEXT_KEYWORDS_READONLY Make Free-Text Keywords writable from users. Or read-only when set to False.
     freetext_keywords_readonly: false
