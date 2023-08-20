@@ -133,7 +133,7 @@ data:
   OAUTH2_CLIENT_ID: ""
   OAUTH2_CLIENT_SECRET: ""
 
-  DJANGO_SETTINGS_MODULE: geonode.settings
+  DJANGO_SETTINGS_MODULE: {{ .Values.geonode.general.settings_module }}
   DEFAULT_BACKEND_DATASTORE: datastore
   DEFAULT_BACKEND_UPLOADER: geonode.importer
 
