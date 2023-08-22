@@ -171,13 +171,19 @@ Helm Chart for Geonode
 | postgres-operator.operatorApiUrl | string | `"http://{{ .Release.Name }}-postgres-operator:8080"` | ??? |
 | postgres-operator.podServiceAccount | object | `{"name":""}` | not setting the podServiceAccount name will leed to generation of this name. This allows to run multiple postgres-operators in a single kubernetes cluster. just seperating them by namespace. |
 | postgres-operator.storageClass | string | `nil` | postgress pv storageclass |
-| postgres.geodatabasename | string | `"geogeonode"` | geoserver database name |
-| postgres.geonodedatabase | string | `"geonode"` | geonode database name |
-| postgres.operator_manifest | object | `{"numberOfInstances":1,"postgres_version":15,"storageSize":"3Gi"}` | configuration for postgres operator database manifest |
+| postgres.external_postgres.enabled | bool | `false` |  |
+| postgres.external_postgres.geodata_password | string | `"geogeonode"` |  |
+| postgres.external_postgres.geonode_password | string | `"geonode"` |  |
+| postgres.external_postgres.hostname | string | `"my-external-postgres.com"` |  |
+| postgres.external_postgres.port | int | `5432` |  |
+| postgres.external_postgres.postgres_password | string | `"postgres"` |  |
+| postgres.geodata_databasename_and_username | string | `"geodata"` | geoserver database name and username |
+| postgres.geonode_databasename_and_username | string | `"geonode"` | geonode database name and username |
+| postgres.operator_manifest | object | `{"numberOfInstances":1,"pod_name":"postgresql","postgres_version":15,"storageSize":"3Gi"}` | configuration for postgres operator database manifest |
 | postgres.operator_manifest.numberOfInstances | int | `1` | number of database instances |
+| postgres.operator_manifest.pod_name | string | `"postgresql"` | pod name for postgres containers == teamID for mainifest |
 | postgres.operator_manifest.postgres_version | int | `15` | postgres version |
 | postgres.operator_manifest.storageSize | string | `"3Gi"` | Database storage size |
-| postgres.pod_name | string | `"postgresql"` | pod name for postgres containers == teamID for mainifest |
 | postgres.schema | string | `"public"` | database schema |
 | postgres.username | string | `"postgres"` | postgres username |
 | rabbitmq | object | `{"auth":{"erlangCookie":"jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu","password":"rabbitpassword","username":"rabbituser"},"enabled":true,"limits":{"cpu":"750m","memory":"1Gi"},"persistence":{"enabled":false},"replicaCount":1,"requests":{"cpu":"500m","memory":"1Gi"}}` | VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml |
