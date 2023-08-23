@@ -1,3 +1,18 @@
+# check if external and postgres-operator database backends are active
+{{ $postgres_operator := index .Values "postgres-operator" "enabled" }}
+{{ $postgres_operator_ui := index .Values "postgres-operator-ui" "enabled"}}
+# check if multiple database backends are active
+{{ if and .Values.postgres.external_postgres.enabled $postgres_operator }}
+  {{- fail "Error, two Database backends enabled, check .Values.postgres.external_postgres or .Values.postgres-operator ..." }}
+{{ else if  and (not .Values.postgres.external_postgres.enabled) (not $postgres_operator) }}
+  {{- fail "Error, no Database backend is enabled, check .Values.postgres.external_postgres or .Values.postgres-operator ..." }}
+{{ end }}
+# check if operator ui is activated even postgres-operator is disabled
+{{ if and ($postgres_operator_ui) (not $postgres_operator) }}
+  {{- fail "Error, postgres-operator-ui enabled even postgres-operator ist disabled ..." }}
+{{ end }}
+
+
 # geonode stateful set
 apiVersion: apps/v1
 kind: StatefulSet
@@ -29,7 +44,7 @@ spec:
         args:
         - -timeout=60s
         - -wait
-        - tcp://{{ include "postgres_pod_name" . }}:{{ include "database_port" .}}
+        - tcp://{{ include "database_hostname" . }}:{{ include "database_port" . }}
         - -wait
         - tcp://{{ include "rabbit_host" .}}
 
@@ -80,18 +95,18 @@ spec:
         env:
         - name: GEONODE_DATABASE_PASSWORD
           valueFrom:
-            secretKeyRef:
-              name:  {{ .Values.postgres.geonodedatabase }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
+            secretKeyRef: 
+              name: {{ include "database_geonode_password_secret_key_ref" . }}
               key: password
         - name: GEONODE_GEODATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.postgres.geodatabasename }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
+              name: {{ include "database_geodata_password_secret_key_ref" . }}
               key: password
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.postgres.username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
+              name: {{ include "database_postgres_password_secret_key_ref" . }}
               key: password
         - name: GEODATABASE_URL
           value: "postgis://$(GEONODE_GEODATABASE):$(GEONODE_GEODATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_GEODATABASE)"
@@ -128,6 +143,11 @@ spec:
           mountPath: "/usr/src/geonode/geonode/geonode-k8s-settings.py"
           subPath: geonode-k8s-settings.py
           readOnly: true
+        {{ if .Values.geonodeFixtures }}
+        - name: geonode-fixtures
+          mountPath: "/usr/src/geonode/geonode/fixtures"
+          readOnly: true
+        {{ end }}
 
         livenessProbe:
           httpGet:
@@ -183,27 +203,25 @@ spec:
               name: {{ include "geonode_pod_name" . }}-env
 
         env:
-        - name: IS_CELERY
-          value: 'True'
         - name: GEONODE_DATABASE_PASSWORD
           valueFrom:
-            secretKeyRef:
-              name:  {{ .Values.postgres.geonodedatabase }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
+            secretKeyRef: 
+              name: {{ include "database_geonode_password_secret_key_ref" . }}
               key: password
         - name: GEONODE_GEODATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.postgres.geodatabasename }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
+              name: {{ include "database_geodata_password_secret_key_ref" . }}
               key: password
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.postgres.username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
+              name: {{ include "database_postgres_password_secret_key_ref" . }}
               key: password
         - name: GEODATABASE_URL
           value: "postgis://$(GEONODE_GEODATABASE):$(GEONODE_GEODATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_GEODATABASE)"
         - name: DATABASE_URL
-          value: "postgis://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"        
+          value: "postgis://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"
 
         ports:
         - containerPort: 5555
@@ -234,6 +252,12 @@ spec:
           mountPath: "/usr/src/geonode/geonode/geonode-k8s-settings.py"
           subPath: geonode-k8s-settings.py
           readOnly: true
+        {{ if .Values.geonodeFixtures }}
+        - name: geonode-fixtures
+          mountPath: "/usr/src/geonode/geonode/fixtures"
+          readOnly: true
+        {{ end }}
+
         resources:
           requests:
             memory: {{ .Values.geonode.celery.resources.requests.memory }}
@@ -273,6 +297,18 @@ spec:
             items:
             - key: geonode-k8s-settings.py
               path: "geonode-k8s-settings.py"
+        {{- if .Values.geonodeFixtures }}
+        - name: geonode-fixtures
+          configMap:
+            name: {{ .Release.Name }}-geonode-fixtures
+            defaultMode: 0744
+            items:
+            {{- range $key, $value := .Values.geonodeFixtures }}
+            - key: {{ $key | quote }}
+              path: {{ $key | quote }}
+            {{- end }}
+        {{- end }}
         # Using an emptyDir to cache compiled statics... it will survive container crashes, but not pod restarts
         - name: cache-volume
           emptyDir: {}
+

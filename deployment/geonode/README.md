@@ -23,6 +23,8 @@ Helm Chart for Geonode
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+
+| favicon | string | AAABAAMAEBAAAAEAIABoBA ... AAAA== | A base64 encoded favicon |
 | geonode.acme.email | string | `"support@example.com"` | the email to be used to gain certificates |
 | geonode.acme.enabled | bool | `false` | enables cert-manager to do ACME challenges (aka certificates via letsencrypt) |
 | geonode.acme.stageUrl | string | `"https://acme-staging-v02.api.letsencrypt.org/directory"` | ACME staging environment (use acme-staging to avoid running into rate limits) stageUrl: https://acme-v02.api.letsencrypt.org/directory |
@@ -49,6 +51,7 @@ Helm Chart for Geonode
 | geonode.general.ogc_request_timeout | int | `600` | OGC_REQUEST_TIMEOUT |
 | geonode.general.publishing.admin_moderate_uploads | bool | `false` | ADMIN_MODERATE_UPLOADS When this variable is set to True, every uploaded resource must be approved before becoming visible to the public users. Until a resource is in PENDING APPROVAL state, only the superusers, owner and group members can access it, unless specific edit permissions have been set for other users or groups. A Group Manager can approve the resource, but he cannot publish it whenever the setting RESOURCE_PUBLISHING is set to True. Otherwise, if RESOURCE_PUBLISHING (helm: resource_publishing_by_staff) is set to False, the resource becomes accessible as soon as it is approved. |
 | geonode.general.publishing.resource_publishing_by_staff | bool | `false` | RESOURCE_PUBLISHING By default, the GeoNode application allows GeoNode staff members to publish/unpublish resources. By default, resources are published when created. When this setting is set to True the staff members will be able to unpublish a resource (and eventually publish it back). |
+| geonode.general.settings_module | string | `"geonode.settings"` | the settings module to load |
 | geonode.general.superUser.email | string | `"support@example.com"` | admin user password |
 | geonode.general.superUser.password | string | `"geonode"` | admin panel password |
 | geonode.general.superUser.username | string | `"admin"` | admin username |
@@ -61,7 +64,6 @@ Helm Chart for Geonode
 | geonode.ingress.addNginxIngressAnnotation | bool | `false` | adds ingress annotations for nginx ingress class to increase uploadsize and timeout time |
 | geonode.ingress.enabled | bool | `true` | enables external access  |
 | geonode.ingress.externalDomain | string | `"geonode"` | external ingress hostname  |
-| geonode.ingress.externalPort | int | `80` | external ingress port |
 | geonode.ingress.externalScheme | string | `"http"` | external ingress schema. if set to https ingress tls is used. Loading tls certificate via tls-secret options Available options: (http|https) |
 | geonode.ingress.ingressClassName | string | `nil` | define kubernetes ingress class for geonode ingress |
 | geonode.ingress.tlsSecret | string | `"geonode-tls-secret"` | tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/ (for the use of cert-manager, configure the acme section properly). is used when geonode.ingress.externalScheme is set to https |
@@ -136,6 +138,7 @@ Helm Chart for Geonode
 | geonode.uwsgi.processes | int | `128` | Maximum number of workers allowed |
 | geonode.uwsgi.reload_on_rss | int | `2048` | Restart workers after this much resident memory |
 | geonode.uwsgi.worker_reload_mercy | int | `60` | How long to wait before forcefully killing workers |
+| geonodeFixtures | map of fixture files | `{"somefixture.json":"[\n  {\n    \"pk\": 0,\n    \"model\": \"myapp.sample\"\n    \"description\": \"nice little content\"\n  }\n]\n"}` | Fixture files which shall be made available under /usr/src/geonode/geonode/fixtures (refer to https://docs.djangoproject.com/en/4.2/howto/initial-data/) |
 | geoserver | object | `{"admin_password":"geoserver","admin_username":"admin","container_name":"geoserver","image":{"name":"geonode/geoserver","tag":"2.23.0"},"pod_name":"geoserver","port":8080,"resources":{"limits":{"cpu":2,"memory":"4Gi"},"requests":{"cpu":1,"memory":"1Gi"}}}` | CONFIGURATION FOR GEOSERVER DEPLOYMENT |
 | geoserver.admin_password | string | `"geoserver"` | geoserver admin password |
 | geoserver.admin_username | string | `"admin"` | geoserver admin username |
@@ -169,13 +172,19 @@ Helm Chart for Geonode
 | postgres-operator.operatorApiUrl | string | `"http://{{ .Release.Name }}-postgres-operator:8080"` | ??? |
 | postgres-operator.podServiceAccount | object | `{"name":""}` | not setting the podServiceAccount name will leed to generation of this name. This allows to run multiple postgres-operators in a single kubernetes cluster. just seperating them by namespace. |
 | postgres-operator.storageClass | string | `nil` | postgress pv storageclass |
-| postgres.geodatabasename | string | `"geogeonode"` | geoserver database name |
-| postgres.geonodedatabase | string | `"geonode"` | geonode database name |
-| postgres.operator_manifest | object | `{"numberOfInstances":1,"postgres_version":15,"storageSize":"3Gi"}` | configuration for postgres operator database manifest |
+| postgres.external_postgres.enabled | bool | `false` |  |
+| postgres.external_postgres.geodata_password | string | `"geogeonode"` |  |
+| postgres.external_postgres.geonode_password | string | `"geonode"` |  |
+| postgres.external_postgres.hostname | string | `"my-external-postgres.com"` |  |
+| postgres.external_postgres.port | int | `5432` |  |
+| postgres.external_postgres.postgres_password | string | `"postgres"` |  |
+| postgres.geodata_databasename_and_username | string | `"geodata"` | geoserver database name and username |
+| postgres.geonode_databasename_and_username | string | `"geonode"` | geonode database name and username |
+| postgres.operator_manifest | object | `{"numberOfInstances":1,"pod_name":"postgresql","postgres_version":15,"storageSize":"3Gi"}` | configuration for postgres operator database manifest |
 | postgres.operator_manifest.numberOfInstances | int | `1` | number of database instances |
+| postgres.operator_manifest.pod_name | string | `"postgresql"` | pod name for postgres containers == teamID for mainifest |
 | postgres.operator_manifest.postgres_version | int | `15` | postgres version |
 | postgres.operator_manifest.storageSize | string | `"3Gi"` | Database storage size |
-| postgres.pod_name | string | `"postgresql"` | pod name for postgres containers == teamID for mainifest |
 | postgres.schema | string | `"public"` | database schema |
 | postgres.username | string | `"postgres"` | postgres username |
 | rabbitmq | object | `{"auth":{"erlangCookie":"jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu","password":"rabbitpassword","username":"rabbituser"},"enabled":true,"limits":{"cpu":"750m","memory":"1Gi"},"persistence":{"enabled":false},"replicaCount":1,"requests":{"cpu":"500m","memory":"1Gi"}}` | VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml |

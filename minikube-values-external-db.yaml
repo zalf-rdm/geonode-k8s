@@ -15,6 +15,7 @@ geonode:
     enabled: False
     externalScheme: http
     externalDomain: geonode
+    externalPort: 80
 
   superUser:
     password: geonode
@@ -30,23 +31,24 @@ geonode:
     email_verification: "False"
     authentication_method: username_email
 
-pycsw:
-  enabled: True
-
-postgres-operator-ui:
-  enabled: False
-
-postgres-operator:
-  enabled: True
-
-postgres:
-  operator_manifest:
-    storageSize: 2Gi
-    numberOfInstances: 1
-    postgres_version: 15
-
 rabbitmq:
   replicaCount: 1
   auth:
     username: rabbituser
     password: rabbit_password
+
+postgres:
+  username: postgres
+  geonode_databasename_and_username: geonode
+  geodata_databasename_and_username: geodata
+
+  external_postgres:
+    enabled: True
+    hostname: "external-postgres.com"
+    port: 5432
+    postgres_password:
+    geonode_password:
+    geodata_password:
+postgres-operator:
+  enabled: False
+

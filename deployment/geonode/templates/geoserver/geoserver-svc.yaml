@@ -9,6 +9,6 @@ spec:
     org.geonode.instance: "{{ include "geoserver_pod_name" . }}"
   ports:
   - targetPort: {{ .Values.geoserver.port }}
-    port: 8080
+    port: {{ .Values.geoserver.port }}
     name: http
   type: ClusterIP

@@ -1,0 +1,12 @@
+{{ if .Values.geonodeFixtures }}
+# fixture data for Django Geonode
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-geonode-fixtures
+  namespace: {{ .Release.Namespace }}
+data:
+  {{ toYaml .Values.geonodeFixtures | nindent 2 }}
+
+{{ end }}

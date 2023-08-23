@@ -3,8 +3,6 @@
 
 # Helm Chart for Geonode
 
-Table of Contents
-=================
 - [GeoWhat?](#Geonode)
 - [Geonode-k8s](#geonode-k8s)
 - [Install Guilde](#install)
@@ -43,8 +41,9 @@ If you want to go straight for a production installation follow the [installatio
 
 Furhter docs:
 - [https-ingress](docs/https-ingress.md)
-- [access-geonode-database-from-outside-of-kubernetes](docs/external-database-access.md)
+- [access-geonode-database-from-outside-of-kubernetes](docs/access-geonode-database-from-outside.md)
 - [configure-nginx-ingress-body-size-timeout](docs/nginx-ingress-class.md)
+- [run-with-external-postgresql-database](docs/external-database.md)
 
 Install
 -------
@@ -80,4 +79,24 @@ helm upgrade --cleanup-on-fail   --install --namespace geonode --create-namespac
 ## Delete Installation
 ```bash
 helm delete --namespace geonode geonode deployment/geonode
+```
+
+## Contribution
+
+### Create an Issue
+
+You found a bug :lady_beetle:? 
+You have an idea how to improve :bulb:?
+Feel free to [create an issue](https://github.com/zalf-rdm/geonode-k8s/issues/new/choose)!
+
+
+### Documentation
+
+Ensure values.yaml documentation is up-to-date. 
+The [parameter documentation](deployment/geonode/README.md) is generated via [`helm-docs`](https://github.com/norwoodj/helm-docs).
+There is a pre-commit hook configuration so please ensure you install it into your local working copy via 
+
+```
+pre-commit install
+pre-commit install-hooks
 ```

@@ -23,11 +23,13 @@ spec:
         image: "{{ .Values.nginx.image.name }}:{{ .Values.nginx.image.tag }}"
 
         ports:
-        # TODO (mwall) may respect {{ .Values.geonode.ingress.externalPort | quote }}
-        - containerPort: 80
-          name: http
+        {{- if (eq .Values.geonode.ingress.externalScheme "https" )}}
         - containerPort: 443
           name: https
+        {{- else }}
+        - containerPort: 80
+          name: http
+        {{- end }}
 
         volumeMounts:
         - name: "{{ include "persistant_volume_name" . }}"
