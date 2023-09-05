@@ -110,6 +110,20 @@ data:
         proxy_http_version 1.1;
       }
 
+      {{ if .Values.pycsw.enabled }}
+      # external PYCSW forward 
+      location {{ .Values.pycsw.endpoint }} {
+        # Using a variable is a trick to let Nginx start even if upstream host is not up yet
+        set $upstream {{ include "pycsw_pod_name" . }}:{{ .Values.pycsw.port }};
+        proxy_pass http://$upstream;
+        proxy_redirect off;
+        proxy_set_header Host $host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_http_version 1.1;
+      }
+      {{ end }}
+
       location / {
         client_max_body_size {{ .Values.nginx.maxClientBodySize }};
 
