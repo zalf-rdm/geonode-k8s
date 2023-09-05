@@ -61,7 +61,8 @@ This helm chart now supports geonode v4.1.x.
 Update helm dependencies via:
 
 ```bash
-helm dependency update charts/geonode
+helm repo add geonode https://zalf-rdm.github.io/geonode-k8s/
+helm repo update
 ```
 
 ## Override desired values in your own override file

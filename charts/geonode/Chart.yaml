@@ -16,10 +16,11 @@ keywords:
 - rabbitmq
 - memcached
 - django
+icon: https://www.osgeo.org/wp-content/uploads/GeoNode-370x206.png
 annotations:
   artifacthub.io/links: |
     - name: Chart Source
-      url: https://github.com/zalf-rdm/geonode-k8s/tree/main/charts/geonode
+      url: https://github.com/zalf-rdm/geonode-k8s/
     - name: Geonode
       url: https://www.geonode.org/
     - name: support

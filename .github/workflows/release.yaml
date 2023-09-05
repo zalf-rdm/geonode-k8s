@@ -3,7 +3,7 @@ name: Release Charts
 on:
   push:
     branches:
-    - issue#59_Task_prepare_this_repository_to_be_available_on_artifact_hub
+    - main
 
 jobs:
   release:
