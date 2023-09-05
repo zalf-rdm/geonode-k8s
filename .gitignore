@@ -1,6 +1,5 @@
 localtest
 my-values.yaml
 **/Chart.lock
-deployment/geonode/charts/*.tgz
-deployment/geonode/Chart.lock
+charts/*/charts
 .vscode

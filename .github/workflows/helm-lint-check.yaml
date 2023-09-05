@@ -19,9 +19,9 @@ jobs:
       with:
         version: '3.12.0' # default is latest (stable)
     - name: build dependencies
-      run: helm dependency update deployment/geonode/
+      run: helm dependency update charts/geonode/
     - name: helm-check
       uses: igabaydulin/helm-check-action@0.1.4
       env:
-        CHART_LOCATION: ./deployment/geonode/
-        CHART_VALUES: ./deployment/geonode/values.yaml
+        CHART_LOCATION: ./charts/geonode/
+        CHART_VALUES: ./charts/geonode/values.yaml
