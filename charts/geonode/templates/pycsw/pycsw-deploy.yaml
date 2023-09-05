@@ -10,8 +10,6 @@ spec:
     matchLabels:
       org.geonode.instance: "{{ include "pycsw_pod_name" . }}"
   serviceName: "{{ include "pycsw_pod_name" . }}"
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -41,15 +39,15 @@ spec:
           - configMapRef:
               name: {{ include "pycsw_pod_name" . }}-env
         env:
-        - name: PYCSW_SERVER_URL
-          value: "{{ .Values.geonode.ingress.externalDomain}}{{ .Values.pycsw.endpoint }}"
         - name: GEONODE_DATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name:  {{ .Values.postgres.geonodedatabase }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
+              name: {{ .Values.postgres.geodata_databasename_and_username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
               key: password
         - name: PYCSW_REPOSITORY_DATABASE_URI
           value: "postgresql://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"
+        - name: PYCSW_SERVER_URL
+          value: "{{ .Values.geonode.ingress.externalDomain }}{{ .Values.pycsw.endpoint }}"
         ports:
         - containerPort: {{ .Values.pycsw.port }}
         volumeMounts:

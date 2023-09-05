@@ -325,13 +325,6 @@ geoserver:
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: 2
 
-# MEMCACHED CONFIGURATION
-# https://artifacthub.io/packages/helm/bitnami/memcached
-memcached:
-  # -- memcached replica. Loadbalanaced via kubernetes. (only one entry in django settings.py) im memcached is activated under geonode.memcached.enabled this takes place
-  architecture: high-availability
-  replicaCount: 1
-
 # CONFIGURATION FOR NGINX DEPLOYMENT
 # MAY MOVE TO CHART
 nginx:
@@ -375,7 +368,7 @@ pycsw:
     # -- pycsw docker image
     name: geopython/pycsw
     # -- pycsw docker image tag
-    tag: '2.6.0'
+    tag: '2.6.1'
   # -- pycsw endpoint port
   port: 8000
   # -- pycsw url below geonode.ingress.externalDomain
@@ -509,34 +502,6 @@ pycsw:
       contact_email: Email Address
       temp_extent: YYYY-MM-DD/YYYY-MM-DD
 
-
-postgres:
-  # -- pod name for postgres containers == teamID for mainifest
-  pod_name: postgresql
-  # -- postgres username
-  username: postgres
-  # -- database schema
-  schema: public
-  # -- geonode database name
-  geonodedatabase: geonode
-  # -- geoserver database name
-  geodatabasename: geogeonode
-  # database passwords are set randomly 
-  # infos @ https://postgres-operator.readthedocs.io/en/refactoring-sidecars/user/
-  # get password after creation via: kubectl get secret {{ .Release.name }}.{{ .Release.name }}-{{ container_name }}.credentials -o 'jsonpath={.data.password}' | base64 -d
-
-  # -- configuration for postgres operator database manifest
-  operator_manifest:
-    # -- Database storage size
-    storageSize: 3Gi
-    # -- number of database instances
-    numberOfInstances: 1
-    # -- postgres version
-    postgres_version: 15
-
-########################
-# CHART CONFIGURATIONS #
-########################
 
 # MEMCACHED CONFIGURATION
 # https://artifacthub.io/packages/helm/bitnami/memcached
