@@ -1,3 +1,4 @@
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/geonode-k8s)](https://artifacthub.io/packages/search?repo=geonode-k8s)
 # geonode-k8s
 
 ![Version: 4.1.0](https://img.shields.io/badge/Version-4.1.0-informational?style=flat-square)

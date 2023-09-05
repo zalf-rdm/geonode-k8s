@@ -14,7 +14,7 @@ postgres-operator:
 
 Applying this via:
 ```
-helm upgrade --cleanup-on-fail   --install --namespace geonode --create-namespace --values my-values.yaml geonode deployment/geonode
+helm upgrade --cleanup-on-fail   --install --namespace geonode --create-namespace --values my-values.yaml geonode charts/geonode
 ```
 
 Will first of all change our service type to **LoadBalancer**. We can double check this with:

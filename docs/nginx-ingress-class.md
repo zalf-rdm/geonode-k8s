@@ -1,6 +1,6 @@
 # increasing the max uplaod size for kubernetes nginx-ingress
 
-If you run the nginx ingress controller on your cluster. You may ran into an issue where you are unable to upload larger files into your geonode instance. To avoid this you can can ingrese the proxy-body-size for the [nignx-ingress](../deployment/geonode/templates/nginx/nginx-ingress.yaml) definition. See snippet below. 
+If you run the nginx ingress controller on your cluster. You may ran into an issue where you are unable to upload larger files into your geonode instance. To avoid this you can can ingrese the proxy-body-size for the [nignx-ingress](../charts/geonode/templates/nginx/nginx-ingress.yaml) definition. See snippet below. 
 ```
 apiVersion: networking.k8s.io/v1
 kind: Ingress

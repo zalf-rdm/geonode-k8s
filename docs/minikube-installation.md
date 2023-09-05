@@ -9,7 +9,7 @@ To install minikube itself follow the instruction on https://kubernetes.io/de/do
 Download or update latest helm chart dependencies listed in /chart.yaml.
 
 ```bash
-helm dependency update deployment/geonode
+helm dependency update charts/geonode
 ```
 
 ## Edit Minicube values
@@ -20,7 +20,7 @@ View and edit the predefined minikube values under /minikube-values.yaml
 
 To run the installation on minikube run:
 ```bash
-helm upgrade --cleanup-on-fail   --install --namespace geonode --create-namespace --values minikube-values.yaml geonode deployment/geonode
+helm upgrade --cleanup-on-fail   --install --namespace geonode --create-namespace --values minikube-values.yaml geonode charts/geonode
 ```
 
 You can check the installtion process with:
