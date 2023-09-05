@@ -1,5 +1,4 @@
 
-
 # define pod names (equal service names)
 {{- define "geoserver_pod_name" -}}
 {{ .Release.Name }}-{{ .Values.geoserver.pod_name }}
@@ -17,11 +16,7 @@
 {{ .Release.Name }}-{{ .Values.nginx.pod_name }}
 {{- end -}}
 
-
-
 # Database definitions
-
-
 {{- define "database_hostname" -}}
 {{- if (index .Values "postgres-operator" "enabled") -}}
 {{ include "postgres_pod_name" . }}
@@ -64,15 +59,16 @@
 "{{ .Release.Name }}-geodata-external-secrets"
 {{- end -}}
 {{- end -}}
+{{- define "pycsw_pod_name" -}}
+{{ .Release.Name }}-{{ .Values.pycsw.pod_name }}
+{{- end -}}
 
 # Volume names
 {{- define "persistant_volume_name" -}}
 persistence
 {{- end -}}
 
-
 # ports and endpoints
-
 {{- define "rabbit_host" -}}
 {{ .Release.Name }}-rabbitmq:5672
 {{- end -}}
@@ -84,7 +80,6 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
 {{- define "public_url" -}}
 {{ .Values.geonode.ingress.externalScheme }}://{{ .Values.geonode.ingress.externalDomain }}
 {{- end -}}
-
 
 # function
 {{- define "boolean2str" -}}
