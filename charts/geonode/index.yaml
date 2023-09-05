@@ -1,0 +1,113 @@
+apiVersion: v1
+entries:
+  memcached:
+  - annotations:
+      category: Infrastructure
+      licenses: Apache-2.0
+    apiVersion: v2
+    appVersion: 1.6.21
+    created: "2023-09-05T10:09:42.129905972+02:00"
+    dependencies:
+    - name: common
+      repository: oci://registry-1.docker.io/bitnamicharts
+      tags:
+      - bitnami-common
+      version: 2.x.x
+    description: Memcached is an high-performance, distributed memory object caching
+      system, generic in nature, but intended for use in speeding up dynamic web applications
+      by alleviating database load.
+    digest: 4cfb8d96da051d6f9680e62c4a338f9e9c6887e31fba0463ad20c44808975fb0
+    home: https://bitnami.com
+    icon: https://bitnami.com/assets/stacks/memcached/img/memcached-stack-220x234.png
+    keywords:
+    - memcached
+    - cache
+    maintainers:
+    - name: VMware, Inc.
+      url: https://github.com/bitnami/charts
+    name: memcached
+    sources:
+    - https://github.com/bitnami/charts/tree/main/bitnami/memcached
+    urls:
+    - https://zalf-rdm.github.io/geonode-k8s/charts/memcached-6.5.6.tgz
+    version: 6.5.6
+  postgres-operator:
+  - apiVersion: v2
+    appVersion: 1.9.0
+    created: "2023-09-05T10:09:42.133827278+02:00"
+    description: Postgres Operator creates and manages PostgreSQL clusters running
+      in Kubernetes
+    digest: 64df90c898ca591eb3a330328173ffaadfbf9ddd474d8c42ed143edc9e3f4276
+    home: https://github.com/zalando/postgres-operator
+    keywords:
+    - postgres
+    - operator
+    - cloud-native
+    - patroni
+    - spilo
+    maintainers:
+    - email: opensource@zalando.de
+      name: Zalando
+    name: postgres-operator
+    sources:
+    - https://github.com/zalando/postgres-operator
+    urls:
+    - https://zalf-rdm.github.io/geonode-k8s/charts/postgres-operator-1.9.0.tgz
+    version: 1.9.0
+  postgres-operator-ui:
+  - apiVersion: v2
+    appVersion: 1.9.0
+    created: "2023-09-05T10:09:42.134746878+02:00"
+    description: Postgres Operator UI provides a graphical interface for a convenient
+      database-as-a-service user experience
+    digest: df434af6c8b697fe0631017ecc25e3c79e125361ae6622347cea41a545153bdc
+    home: https://github.com/zalando/postgres-operator
+    keywords:
+    - postgres
+    - operator
+    - ui
+    - cloud-native
+    - patroni
+    - spilo
+    maintainers:
+    - email: opensource@zalando.de
+      name: Zalando
+    name: postgres-operator-ui
+    sources:
+    - https://github.com/zalando/postgres-operator
+    urls:
+    - https://zalf-rdm.github.io/geonode-k8s/charts/postgres-operator-ui-1.9.0.tgz
+    version: 1.9.0
+  rabbitmq:
+  - annotations:
+      category: Infrastructure
+    apiVersion: v2
+    appVersion: 3.10.7
+    created: "2023-09-05T10:09:42.139065243+02:00"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 1.x.x
+    description: RabbitMQ is an open source general-purpose message broker that is
+      designed for consistent, highly-available messaging scenarios (both synchronous
+      and asynchronous).
+    digest: 7518dbaa880854dba416b0e8127e29761d3e5b7682e297c07f04173352189382
+    home: https://github.com/bitnami/charts/tree/master/bitnami/rabbitmq
+    icon: https://bitnami.com/assets/stacks/rabbitmq/img/rabbitmq-stack-220x234.png
+    keywords:
+    - rabbitmq
+    - message queue
+    - AMQP
+    maintainers:
+    - name: Bitnami
+      url: https://github.com/bitnami/charts
+    name: rabbitmq
+    sources:
+    - https://github.com/bitnami/containers/tree/main/bitnami/rabbitmq
+    - https://www.rabbitmq.com
+    urls:
+    - https://zalf-rdm.github.io/geonode-k8s/charts/rabbitmq-10.1.19.tgz
+    version: 10.1.19
+generated: "2023-09-05T10:09:42.123041807+02:00"
