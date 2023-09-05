@@ -1,0 +1,62 @@
+apiVersion: v1
+entries:
+  geonode-k8s:
+  - annotations:
+      artifacthub.io/category: storage
+      artifacthub.io/license: GPL3
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/zalf-rdm/geonode-k8s/tree/main/charts/geonode
+        - name: Geonode
+          url: https://www.geonode.org/
+        - name: support
+          url: https://github.com/zalf-rdm/geonode-k8s/issues
+    apiVersion: v2
+    created: "2023-09-05T10:46:46.212507443Z"
+    dependencies:
+    - condition: postgres-operator-ui.enabled
+      name: postgres-operator-ui
+      repository: https://opensource.zalando.com/postgres-operator/charts/postgres-operator-ui/
+      version: ~1.9.0
+    - condition: postgres-operator.enabled
+      name: postgres-operator
+      repository: https://opensource.zalando.com/postgres-operator/charts/postgres-operator/
+      version: ~1.9.0
+    - condition: rabbitmq.enabled
+      name: rabbitmq
+      repository: https://charts.bitnami.com/bitnami
+      version: ~10.1.7
+    - condition: geonode.memcached.enaled
+      name: memcached
+      repository: https://charts.bitnami.com/bitnami
+      version: ~6.x.x
+    description: Helm Chart for Geonode a web-based application and platform for developing
+      geospatial information systems (GIS) and for deploying spatial data infrastructures
+      (SDI)
+    digest: 68095f07547d7b936d3f80c8b1b5a3d6587347b5cf42e4b570d267dad8b38d90
+    home: https://geonode.org/
+    keywords:
+    - geonode
+    - geospatial
+    - geodata
+    - SDI
+    - http
+    - web
+    - python
+    - geoserver
+    - postresql
+    - postgis
+    - rabbitmq
+    - memcached
+    - django
+    maintainers:
+    - email: marcel.wallschlaeger@zalf.de
+      name: mwallschlaeger
+    name: geonode-k8s
+    sources:
+    - https://github.com/zalf-rdm/geonode-k8s
+    - https://github.com/geonode/geonode
+    urls:
+    - https://github.com/zalf-rdm/geonode-k8s/releases/download/geonode-k8s-4.1.0/geonode-k8s-4.1.0.tgz
+    version: 4.1.0
+generated: "2023-09-05T10:46:46.212517043Z"
