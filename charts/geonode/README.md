@@ -59,6 +59,7 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | geonode.general.ogc_request_timeout | int | `600` | OGC_REQUEST_TIMEOUT |
 | geonode.general.publishing.admin_moderate_uploads | bool | `false` | ADMIN_MODERATE_UPLOADS When this variable is set to True, every uploaded resource must be approved before becoming visible to the public users. Until a resource is in PENDING APPROVAL state, only the superusers, owner and group members can access it, unless specific edit permissions have been set for other users or groups. A Group Manager can approve the resource, but he cannot publish it whenever the setting RESOURCE_PUBLISHING is set to True. Otherwise, if RESOURCE_PUBLISHING (helm: resource_publishing_by_staff) is set to False, the resource becomes accessible as soon as it is approved. |
 | geonode.general.publishing.resource_publishing_by_staff | bool | `false` | RESOURCE_PUBLISHING By default, the GeoNode application allows GeoNode staff members to publish/unpublish resources. By default, resources are published when created. When this setting is set to True the staff members will be able to unpublish a resource (and eventually publish it back). |
+| geonode.general.secretName | string | `"demo-secret"` | the secret name containing confidential values  |
 | geonode.general.settings_module | string | `"geonode.settings"` | the settings module to load |
 | geonode.general.superUser.email | string | `"support@example.com"` | admin user password |
 | geonode.general.superUser.password | string | `"geonode"` | admin panel password |
@@ -193,9 +194,24 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | postgres.operator_manifest.storageSize | string | `"3Gi"` | Database storage size |
 | postgres.schema | string | `"public"` | database schema |
 | postgres.username | string | `"postgres"` | postgres username |
+| pycsw.config | string | [server] ... | pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/ |
+| pycsw.container_name | string | `"pycsw"` | pycsw container name |
+| pycsw.enabled | bool | `true` | enable single pycsw pod |
+| pycsw.endpoint | string | `"/catalogue/csw"` | pycsw url below geonode.ingress.externalDomain |
+| pycsw.image.name | string | `"geopython/pycsw"` | pycsw docker image |
+| pycsw.image.tag | string | `"2.6.1"` | pycsw docker image tag |
+| pycsw.mappings | string | MD_CORE_MODEL = { ... } | pycsw local mappings, copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py |
+| pycsw.pod_name | string | `"pysw"` | pycsw pod name |
+| pycsw.port | int | `8000` | pycsw endpoint port |
+| pycsw.replicaCount | int | `1` | pycsw container replicas |
+| pycsw.resources.limits.cpu | string | `"500m"` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| pycsw.resources.limits.memory | string | `"1Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| pycsw.resources.requests.cpu | string | `"500m"` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| pycsw.resources.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | rabbitmq | object | `{"auth":{"erlangCookie":"jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu","password":"rabbitpassword","username":"rabbituser"},"enabled":true,"limits":{"cpu":"750m","memory":"1Gi"},"persistence":{"enabled":false},"replicaCount":1,"requests":{"cpu":"500m","memory":"1Gi"}}` | VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml |
 | rabbitmq.limits.cpu | string | `"750m"` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | rabbitmq.limits.memory | string | `"1Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| rabbitmq.replicaCount | int | `1` | rabbitmq raplica count |
 | rabbitmq.requests.cpu | string | `"500m"` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | rabbitmq.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 

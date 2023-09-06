@@ -109,6 +109,9 @@ geonode:
     cheaper_busyness_backlog_step: 2
 
   general:
+    # -- the secret name containing confidential values 
+    secretName: demo-secret
+
     # -- external ingress schema. If set to 'https', make sure to configure TLS either by 
     # configuring tls certificate or using cert-manager. Available options: (http|https)
     externalScheme: http
@@ -356,7 +359,7 @@ nginx:
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: "800m"
 
-# -- pycsw integration is based on https://github.com/geopython/pycsw/blob/master/docker/kubernetes
+# pycsw integration is based on https://github.com/geopython/pycsw/blob/master/docker/kubernetes
 pycsw:
   # -- enable single pycsw pod
   enabled: True
@@ -386,8 +389,8 @@ pycsw:
       memory: "1Gi"
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: "500m"
-  # copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py
-  # -- pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/
+  # -- pycsw local mappings, copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py
+  # @default -- MD_CORE_MODEL = { ... }
   mappings: |-
     MD_CORE_MODEL = {
       "typename": "pycsw:CoreMetadata",
@@ -452,7 +455,9 @@ pycsw:
           "pycsw:Links": "download_links",
       },
     }
-  config: |-
+  # -- pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/
+  # @default -- [server] ...
+  config: |
     [server]
         home=/home/pycsw
         url=$(PYCSW_SERVER_URL)

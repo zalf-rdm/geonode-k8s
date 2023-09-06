@@ -47,11 +47,6 @@ data:
   ALLOWED_HOSTS: "['django', '*', '{{ .Values.geonode.general.externalDomain }}']"
   PROXY_ALLOWED_HOSTS: 'localhost,django,geonode,geoserver,spatialreference.org,nominatim.openstreetmap.org,dev.openlayers.org'
 
-  # Admin Settings
-  ADMIN_USERNAME: {{ .Values.geonode.general.superUser.username | quote }}
-  ADMIN_EMAIL: {{ .Values.geonode.general.superUser.email | quote }}
-  ADMIN_PASSWORD: {{ .Values.geonode.general.superUser.password | quote }}
-
   # General settings
   FREETEXT_KEYWORDS_READONLY: {{ include "boolean2str" .Values.geonode.general.freetext_keywords_readonly | quote }}
   FIXTURE_DIRS: "[ '/usr/src/geonode/geonode/fixtures' ]"
