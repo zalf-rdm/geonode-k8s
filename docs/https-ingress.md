@@ -1,11 +1,11 @@
 HTTPS Ingress
 -------------
 
-To enable https for the given configuration: geonode.ingress.externalDomain in values.yaml. Set the externalScheme to "https" and define a secret which has to be
+To enable https for the given configuration: geonode.general.externalDomain in values.yaml. Set the externalScheme to "https" and define a secret which has to be
 in the same namespace as the geonode installation.
 
 ```
-geonode.ingress.externalScheme: https
+geonode.general.externalScheme: https
 geonode.ingress.tlsSecret: geonode-tls-secret
 ```
 

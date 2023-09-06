@@ -4,7 +4,7 @@ metadata:
   name: {{ include "geoserver_pod_name" . }}-env
   namespace: {{ .Release.Namespace }}
 data:
-  GEONODE_LB_HOST_IP: {{ .Values.geonode.ingress.externalDomain | quote }}
+  GEONODE_LB_HOST_IP: {{ .Values.geonode.general.externalDomain | quote }}
   GEONODE_HOST_IP: localhost
 
   DJANGO_URL: http://{{ include "geonode_pod_name" .}}/
