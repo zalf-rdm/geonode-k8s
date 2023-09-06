@@ -50,11 +50,7 @@ geonode:
     ingressClassName:
     # -- adds ingress annotations for nginx ingress class to increase uploadsize and timeout time
     addNginxIngressAnnotation: false
-    # -- external ingress schema. if set to https ingress tls is used. Loading tls certificate via tls-secret options Available options: (http|https)
-    externalScheme: http
-    # -- external ingress hostname 
-    externalDomain: geonode
-    # -- tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/ (for the use of cert-manager, configure the acme section properly). is used when geonode.ingress.externalScheme is set to https
+    # -- tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/ (for the use of cert-manager, configure the acme section properly). is used when geonode.general.externalScheme is set to 'https'
     tlsSecret: geonode-tls-secret
 
   acme:
@@ -113,6 +109,12 @@ geonode:
     cheaper_busyness_backlog_step: 2
 
   general:
+    # -- external ingress schema. If set to 'https', make sure to configure TLS either by 
+    # configuring tls certificate or using cert-manager. Available options: (http|https)
+    externalScheme: http
+    # -- external ingress hostname 
+    externalDomain: geonode
+
     # -- max upload document size in MB
     max_document_size: 10
     # -- to describe

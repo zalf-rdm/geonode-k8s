@@ -78,7 +78,7 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
 {{- end -}}
 
 {{- define "public_url" -}}
-{{ .Values.geonode.ingress.externalScheme }}://{{ .Values.geonode.ingress.externalDomain }}
+{{ .Values.geonode.general.externalScheme }}://{{ .Values.geonode.general.externalDomain }}
 {{- end -}}
 
 # function

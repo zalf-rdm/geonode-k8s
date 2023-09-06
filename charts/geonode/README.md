@@ -1,15 +1,21 @@
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/geonode-k8s)](https://artifacthub.io/packages/search?repo=geonode-k8s)
 # geonode-k8s
 
 ![Version: 4.1.0](https://img.shields.io/badge/Version-4.1.0-informational?style=flat-square)
 
-Helm Chart for Geonode
+Helm Chart for Geonode a web-based application and platform for developing geospatial information systems (GIS) and for deploying spatial data infrastructures (SDI)
 
-**Homepage:** <https://github.com/zalf-rdm/geonode-k8s>
+**Homepage:** <https://geonode.org/>
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| mwallschlaeger | <marcel.wallschlaeger@zalf.de> |  |
 
 ## Source Code
 
 * <https://github.com/zalf-rdm/geonode-k8s>
+* <https://github.com/geonode/geonode>
 
 ## Requirements
 
@@ -42,6 +48,8 @@ Helm Chart for Geonode
 | geonode.general.display.rating | bool | `true` | DISPLAY_RATINGS If set to False ratings are hidden. |
 | geonode.general.display.social | bool | `true` | DISPLAY_SOCIAL If set to False social sharing is hidden. |
 | geonode.general.display.wms_link | bool | `true` | DISPLAY_WMS_LINKS If set to False direct WMS link to GeoServer is hidden. |
+| geonode.general.externalDomain | string | `"geonode"` | external ingress hostname  |
+| geonode.general.externalScheme | string | `"http"` | external ingress schema. If set to 'https', make sure to configure TLS either by  configuring tls certificate or using cert-manager. Available options: (http|https) |
 | geonode.general.freetext_keywords_readonly | bool | `false` | FREETEXT_KEYWORDS_READONLY Make Free-Text Keywords writable from users. Or read-only when set to False. |
 | geonode.general.max_document_size | int | `10` | max upload document size in MB |
 | geonode.general.ogc_request_backoff_factor | float | `0.3` | OGC_REQUEST_BACKOFF_FACTOR |
@@ -63,10 +71,8 @@ Helm Chart for Geonode
 | geonode.image.tag | string | `"4.1.x"` | tag of used geonode image |
 | geonode.ingress.addNginxIngressAnnotation | bool | `false` | adds ingress annotations for nginx ingress class to increase uploadsize and timeout time |
 | geonode.ingress.enabled | bool | `true` | enables external access  |
-| geonode.ingress.externalDomain | string | `"geonode"` | external ingress hostname  |
-| geonode.ingress.externalScheme | string | `"http"` | external ingress schema. if set to https ingress tls is used. Loading tls certificate via tls-secret options Available options: (http|https) |
 | geonode.ingress.ingressClassName | string | `nil` | define kubernetes ingress class for geonode ingress |
-| geonode.ingress.tlsSecret | string | `"geonode-tls-secret"` | tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/ (for the use of cert-manager, configure the acme section properly). is used when geonode.ingress.externalScheme is set to https |
+| geonode.ingress.tlsSecret | string | `"geonode-tls-secret"` | tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/ (for the use of cert-manager, configure the acme section properly). is used when geonode.general.externalScheme is set to 'https' |
 | geonode.ldap.always_update_user | bool | `true` | always update local user database from ldap |
 | geonode.ldap.attr_map_email_addr | string | `"mailPrimaryAddress"` | email attribute used from ldap  |
 | geonode.ldap.attr_map_first_name | string | `"givenName"` | given name attribute used from ldap |
