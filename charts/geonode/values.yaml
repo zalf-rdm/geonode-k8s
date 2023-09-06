@@ -325,14 +325,6 @@ geoserver:
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: 2
 
-# MEMCACHED CONFIGURATION
-# https://artifacthub.io/packages/helm/bitnami/memcached
-memcached:
-  # -- memcached replica. Loadbalanaced via kubernetes. (only one entry in django settings.py) im memcached is activated under geonode.memcached.enabled this takes place
-  architecture: high-availability
-  replicaCount: 1
-
-
 # CONFIGURATION FOR NGINX DEPLOYMENT
 # MAY MOVE TO CHART
 nginx:
@@ -362,9 +354,177 @@ nginx:
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: "800m"
 
+# -- pycsw integration is based on https://github.com/geopython/pycsw/blob/master/docker/kubernetes
+pycsw:
+  # -- enable single pycsw pod
+  enabled: True
+  # -- pycsw pod name
+  pod_name: pysw
+  # -- pycsw container replicas
+  replicaCount: 1
+  # -- pycsw container name
+  container_name: pycsw
+  image:
+    # -- pycsw docker image
+    name: geopython/pycsw
+    # -- pycsw docker image tag
+    tag: '2.6.1'
+  # -- pycsw endpoint port
+  port: 8000
+  # -- pycsw url below geonode.ingress.externalDomain
+  endpoint: /catalogue/csw
+  resources:
+    requests:
+      # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "1Gi"
+      # -- requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: "500m"
+    limits:
+      # -- limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "1Gi"
+      # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: "500m"
+  # copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py
+  # -- pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/
+  mappings: |-
+    MD_CORE_MODEL = {
+      "typename": "pycsw:CoreMetadata",
+      "outputschema": "http://pycsw.org/metadata",
+      "mappings": {
+          "pycsw:Identifier": "uuid",
+          "pycsw:Typename": "csw_typename",
+          "pycsw:Schema": "csw_schema",
+          "pycsw:MdSource": "csw_mdsource",
+          "pycsw:InsertDate": "csw_insert_date",
+          "pycsw:XML": "metadata_xml",
+          "pycsw:AnyText": "csw_anytext",
+          "pycsw:Language": "language",
+          "pycsw:Title": "title",
+          "pycsw:Abstract": "raw_abstract",
+          "pycsw:Keywords": "keyword_csv",
+          "pycsw:KeywordType": "keywordstype",
+          "pycsw:Format": "spatial_representation_type_string",
+          "pycsw:Source": "source",
+          "pycsw:Date": "date",
+          "pycsw:Modified": "date",
+          "pycsw:Type": "csw_type",
+          "pycsw:BoundingBox": "csw_wkt_geometry",
+          "pycsw:CRS": "csw_crs",
+          "pycsw:AlternateTitle": "alternate",
+          "pycsw:RevisionDate": "date",
+          "pycsw:CreationDate": "date",
+          "pycsw:PublicationDate": "date",
+          "pycsw:Organization": "organizationname",
+          "pycsw:OrganizationName": "organizationname",
+          "pycsw:SecurityConstraints": "securityconstraints",
+          "pycsw:ParentIdentifier": "parentidentifier",
+          "pycsw:TopicCategory": "topiccategory",
+          "pycsw:ResourceLanguage": "language",
+          "pycsw:GeographicDescriptionCode": "geodescode",
+          "pycsw:Denominator": "denominator",
+          "pycsw:DistanceValue": "distancevalue",
+          "pycsw:DistanceUOM": "distanceuom",
+          "pycsw:TempExtent_begin": "temporal_extent_start",
+          "pycsw:TempExtent_end": "temporal_extent_end",
+          "pycsw:ServiceType": "servicetype",
+          "pycsw:ServiceTypeVersion": "servicetypeversion",
+          "pycsw:Operation": "operation",
+          "pycsw:CouplingType": "couplingtype",
+          "pycsw:OperatesOn": "operateson",
+          "pycsw:OperatesOnIdentifier": "operatesonidentifier",
+          "pycsw:OperatesOnName": "operatesoname",
+          "pycsw:Degree": "degree",
+          "pycsw:AccessConstraints": "restriction_code",
+          "pycsw:OtherConstraints": "raw_constraints_other",
+          "pycsw:Classification": "classification",
+          "pycsw:ConditionApplyingToAccessAndUse": "conditionapplyingtoaccessanduse",
+          "pycsw:Lineage": "lineage",
+          "pycsw:ResponsiblePartyRole": "responsiblepartyrole",
+          "pycsw:SpecificationTitle": "specificationtitle",
+          "pycsw:SpecificationDate": "specificationdate",
+          "pycsw:SpecificationDateType": "specificationdatetype",
+          "pycsw:Creator": "creator",
+          "pycsw:Publisher": "publisher",
+          "pycsw:Contributor": "contributor",
+          "pycsw:Relation": "relation",
+          "pycsw:Links": "download_links",
+      },
+    }
+  config: |-
+    [server]
+        home=/home/pycsw
+        url=$(PYCSW_SERVER_URL)
+        mimetype=application/xml; charset=UTF-8
+        encoding=UTF-8
+        language= en-US
+        maxrecords=10
+        # loglevel=
+        # logfile=
+        # ogc_schemas_base=
+        # federatedcatalogues=
+        # pretty_print=
+        gzip_compresslevel=1
+        # domainquerytype=
+        # domaincounts=
+        # spatial_ranking=
+        profiles=apiso
+        # workers=
+        timeout=30
+    [manager]
+        transactions=false
+        # allowed_ips={{ .Values.pycsw.config.manager.allowed_ips }}{{ end }}
+        # csw_harvest_pagesize={{ .Values.pycsw.config.manager.csw_harvest_pagesize }}{{ end }}
+    [metadata:main]
+        identification_title=GeoNode pycsw Geospatial Catalogue
+        identification_abstract=GeoNode-k8s pycsw Geospatial Catalogue
+        identification_keywords=catalogue,discovery,metadata, geonode
+        identification_keywords_type=theme
+        identification_fees=None
+        identification_accessconstraints=None
+        provider_name=GeoNode Kubernetes
+        provider_url=https://pycsw.org/
+        contact_name=Lastname, Firstname
+        contact_position=Position Title
+        contact_address=Mailing Address
+        contact_city=City
+        contact_stateorprovince=Administrative Area
+        contact_postalcode=Zip or Postal Code
+        contact_country=Country
+        contact_phone=+xx-xxx-xxx-xxxx
+        contact_fax=+xx-xxx-xxx-xxxx
+        contact_email=Email Address
+        contact_url=Contact URL
+        contact_hours=Hours of Service
+        contact_instructions=During hours of service.  Off on weekends.
+        contact_role=pointOfContact
+    [repository]
+        database=${PYCSW_REPOSITORY_DATABASE_URI}
+        mappings=/etc/pycsw/pycsw-mappings.py
+        table=base_resourcebase
+        # filter=
+    [metadata:inspire]
+        enabled="true"
+        languages_supported=eng,gre
+        default_language=eng
+        date=YYYY-MM-DD
+        gemet_keywords=Utility and governmental services
+        conformity_service=notEvaluated
+        contact_name=Organization Name
+        contact_email=Email Address
+        temp_extent=YYYY-MM-DD/YYYY-MM-DD
+
+
+# MEMCACHED CONFIGURATION
+# https://artifacthub.io/packages/helm/bitnami/memcached
+memcached:
+  # -- memcached replica. Loadbalanaced via kubernetes. (only one entry in django settings.py) im memcached is activated under geonode.memcached.enabled this takes place
+  architecture: high-availability
+  replicaCount: 1
+
 # -- VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml
 rabbitmq:
   enabled: true
+  # -- rabbitmq raplica count
   replicaCount: 1
   auth:
     username: rabbituser
@@ -415,11 +575,6 @@ postgres:
     postgres_password: postgres
     geonode_password: geonode
     geodata_password: geogeonode
-
-
-########################
-# CHART CONFIGURATIONS #
-########################
 
 # VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator/values.yaml
 postgres-operator:

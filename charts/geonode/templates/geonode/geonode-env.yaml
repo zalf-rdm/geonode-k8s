@@ -127,6 +127,13 @@ data:
   LDAP_USER_ATTR_MAP_LAST_NAME: {{ .Values.geonode.ldap.attr_map_last_name | quote }}
   LDAP_USER_ATTR_MAP_EMAIL_ADDR: {{ .Values.geonode.ldap.attr_map_email_addr | quote }}
 
+  # Configure PYCSW
+  {{ if .Values.pycsw.enabled }}
+  CATALOGUE_ENGINE: geonode.catalogue.backends.pycsw_http
+  CATALOGUE_URL: "http://{{ include "pycsw_pod_name" . }}:{{ .Values.pycsw.port }}"
+  {{ else }}
+  CATALOGUE_ENGINE: geonode.catalogue.backends.pycsw_local
+  {{ end}}
   # OAuth2
   # TODO (mwall) implement OAUTH2
   OAUTH2_API_KEY: ""

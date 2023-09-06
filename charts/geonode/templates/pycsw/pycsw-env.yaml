@@ -1,0 +1,13 @@
+{{ if .Values.pycsw.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "pycsw_pod_name" . }}-env
+  namespace: {{ .Release.Namespace }}
+data:
+  # Database Settings
+  DATABASE_HOST: "{{ include "postgres_pod_name" . }}"
+  DATABASE_PORT: "{{ include "database_port" .}}"
+  GEONODE_DATABASE: {{ .Values.postgres.geonode_databasename_and_username | quote }}
+  GEONODE_DATABASE_SCHEMA: {{ .Values.postgres.schema }}
+{{ end }}
