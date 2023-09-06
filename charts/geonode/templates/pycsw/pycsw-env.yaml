@@ -8,6 +8,6 @@ data:
   # Database Settings
   DATABASE_HOST: "{{ include "postgres_pod_name" . }}"
   DATABASE_PORT: "{{ include "database_port" .}}"
-  GEONODE_DATABASE: {{ .Values.postgres.geonodedatabase | quote }}
+  GEONODE_DATABASE: {{ .Values.postgres.geonode_databasename_and_username | quote }}
   GEONODE_DATABASE_SCHEMA: {{ .Values.postgres.schema }}
 {{ end }}

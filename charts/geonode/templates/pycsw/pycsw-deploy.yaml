@@ -38,16 +38,18 @@ spec:
         envFrom:
           - configMapRef:
               name: {{ include "pycsw_pod_name" . }}-env
-        env:
+        env: 
+        - name: PYCSW_SERVER_URL
+          value: "{{ .Values.geonode.ingress.externalScheme}}://{{ .Values.geonode.ingress.externalDomain }}{{ .Values.pycsw.endpoint }}"
         - name: GEONODE_DATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.postgres.geodata_databasename_and_username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
+              name: {{ .Values.postgres.geonode_databasename_and_username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
               key: password
         - name: PYCSW_REPOSITORY_DATABASE_URI
           value: "postgresql://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"
-        - name: PYCSW_SERVER_URL
-          value: "{{ .Values.geonode.ingress.externalDomain }}{{ .Values.pycsw.endpoint }}"
+
+       
         ports:
         - containerPort: {{ .Values.pycsw.port }}
         volumeMounts:
@@ -56,7 +58,7 @@ spec:
           subPath: pycsw.cfg
           readOnly: true
         - name: pycsw-mappings-py
-          mountPath: {{ .Values.pycsw.config.repository.mappings }}
+          mountPath: /etc/pycsw/pycsw-mappings.py
           subPath: pycsw-mappings.py
           readOnly: true
         resources:
@@ -66,12 +68,12 @@ spec:
           limits:
             memory: {{ .Values.pycsw.resources.limits.memory }}
             cpu: {{ .Values.pycsw.resources.limits.cpu }}
-        livenessProbe:
-          httpGet:
-            path: /
-            port: {{ .Values.pycsw.port }}
-          initialDelaySeconds: 3
-          periodSeconds: 10
+        # livenessProbe:
+        #   httpGet:
+        #     path: /
+        #     port: {{ .Values.pycsw.port }}
+        #   initialDelaySeconds: 3
+        #   periodSeconds: 10
 
       volumes:
       - name: pycsw-cfg

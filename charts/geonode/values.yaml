@@ -450,57 +450,68 @@ pycsw:
           "pycsw:Links": "download_links",
       },
     }
-  config:
-    server:
-      home: /home/pycsw
-      mimetype: application/xml; charset=UTF-8
-      encoding: UTF-8
-      language: en-US
-      maxrecords: 10
-      profiles: apiso
-      # workers: 2
-      timeout: 30
-    manager:
-      transactions: "false"
-    metadata:
-      identification_title: GeoNode pycsw Geospatial Catalogue
-      identification_abstract: GeoNode-k8s pycsw Geospatial Catalogue
-      identification_keywords: catalogue,discovery,metadata, geonode
-      identification_keywords_type: theme
-      identification_fees: None
-      identification_accessconstraints: None
-      provider_name: GeoNode Kubernetes
-      provider_url: https://pycsw.org/
-      contact_name: Lastname, Firstname
-      contact_position: Position Title
-      contact_address: Mailing Address
-      contact_city: City
-      contact_stateorprovince: Administrative Area
-      contact_postalcode: Zip or Postal Code
-      contact_country: Country
-      contact_phone: +xx-xxx-xxx-xxxx
-      contact_fax: +xx-xxx-xxx-xxxx
-      contact_email: Email Address
-      contact_url: Contact URL
-      contact_hours: Hours of Service
-      contact_instructions: During hours of service.  Off on weekends.
-      contact_role: pointOfContact
-
-    repository:
-      table: base_resourcebase
-      mappings: /etc/pycsw/pycsw-mappings.py
-      # filter: type = 'http://purl.org/dc/dcmitype/Dataset'
-
-    inspire:
-      enabled: "true"
-      languages_supported: eng,gre
-      default_language: eng
-      date: YYYY-MM-DD
-      gemet_keywords: Utility and governmental services
-      conformity_service: notEvaluated
-      contact_name: Organization Name
-      contact_email: Email Address
-      temp_extent: YYYY-MM-DD/YYYY-MM-DD
+  config: |-
+    [server]
+        home=/home/pycsw
+        url=$(PYCSW_SERVER_URL)
+        mimetype=application/xml; charset=UTF-8
+        encoding=UTF-8
+        language= en-US
+        maxrecords=10
+        # loglevel=
+        # logfile=
+        # ogc_schemas_base=
+        # federatedcatalogues=
+        # pretty_print=
+        gzip_compresslevel=1
+        # domainquerytype=
+        # domaincounts=
+        # spatial_ranking=
+        profiles=apiso
+        # workers=
+        timeout=30
+    [manager]
+        transactions=false
+        # allowed_ips={{ .Values.pycsw.config.manager.allowed_ips }}{{ end }}
+        # csw_harvest_pagesize={{ .Values.pycsw.config.manager.csw_harvest_pagesize }}{{ end }}
+    [metadata:main]
+        identification_title=GeoNode pycsw Geospatial Catalogue
+        identification_abstract=GeoNode-k8s pycsw Geospatial Catalogue
+        identification_keywords=catalogue,discovery,metadata, geonode
+        identification_keywords_type=theme
+        identification_fees=None
+        identification_accessconstraints=None
+        provider_name=GeoNode Kubernetes
+        provider_url=https://pycsw.org/
+        contact_name=Lastname, Firstname
+        contact_position=Position Title
+        contact_address=Mailing Address
+        contact_city=City
+        contact_stateorprovince=Administrative Area
+        contact_postalcode=Zip or Postal Code
+        contact_country=Country
+        contact_phone=+xx-xxx-xxx-xxxx
+        contact_fax=+xx-xxx-xxx-xxxx
+        contact_email=Email Address
+        contact_url=Contact URL
+        contact_hours=Hours of Service
+        contact_instructions=During hours of service.  Off on weekends.
+        contact_role=pointOfContact
+    [repository]
+        database=${PYCSW_REPOSITORY_DATABASE_URI}
+        mappings=/etc/pycsw/pycsw-mappings.py
+        table=base_resourcebase
+        # filter=
+    [metadata:inspire]
+        enabled="true"
+        languages_supported=eng,gre
+        default_language=eng
+        date=YYYY-MM-DD
+        gemet_keywords=Utility and governmental services
+        conformity_service=notEvaluated
+        contact_name=Organization Name
+        contact_email=Email Address
+        temp_extent=YYYY-MM-DD/YYYY-MM-DD
 
 
 # MEMCACHED CONFIGURATION
