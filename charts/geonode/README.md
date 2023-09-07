@@ -122,7 +122,8 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | geonode.resources.limits.memory | string | `"2Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.resources.requests.cpu | int | `1` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.resources.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| geonode.secret.content | object | `{"email":"support@example.com","password":"geonode","username":"admin"}` | Values of the Secret. If empty, the Secret will not be created from template. In this case, you have to either create the Secret on your own (you may choose a different name). |
+| geonode.secret.content | object | `{"superuser":{"email":"support@example.com","password":"geonode","username":"admin"}}` | Values of the Secret. If empty, the Secret will not be created from template. In this case, you have to either create the Secret on your own (you may choose a different name). |
+| geonode.secret.createFromContent | bool | `true` | if Secret shall be created based on the values of `secret.content`. |
 | geonode.secret.name | string | `"geonode-secret"` | name of the secret to use. Change, if you want to maintain them separately. |
 | geonode.sentry.build_number | int | `0` | sentry build number |
 | geonode.sentry.dsn | string | `""` | sentry dsn url |

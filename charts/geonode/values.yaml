@@ -34,11 +34,14 @@ geonode:
   secret:
     # -- name of the secret to use. Change, if you want to maintain them separately.
     name: geonode-secret
+    # -- if Secret shall be created based on the values of `secret.content`.
+    createFromContent: True
     # -- Values of the Secret. If empty, the Secret will not be created from template. In this case, you have to either create the Secret on your own (you may choose a different name).
     content:
-      username: admin
-      password: geonode
-      email: support@example.com
+      superuser:
+        username: admin
+        password: geonode
+        email: support@example.com
 
   resources:
     requests:
