@@ -122,6 +122,8 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | geonode.resources.limits.memory | string | `"2Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.resources.requests.cpu | int | `1` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.resources.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| geonode.secret.content | string | `"apiVersion: v1\nkind: Secret\nmetadata:\n  name: geonode-secret\ntype: Opaque\ndata:\n  # superuser\n  ADMIN_USERNAME: {{ admin | base64 }}\n  ADMIN_PASSWORD: {{ geonode | base64 }}\n  ADMIN_EMAIL: {{ support@example.com | base64 }}\n"` | Default contents of the secret |
+| geonode.secret.name | string | `"geonode-secret"` | the name of the secret to use |
 | geonode.sentry.build_number | int | `0` | sentry build number |
 | geonode.sentry.dsn | string | `""` | sentry dsn url |
 | geonode.sentry.enabled | bool | `false` | enable sentry integration for geonode |

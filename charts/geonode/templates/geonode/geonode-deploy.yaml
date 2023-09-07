@@ -206,26 +206,12 @@ spec:
 
         envFrom:
           - configMapRef:
-              name: {{ include "geonode_pod_name" . }}-env
+            name: {{ include "geonode_pod_name" . }}-env
+        {{- if .Values.geonode.general.secretName }}
+          - secretRef:
+            name: {{ .Values.geonode.general.secretName }}
 
         env:
-        {{- if .Values.geonode.general.secretName }}
-        - name: ADMIN_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.geonode.general.secretName }}
-              key: ADMIN_USERNAME
-        - name: ADMIN_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.geonode.general.secretName }}
-              key: ADMIN_PASSWORD
-        - name: ADMIN_EMAIL
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.geonode.general.secretName }}
-              key: ADMIN_EMAIL
-        {{ end }}
         - name: GEONODE_DATABASE_PASSWORD
           valueFrom:
             secretKeyRef: 

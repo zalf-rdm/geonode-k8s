@@ -1,10 +1,10 @@
-
 global:
   # -- storageClass used by helm dependencies pvc
   storageClass:
   # -- storage access mode used by helm dependency pvc
   accessMode: ReadWriteMany
 
+  
 # geonode configuration
 geonode:
   # -- pod name
@@ -30,6 +30,22 @@ geonode:
   # -- additions to tasks.py script at the beginning of the tasks.py, must be additional code written in python
   tasks_post_script: |
     print("tasks_post_script not defined ...")
+
+  secret:
+    # -- the name of the secret to use
+    name: geonode-secret
+    # -- Default contents of the secret
+    content: |
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: geonode-secret
+      type: Opaque
+      data:
+        # superuser
+        ADMIN_USERNAME: {{ admin | base64 }}
+        ADMIN_PASSWORD: {{ geonode | base64 }}
+        ADMIN_EMAIL: {{ support@example.com | base64 }}
 
   resources:
     requests:
