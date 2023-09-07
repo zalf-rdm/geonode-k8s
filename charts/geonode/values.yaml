@@ -32,16 +32,26 @@ geonode:
     print("tasks_post_script not defined ...")
 
   secret:
-    # -- name of the secret to use. Change, if you want to maintain them separately.
-    name: geonode-secret
-    # -- if Secret shall be created based on the values of `secret.content`.
-    createFromContent: True
-    # -- Values of the Secret. If empty, the Secret will not be created from template. In this case, you have to either create the Secret on your own (you may choose a different name).
-    content:
-      superuser:
-        username: admin
-        password: geonode
-        email: support@example.com
+    # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
+    existingSecretName: ""
+    superUser:
+      # -- admin username
+      username: admin
+      # -- admin panel password
+      password: geonode
+      # -- admin user password
+      email: support@example.com
+    mail:
+      # -- define mail user to send mails from
+      user: "changeme"
+      # -- set password for mailuser in geonode
+      password: "changeme"
+      # -- define from mail-addr 
+      from: "changeme@web.de"
+    ldap:
+      # -- ldap password
+      bind_password: password
+
 
   resources:
     requests:
@@ -121,8 +131,6 @@ geonode:
     cheaper_busyness_backlog_step: 2
 
   general:
-    # -- the secret name containing confidential values 
-    secretName: demo-secret
 
     # -- external ingress schema. If set to 'https', make sure to configure TLS either by 
     # configuring tls certificate or using cert-manager. Available options: (http|https)
@@ -153,14 +161,6 @@ geonode:
     ogc_request_pool_maxsize: 10
     # -- OGC_REQUEST_POOL_CONNECTIONS
     ogc_request_pool_connections: 10
-
-    superUser:
-      # -- admin username
-      username: admin
-      # -- admin panel password
-      password: geonode
-      # -- admin user password
-      email: support@example.com
 
     publishing:
       # -- RESOURCE_PUBLISHING By default, the GeoNode application allows GeoNode staff members to publish/unpublish resources.
@@ -198,12 +198,6 @@ geonode:
     tls: true
     # -- enable ssl for geonode mail (only tls or ssl can be true not both)
     use_ssl: False
-    # -- define mail user to send mails from
-    user: "changeme"
-    # -- set password for mailuser in geonode
-    password: "changeme"
-    # -- define from mail-addr 
-    from: "changeme@web.de"
 
   ldap:
     # -- enable ldap AUTHENTICATION_BACKENDS in DJANGO Geonode
@@ -212,8 +206,6 @@ geonode:
     uri: ldap://example.com
     # -- ldap user bind dn
     bind_dn: "CN=Users,DC=ad,DC=example,DC=com"
-    # -- ldap password
-    bind_password: password
     # -- ldap user search dn
     user_search_dn: "OU=User,DC=ad,DC=example,DC=com"
     # -- ldap user filterstr
@@ -324,10 +316,14 @@ geoserver:
     tag: '2.23.0'
   # -- geoserver port
   port: 8080
-  # -- geoserver admin username
-  admin_username: admin
-  # -- geoserver admin password
-  admin_password: "geoserver"
+
+  secret:
+    # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
+    existingSecretName: ""
+    # -- geoserver admin username
+    admin_username: admin
+    # -- geoserver admin password
+    admin_password: "geoserver"
 
   # -- geoserver kube resources
   resources:
@@ -549,6 +545,8 @@ rabbitmq:
     username: rabbituser
     password: rabbitpassword
     erlangCookie: jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu
+    existingPasswordSecret: ""
+    existingErlangSecret: ""
   persistence:
     enabled: False
 

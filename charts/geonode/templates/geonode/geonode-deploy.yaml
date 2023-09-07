@@ -89,25 +89,12 @@ spec:
         envFrom:
           - configMapRef:
               name: {{ include "geonode_pod_name" . }}-env
+          - secretRef:
+            name: {{ .Values.geonode.secret.existingSecretName | "geonode-secret" | quote }}
+          - secretRef:
+            name: {{ .Values.geoserver.secret.existingSecretName | "geoserver-secret" | quote }}
 
         env:
-        {{- if .Values.geonode.general.secretName }}
-        - name: ADMIN_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.geonode.general.secretName }}
-              key: ADMIN_USERNAME
-        - name: ADMIN_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.geonode.general.secretName }}
-              key: ADMIN_PASSWORD
-        - name: ADMIN_EMAIL
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.geonode.general.secretName }}
-              key: ADMIN_EMAIL
-        {{ end }}
         - name: GEONODE_DATABASE_PASSWORD
           valueFrom:
             secretKeyRef: 
@@ -207,9 +194,8 @@ spec:
         envFrom:
           - configMapRef:
             name: {{ include "geonode_pod_name" . }}-env
-        {{- if .Values.geonode.general.secretName }}
           - secretRef:
-            name: {{ .Values.geonode.general.secretName }}
+            name: {{ .Values.geonode.secret.existingSecretName | "geonode-secret" | quote }}
 
         env:
         - name: GEONODE_DATABASE_PASSWORD

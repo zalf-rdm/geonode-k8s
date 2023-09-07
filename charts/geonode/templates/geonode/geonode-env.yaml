@@ -66,11 +66,8 @@ data:
   DJANGO_EMAIL_BACKEND: {{ .Values.geonode.mail.backend | quote }}
   DJANGO_EMAIL_HOST: {{ .Values.geonode.mail.host | quote }}
   DJANGO_EMAIL_PORT: {{ .Values.geonode.mail.port | quote }}
-  DJANGO_EMAIL_HOST_USER: {{ .Values.geonode.mail.user | quote }}
-  DJANGO_EMAIL_HOST_PASSWORD: {{ .Values.geonode.mail.password | quote }}
   DJANGO_EMAIL_USE_TLS: {{ include "boolean2str" .Values.geonode.mail.tls | quote }}
   DJANGO_EMAIL_USE_SSL: {{ include "boolean2str" .Values.geonode.mail.use_ssl | quote }}
-  DEFAULT_FROM_EMAIL: {{ .Values.geonode.mail.from | quote }}
 
   # PATH
   # TODO (mwall) allign with volumeMount locations
@@ -110,7 +107,6 @@ data:
   LDAP_ENABLED:  {{ include "boolean2str" .Values.geonode.ldap.enabled | quote }}
   LDAP_SERVER_URL: {{ .Values.geonode.ldap.uri | quote }}
   LDAP_BIND_DN: {{ .Values.geonode.ldap.bind_dn | quote }}
-  LDAP_BIND_PASSWORD: {{ .Values.geonode.ldap.bind_password | quote }}
   LDAP_USER_SEARCH_DN: {{ .Values.geonode.ldap.user_search_dn | quote }}
   LDAP_USER_SEARCH_FILTERSTR: {{ .Values.geonode.ldap.user_search_filterstr | quote }}
   LDAP_ALWAYS_UPDATE_USER: {{ .Values.geonode.ldap.always_update_user | quote }}
@@ -175,8 +171,6 @@ data:
   GEOSERVER_PUBLIC_LOCATION: "{{ include "public_url" . }}/geoserver/"
   GEOSERVER_PUBLIC_SCHEMA: {{ .Values.geonode.general.externalScheme | quote }}
   GEOSERVER_LOCATION: "http://{{ include "geoserver_pod_name" . }}:{{ .Values.geoserver.port }}/geoserver/"
-  GEOSERVER_ADMIN_USER: {{ .Values.geoserver.admin_username | quote }}
-  GEOSERVER_ADMIN_PASSWORD: {{ .Values.geoserver.admin_password | quote }}
 
   OGC_REQUEST_TIMEOUT: {{ .Values.geonode.general.ogc_request_timeout | quote }}
   OGC_REQUEST_MAX_RETRIES: '1'
