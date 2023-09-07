@@ -32,20 +32,13 @@ geonode:
     print("tasks_post_script not defined ...")
 
   secret:
-    # -- the name of the secret to use
+    # -- name of the secret to use. Change, if you want to maintain them separately.
     name: geonode-secret
-    # -- Default contents of the secret
-    content: |
-      apiVersion: v1
-      kind: Secret
-      metadata:
-        name: geonode-secret
-      type: Opaque
-      data:
-        # superuser
-        ADMIN_USERNAME: {{ admin | base64 }}
-        ADMIN_PASSWORD: {{ geonode | base64 }}
-        ADMIN_EMAIL: {{ support@example.com | base64 }}
+    # -- Values of the Secret. If empty, the Secret will not be created from template. In this case, you have to either create the Secret on your own (you may choose a different name).
+    content:
+      username: admin
+      password: geonode
+      email: support@example.com
 
   resources:
     requests:
