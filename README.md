@@ -55,10 +55,9 @@ Install
 
 The chart will automatically install required dependencies, i.e. a RabbitMQ broker and a Postgres database with `postgis` extensions installed, and link them up.
 
-Table to map chart version to geonode version
-
-| GeoNode-k8s chart version | GeoNode version |
-| 1.0.0 | 4.1.2 |
+| GeoNode-k8s chart version | GeoNode version(s) | container image | 
+|---------------------------|-----------------|--------------------|
+| 1.0.0 | [4.1.2](https://github.com/GeoNode/geonode/releases/tag/4.1.2) | [52north/geonode:4.1.2](https://hub.docker.com/r/52north/geonode/tags)
 
 
 ## Install chart dependencies

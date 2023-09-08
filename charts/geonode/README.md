@@ -10,7 +10,7 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| mwallschlaeger | <marcel.wallschlaeger@zalf.de> |  |
+| mwallschlaeger | <marcel.wallschlaeger@zalf.de> | <https://github.com/mwallschlaeger> |
 
 ## Source Code
 
