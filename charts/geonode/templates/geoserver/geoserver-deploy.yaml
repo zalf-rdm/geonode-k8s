@@ -63,10 +63,10 @@ spec:
         - containerPort: {{ .Values.geoserver.port }}
 
         envFrom:
-          - configMapRef:
-              name:  {{ include "geoserver_pod_name" . }}-env
-          - secretRef:
-              name: {{ .Values.geoserver.secret.existingSecretName | "geoserver-secret" | quote }}
+        - configMapRef:
+            name:  {{ include "geoserver_pod_name" . }}-env
+        - secretRef:
+            name: {{ default "geoserver-secret" .Values.geoserver.secret.existingSecretName | quote }}
 
         env:
           # read auto generated password from secret

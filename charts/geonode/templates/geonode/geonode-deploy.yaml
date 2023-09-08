@@ -87,17 +87,17 @@ spec:
         - containerPort: 8001
 
         envFrom:
-          - configMapRef:
-              name: {{ include "geonode_pod_name" . }}-env
-          - secretRef:
-            name: {{ .Values.geonode.secret.existingSecretName | "geonode-secret" | quote }}
-          - secretRef:
-            name: {{ .Values.geoserver.secret.existingSecretName | "geoserver-secret" | quote }}
+        - configMapRef:
+            name: {{ include "geonode_pod_name" . }}-env
+        - secretRef:
+            name: {{ default "geonode-secret" .Values.geonode.secret.existingSecretName | quote }}
+        - secretRef:
+            name: {{ default "geoserver-secret" .Values.geoserver.secret.existingSecretName | quote }}
 
         env:
         - name: GEONODE_DATABASE_PASSWORD
           valueFrom:
-            secretKeyRef: 
+            secretKeyRef:
               name: {{ include "database_geonode_password_secret_key_ref" . }}
               key: password
         - name: GEONODE_GEODATABASE_PASSWORD
@@ -162,7 +162,6 @@ spec:
       # Celery is the task worker
       - name: {{ .Values.geonode.celery.container_name }}
         image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
-
         command:
         - bash
         - -c
@@ -180,6 +179,7 @@ spec:
           cd /usr/src/geonode-contribs/ldap; pip install --upgrade  -e .
           cd /usr/src/geonode/
           {{ end }}
+
           {{ if .Values.geonode.sentry.enabled }}
           pip install sentry-sdk
           {{ end }}
@@ -192,15 +192,17 @@ spec:
           dockerize -stdout /var/log/celery.log /usr/src/geonode/entrypoint.sh celery-cmd
 
         envFrom:
-          - configMapRef:
+        - configMapRef:
             name: {{ include "geonode_pod_name" . }}-env
-          - secretRef:
-            name: {{ .Values.geonode.secret.existingSecretName | "geonode-secret" | quote }}
+        - secretRef:
+            name: {{ default "geonode-secret" .Values.geonode.secret.existingSecretName | quote }}
+        - secretRef:
+            name: {{ default "geoserver-secret" .Values.geoserver.secret.existingSecretName | quote }}
 
         env:
         - name: GEONODE_DATABASE_PASSWORD
           valueFrom:
-            secretKeyRef: 
+            secretKeyRef:
               name: {{ include "database_geonode_password_secret_key_ref" . }}
               key: password
         - name: GEONODE_GEODATABASE_PASSWORD
