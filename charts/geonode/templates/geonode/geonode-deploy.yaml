@@ -192,6 +192,9 @@ spec:
               name: {{ include "geonode_pod_name" . }}-env
 
         env:
+        env:
+        - name: IS_CELERY
+          value: 'True'
         - name: GEONODE_DATABASE_PASSWORD
           valueFrom:
             secretKeyRef: 

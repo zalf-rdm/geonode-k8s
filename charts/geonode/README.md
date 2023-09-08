@@ -1,15 +1,21 @@
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/geonode-k8s)](https://artifacthub.io/packages/search?repo=geonode-k8s)
 # geonode-k8s
 
 ![Version: 4.1.0](https://img.shields.io/badge/Version-4.1.0-informational?style=flat-square)
 
-Helm Chart for Geonode
+Helm Chart for Geonode a web-based application and platform for developing geospatial information systems (GIS) and for deploying spatial data infrastructures (SDI)
 
-**Homepage:** <https://github.com/zalf-rdm/geonode-k8s>
+**Homepage:** <https://geonode.org/>
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| mwallschlaeger | <marcel.wallschlaeger@zalf.de> |  |
 
 ## Source Code
 
 * <https://github.com/zalf-rdm/geonode-k8s>
+* <https://github.com/geonode/geonode>
 
 ## Requirements
 
@@ -29,8 +35,8 @@ Helm Chart for Geonode
 | geonode.acme.enabled | bool | `false` | enables cert-manager to do ACME challenges (aka certificates via letsencrypt) |
 | geonode.acme.stageUrl | string | `"https://acme-staging-v02.api.letsencrypt.org/directory"` | ACME staging environment (use acme-staging to avoid running into rate limits) stageUrl: https://acme-v02.api.letsencrypt.org/directory |
 | geonode.celery.container_name | string | `"celery"` |  |
-| geonode.celery.resources.limits.cpu | int | `1` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| geonode.celery.resources.limits.memory | string | `"1Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| geonode.celery.resources.limits.cpu | int | `2` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| geonode.celery.resources.limits.memory | string | `"2Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.celery.resources.requests.cpu | int | `1` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.celery.resources.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.container_name | string | `"geonode"` | container name |
@@ -59,8 +65,8 @@ Helm Chart for Geonode
 | geonode.haystack.engine_index_name | string | `"haystack"` | hystack index name |
 | geonode.haystack.engine_url | string | `"http://elasticsearch:9200/"` | hystack url |
 | geonode.haystack.search_results_per_page | string | `"200"` | hystack results per page |
-| geonode.image.name | string | `"mwall2bitflow/geonode"` | used geonode image |
-| geonode.image.tag | string | `"4.1.x"` | tag of used geonode image |
+| geonode.image.name | string | `"52north/geonode"` | used geonode image |
+| geonode.image.tag | string | `"4.1.2"` | tag of used geonode image |
 | geonode.ingress.addNginxIngressAnnotation | bool | `false` | adds ingress annotations for nginx ingress class to increase uploadsize and timeout time |
 | geonode.ingress.enabled | bool | `true` | enables external access  |
 | geonode.ingress.externalDomain | string | `"geonode"` | external ingress hostname  |
@@ -187,9 +193,24 @@ Helm Chart for Geonode
 | postgres.operator_manifest.storageSize | string | `"3Gi"` | Database storage size |
 | postgres.schema | string | `"public"` | database schema |
 | postgres.username | string | `"postgres"` | postgres username |
+| pycsw | object | `{"config":"[server]\n    home=/home/pycsw\n    url=$(PYCSW_SERVER_URL)\n    mimetype=application/xml; charset=UTF-8\n    encoding=UTF-8\n    language= en-US\n    maxrecords=10\n    # loglevel=\n    # logfile=\n    # ogc_schemas_base=\n    # federatedcatalogues=\n    # pretty_print=\n    gzip_compresslevel=1\n    # domainquerytype=\n    # domaincounts=\n    # spatial_ranking=\n    profiles=apiso\n    # workers=\n    timeout=30\n[manager]\n    transactions=false\n    # allowed_ips=\n    # csw_harvest_pagesize=\n[metadata:main]\n    identification_title=GeoNode pycsw Geospatial Catalogue\n    identification_abstract=GeoNode-k8s pycsw Geospatial Catalogue\n    identification_keywords=catalogue,discovery,metadata, geonode\n    identification_keywords_type=theme\n    identification_fees=None\n    identification_accessconstraints=None\n    provider_name=GeoNode Kubernetes\n    provider_url=https://pycsw.org/\n    contact_name=Lastname, Firstname\n    contact_position=Position Title\n    contact_address=Mailing Address\n    contact_city=City\n    contact_stateorprovince=Administrative Area\n    contact_postalcode=Zip or Postal Code\n    contact_country=Country\n    contact_phone=+xx-xxx-xxx-xxxx\n    contact_fax=+xx-xxx-xxx-xxxx\n    contact_email=Email Address\n    contact_url=Contact URL\n    contact_hours=Hours of Service\n    contact_instructions=During hours of service.  Off on weekends.\n    contact_role=pointOfContact\n[repository]\n    database=${PYCSW_REPOSITORY_DATABASE_URI}\n    mappings=/etc/pycsw/pycsw-mappings.py\n    table=base_resourcebase\n    # filter=\n[metadata:inspire]\n    enabled=\"true\"\n    languages_supported=eng,gre\n    default_language=eng\n    date=YYYY-MM-DD\n    gemet_keywords=Utility and governmental services\n    conformity_service=notEvaluated\n    contact_name=Organization Name\n    contact_email=Email Address\n    temp_extent=YYYY-MM-DD/YYYY-MM-DD","container_name":"pycsw","enabled":true,"endpoint":"/catalogue/csw","image":{"name":"geopython/pycsw","tag":"2.6.1"},"mappings":"MD_CORE_MODEL = {\n  \"typename\": \"pycsw:CoreMetadata\",\n  \"outputschema\": \"http://pycsw.org/metadata\",\n  \"mappings\": {\n      \"pycsw:Identifier\": \"uuid\",\n      \"pycsw:Typename\": \"csw_typename\",\n      \"pycsw:Schema\": \"csw_schema\",\n      \"pycsw:MdSource\": \"csw_mdsource\",\n      \"pycsw:InsertDate\": \"csw_insert_date\",\n      \"pycsw:XML\": \"metadata_xml\",\n      \"pycsw:AnyText\": \"csw_anytext\",\n      \"pycsw:Language\": \"language\",\n      \"pycsw:Title\": \"title\",\n      \"pycsw:Abstract\": \"raw_abstract\",\n      \"pycsw:Keywords\": \"keyword_csv\",\n      \"pycsw:KeywordType\": \"keywordstype\",\n      \"pycsw:Format\": \"spatial_representation_type_string\",\n      \"pycsw:Source\": \"source\",\n      \"pycsw:Date\": \"date\",\n      \"pycsw:Modified\": \"date\",\n      \"pycsw:Type\": \"csw_type\",\n      \"pycsw:BoundingBox\": \"csw_wkt_geometry\",\n      \"pycsw:CRS\": \"csw_crs\",\n      \"pycsw:AlternateTitle\": \"alternate\",\n      \"pycsw:RevisionDate\": \"date\",\n      \"pycsw:CreationDate\": \"date\",\n      \"pycsw:PublicationDate\": \"date\",\n      \"pycsw:Organization\": \"organizationname\",\n      \"pycsw:OrganizationName\": \"organizationname\",\n      \"pycsw:SecurityConstraints\": \"securityconstraints\",\n      \"pycsw:ParentIdentifier\": \"parentidentifier\",\n      \"pycsw:TopicCategory\": \"topiccategory\",\n      \"pycsw:ResourceLanguage\": \"language\",\n      \"pycsw:GeographicDescriptionCode\": \"geodescode\",\n      \"pycsw:Denominator\": \"denominator\",\n      \"pycsw:DistanceValue\": \"distancevalue\",\n      \"pycsw:DistanceUOM\": \"distanceuom\",\n      \"pycsw:TempExtent_begin\": \"temporal_extent_start\",\n      \"pycsw:TempExtent_end\": \"temporal_extent_end\",\n      \"pycsw:ServiceType\": \"servicetype\",\n      \"pycsw:ServiceTypeVersion\": \"servicetypeversion\",\n      \"pycsw:Operation\": \"operation\",\n      \"pycsw:CouplingType\": \"couplingtype\",\n      \"pycsw:OperatesOn\": \"operateson\",\n      \"pycsw:OperatesOnIdentifier\": \"operatesonidentifier\",\n      \"pycsw:OperatesOnName\": \"operatesoname\",\n      \"pycsw:Degree\": \"degree\",\n      \"pycsw:AccessConstraints\": \"restriction_code\",\n      \"pycsw:OtherConstraints\": \"raw_constraints_other\",\n      \"pycsw:Classification\": \"classification\",\n      \"pycsw:ConditionApplyingToAccessAndUse\": \"conditionapplyingtoaccessanduse\",\n      \"pycsw:Lineage\": \"lineage\",\n      \"pycsw:ResponsiblePartyRole\": \"responsiblepartyrole\",\n      \"pycsw:SpecificationTitle\": \"specificationtitle\",\n      \"pycsw:SpecificationDate\": \"specificationdate\",\n      \"pycsw:SpecificationDateType\": \"specificationdatetype\",\n      \"pycsw:Creator\": \"creator\",\n      \"pycsw:Publisher\": \"publisher\",\n      \"pycsw:Contributor\": \"contributor\",\n      \"pycsw:Relation\": \"relation\",\n      \"pycsw:Links\": \"download_links\",\n  },\n}","pod_name":"pysw","port":8000,"replicaCount":1,"resources":{"limits":{"cpu":"500m","memory":"1Gi"},"requests":{"cpu":"500m","memory":"1Gi"}}}` | pycsw integration is based on https://github.com/geopython/pycsw/blob/master/docker/kubernetes |
+| pycsw.container_name | string | `"pycsw"` | pycsw container name |
+| pycsw.enabled | bool | `true` | enable single pycsw pod |
+| pycsw.endpoint | string | `"/catalogue/csw"` | pycsw url below geonode.ingress.externalDomain |
+| pycsw.image.name | string | `"geopython/pycsw"` | pycsw docker image |
+| pycsw.image.tag | string | `"2.6.1"` | pycsw docker image tag |
+| pycsw.mappings | string | `"MD_CORE_MODEL = {\n  \"typename\": \"pycsw:CoreMetadata\",\n  \"outputschema\": \"http://pycsw.org/metadata\",\n  \"mappings\": {\n      \"pycsw:Identifier\": \"uuid\",\n      \"pycsw:Typename\": \"csw_typename\",\n      \"pycsw:Schema\": \"csw_schema\",\n      \"pycsw:MdSource\": \"csw_mdsource\",\n      \"pycsw:InsertDate\": \"csw_insert_date\",\n      \"pycsw:XML\": \"metadata_xml\",\n      \"pycsw:AnyText\": \"csw_anytext\",\n      \"pycsw:Language\": \"language\",\n      \"pycsw:Title\": \"title\",\n      \"pycsw:Abstract\": \"raw_abstract\",\n      \"pycsw:Keywords\": \"keyword_csv\",\n      \"pycsw:KeywordType\": \"keywordstype\",\n      \"pycsw:Format\": \"spatial_representation_type_string\",\n      \"pycsw:Source\": \"source\",\n      \"pycsw:Date\": \"date\",\n      \"pycsw:Modified\": \"date\",\n      \"pycsw:Type\": \"csw_type\",\n      \"pycsw:BoundingBox\": \"csw_wkt_geometry\",\n      \"pycsw:CRS\": \"csw_crs\",\n      \"pycsw:AlternateTitle\": \"alternate\",\n      \"pycsw:RevisionDate\": \"date\",\n      \"pycsw:CreationDate\": \"date\",\n      \"pycsw:PublicationDate\": \"date\",\n      \"pycsw:Organization\": \"organizationname\",\n      \"pycsw:OrganizationName\": \"organizationname\",\n      \"pycsw:SecurityConstraints\": \"securityconstraints\",\n      \"pycsw:ParentIdentifier\": \"parentidentifier\",\n      \"pycsw:TopicCategory\": \"topiccategory\",\n      \"pycsw:ResourceLanguage\": \"language\",\n      \"pycsw:GeographicDescriptionCode\": \"geodescode\",\n      \"pycsw:Denominator\": \"denominator\",\n      \"pycsw:DistanceValue\": \"distancevalue\",\n      \"pycsw:DistanceUOM\": \"distanceuom\",\n      \"pycsw:TempExtent_begin\": \"temporal_extent_start\",\n      \"pycsw:TempExtent_end\": \"temporal_extent_end\",\n      \"pycsw:ServiceType\": \"servicetype\",\n      \"pycsw:ServiceTypeVersion\": \"servicetypeversion\",\n      \"pycsw:Operation\": \"operation\",\n      \"pycsw:CouplingType\": \"couplingtype\",\n      \"pycsw:OperatesOn\": \"operateson\",\n      \"pycsw:OperatesOnIdentifier\": \"operatesonidentifier\",\n      \"pycsw:OperatesOnName\": \"operatesoname\",\n      \"pycsw:Degree\": \"degree\",\n      \"pycsw:AccessConstraints\": \"restriction_code\",\n      \"pycsw:OtherConstraints\": \"raw_constraints_other\",\n      \"pycsw:Classification\": \"classification\",\n      \"pycsw:ConditionApplyingToAccessAndUse\": \"conditionapplyingtoaccessanduse\",\n      \"pycsw:Lineage\": \"lineage\",\n      \"pycsw:ResponsiblePartyRole\": \"responsiblepartyrole\",\n      \"pycsw:SpecificationTitle\": \"specificationtitle\",\n      \"pycsw:SpecificationDate\": \"specificationdate\",\n      \"pycsw:SpecificationDateType\": \"specificationdatetype\",\n      \"pycsw:Creator\": \"creator\",\n      \"pycsw:Publisher\": \"publisher\",\n      \"pycsw:Contributor\": \"contributor\",\n      \"pycsw:Relation\": \"relation\",\n      \"pycsw:Links\": \"download_links\",\n  },\n}"` | pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/ |
+| pycsw.pod_name | string | `"pysw"` | pycsw pod name |
+| pycsw.port | int | `8000` | pycsw endpoint port |
+| pycsw.replicaCount | int | `1` | pycsw container replicas |
+| pycsw.resources.limits.cpu | string | `"500m"` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| pycsw.resources.limits.memory | string | `"1Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| pycsw.resources.requests.cpu | string | `"500m"` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| pycsw.resources.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | rabbitmq | object | `{"auth":{"erlangCookie":"jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu","password":"rabbitpassword","username":"rabbituser"},"enabled":true,"limits":{"cpu":"750m","memory":"1Gi"},"persistence":{"enabled":false},"replicaCount":1,"requests":{"cpu":"500m","memory":"1Gi"}}` | VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml |
 | rabbitmq.limits.cpu | string | `"750m"` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | rabbitmq.limits.memory | string | `"1Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| rabbitmq.replicaCount | int | `1` | rabbitmq raplica count |
 | rabbitmq.requests.cpu | string | `"500m"` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | rabbitmq.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 
