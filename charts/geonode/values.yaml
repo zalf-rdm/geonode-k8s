@@ -251,7 +251,7 @@ geonode:
     # -- If True, new user accounts will be created as inactive. The user must use the activation link to activate his account.
     conformation_required: True
     # -- Specifies the login method to use – whether the user logs in by entering their username, e-mail address, or either one of both. Setting this to “email” requires email_required=True
-    authentication_method: "user_email"
+    authentication_method: "username_email"
     # -- group name to add new registered users to, requires auto_assign_registered_members_to_registered: True.
     registered_members_group_name:
     # -- if set to True new registered user will be add to defined group in registered_members_group_name
