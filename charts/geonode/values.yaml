@@ -4,7 +4,7 @@ global:
   # -- storage access mode used by helm dependency pvc
   accessMode: ReadWriteMany
 
-  
+
 # geonode configuration
 geonode:
   # -- pod name
@@ -589,9 +589,12 @@ postgres:
     enabled: False
     hostname: my-external-postgres.com
     port: 5432
-    postgres_password: postgres
-    geonode_password: geonode
-    geodata_password: geogeonode
+    secret:
+      # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
+      existingSecretName: ""
+      postgres_password: postgres
+      geonode_password: geonode
+      geodata_password: geogeonode
 
 # VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator/values.yaml
 postgres-operator:
