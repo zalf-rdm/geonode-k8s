@@ -1,18 +1,31 @@
 # Maintain Secrets
 
 Ensure to put confidential settings in a Kubernetes Secret.
-By default, each service provides a secret template which is filled by the `secret.content` value given in the `values.yaml` for each component.
+By default, each service provides a secret template which is filled by the values within the `secret` section given in the `values.yaml` for each component.
 
 In your `values.yaml` you have two options:
 
-1. Override the `secret.content` to set project specific secrets
-1. Create custom Kubernetes Secrets and configure `secret.name` accordingly
+1. Set the secret values directly within the `secret` section
+1. Override the `secret.existingSecretName` to reference a secret which you maintain separately
+ 
 
 > :bulb: **Note:**
 >
 > Make sure to not expose your secrets, e.g. via Git! 
 > Consider to pass secrets from a CD pipeline via masked environment settings.
-> By referencing a custom Secret (leaving `secret.content` empty), you would have to create and maintain a Secret by yourself.
+
+Consult the documentation of Chart dependedncies how this is there (most of them handle it similarly).
+For RabbitMQ you can provide externally managed Secrets as declared[in the `auth` section of the rabbitmq config](https://github.com/bitnami/charts/blob/main/bitnami/rabbitmq/values.yaml#L130):
+
+```yaml
+rabbitmq:
+  auth:
+    username: rabbituser
+    existingPasswordSecret: "rabbitmq-password-secret"
+    existingErlangSecret: "rabbitmq-erlang-secret"
+
+```
+
 
 ## Tooling
 
