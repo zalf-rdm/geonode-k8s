@@ -23,7 +23,7 @@ spec:
         image: "{{ .Values.nginx.image.name }}:{{ .Values.nginx.image.tag }}"
 
         ports:
-        {{- if (eq .Values.geonode.ingress.externalScheme "https" )}}
+        {{- if (eq .Values.geonode.general.externalScheme "https" )}}
         - containerPort: 443
           name: https
         {{- else }}

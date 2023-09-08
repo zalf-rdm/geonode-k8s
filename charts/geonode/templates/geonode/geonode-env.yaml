@@ -34,7 +34,7 @@ data:
   CACHE_BUSTING_MEDIA_ENABLED: 'False'
 
   GEONODE_INSTANCE_NAME: {{ .Release.Name }}
-  GEONODE_LB_HOST_IP: {{ .Values.geonode.ingress.externalDomain | quote }}
+  GEONODE_LB_HOST_IP: {{ .Values.geonode.general.externalDomain | quote }}
   GEONODE_DB_CONN_MAX_AGE: '0'
   GEONODE_DB_CONN_TOUT: '5'
 
@@ -43,8 +43,8 @@ data:
 
   # DJANGO SITE CONF
   SITEURL: "{{ include "public_url" . }}/"
-  SITE_HOST_SCHEMA: {{ .Values.geonode.ingress.externalScheme | quote }}
-  ALLOWED_HOSTS: "['django', '*', '{{ .Values.geonode.ingress.externalDomain }}']"
+  SITE_HOST_SCHEMA: {{ .Values.geonode.general.externalScheme | quote }}
+  ALLOWED_HOSTS: "['django', '*', '{{ .Values.geonode.general.externalDomain }}']"
   PROXY_ALLOWED_HOSTS: 'localhost,django,geonode,geoserver,spatialreference.org,nominatim.openstreetmap.org,dev.openlayers.org'
 
   # Admin Settings
@@ -178,7 +178,7 @@ data:
   # GEOSERVER CONFIGURATION #
   GEOSERVER_WEB_UI_LOCATION: "{{ include "public_url" . }}/geoserver/"
   GEOSERVER_PUBLIC_LOCATION: "{{ include "public_url" . }}/geoserver/"
-  GEOSERVER_PUBLIC_SCHEMA: {{ .Values.geonode.ingress.externalScheme | quote }}
+  GEOSERVER_PUBLIC_SCHEMA: {{ .Values.geonode.general.externalScheme | quote }}
   GEOSERVER_LOCATION: "http://{{ include "geoserver_pod_name" . }}:{{ .Values.geoserver.port }}/geoserver/"
   GEOSERVER_ADMIN_USER: {{ .Values.geoserver.admin_username | quote }}
   GEOSERVER_ADMIN_PASSWORD: {{ .Values.geoserver.admin_password | quote }}
