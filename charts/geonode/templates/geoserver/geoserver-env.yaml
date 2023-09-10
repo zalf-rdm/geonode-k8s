@@ -17,6 +17,3 @@ data:
   DATABASE_PORT: "{{ include "database_port" . }}"
   GEONODE_GEODATABASE: {{ .Values.postgres.geonode_databasename_and_username | quote  }}
   GEONODE_GEODATABASE_SCHEMA: {{ .Values.postgres.schema | quote }}
-
-  GEOSERVER_ADMIN_USER: {{ .Values.geoserver.admin_username | quote }}
-  GEOSERVER_ADMIN_PASSWORD: {{ .Values.geoserver.admin_password | quote }}
