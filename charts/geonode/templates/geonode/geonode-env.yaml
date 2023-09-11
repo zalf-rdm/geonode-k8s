@@ -34,7 +34,7 @@ data:
   CACHE_BUSTING_MEDIA_ENABLED: 'False'
 
   GEONODE_INSTANCE_NAME: {{ .Release.Name }}
-  GEONODE_LB_HOST_IP: {{ .Values.geonode.ingress.externalDomain | quote }}
+  GEONODE_LB_HOST_IP: {{ .Values.geonode.general.externalDomain | quote }}
   GEONODE_DB_CONN_MAX_AGE: '0'
   GEONODE_DB_CONN_TOUT: '5'
 
@@ -43,14 +43,9 @@ data:
 
   # DJANGO SITE CONF
   SITEURL: "{{ include "public_url" . }}/"
-  SITE_HOST_SCHEMA: {{ .Values.geonode.ingress.externalScheme | quote }}
-  ALLOWED_HOSTS: "['django', '*', '{{ .Values.geonode.ingress.externalDomain }}']"
+  SITE_HOST_SCHEMA: {{ .Values.geonode.general.externalScheme | quote }}
+  ALLOWED_HOSTS: "['django', '*', '{{ .Values.geonode.general.externalDomain }}']"
   PROXY_ALLOWED_HOSTS: 'localhost,django,geonode,geoserver,spatialreference.org,nominatim.openstreetmap.org,dev.openlayers.org'
-
-  # Admin Settings
-  ADMIN_USERNAME: {{ .Values.geonode.general.superUser.username | quote }}
-  ADMIN_EMAIL: {{ .Values.geonode.general.superUser.email | quote }}
-  ADMIN_PASSWORD: {{ .Values.geonode.general.superUser.password | quote }}
 
   # General settings
   FREETEXT_KEYWORDS_READONLY: {{ include "boolean2str" .Values.geonode.general.freetext_keywords_readonly | quote }}
@@ -71,11 +66,8 @@ data:
   DJANGO_EMAIL_BACKEND: {{ .Values.geonode.mail.backend | quote }}
   DJANGO_EMAIL_HOST: {{ .Values.geonode.mail.host | quote }}
   DJANGO_EMAIL_PORT: {{ .Values.geonode.mail.port | quote }}
-  DJANGO_EMAIL_HOST_USER: {{ .Values.geonode.mail.user | quote }}
-  DJANGO_EMAIL_HOST_PASSWORD: {{ .Values.geonode.mail.password | quote }}
   DJANGO_EMAIL_USE_TLS: {{ include "boolean2str" .Values.geonode.mail.tls | quote }}
   DJANGO_EMAIL_USE_SSL: {{ include "boolean2str" .Values.geonode.mail.use_ssl | quote }}
-  DEFAULT_FROM_EMAIL: {{ .Values.geonode.mail.from | quote }}
 
   # PATH
   # TODO (mwall) allign with volumeMount locations
@@ -115,7 +107,6 @@ data:
   LDAP_ENABLED:  {{ include "boolean2str" .Values.geonode.ldap.enabled | quote }}
   LDAP_SERVER_URL: {{ .Values.geonode.ldap.uri | quote }}
   LDAP_BIND_DN: {{ .Values.geonode.ldap.bind_dn | quote }}
-  LDAP_BIND_PASSWORD: {{ .Values.geonode.ldap.bind_password | quote }}
   LDAP_USER_SEARCH_DN: {{ .Values.geonode.ldap.user_search_dn | quote }}
   LDAP_USER_SEARCH_FILTERSTR: {{ .Values.geonode.ldap.user_search_filterstr | quote }}
   LDAP_ALWAYS_UPDATE_USER: {{ .Values.geonode.ldap.always_update_user | quote }}
@@ -127,6 +118,13 @@ data:
   LDAP_USER_ATTR_MAP_LAST_NAME: {{ .Values.geonode.ldap.attr_map_last_name | quote }}
   LDAP_USER_ATTR_MAP_EMAIL_ADDR: {{ .Values.geonode.ldap.attr_map_email_addr | quote }}
 
+  # Configure PYCSW
+  {{ if .Values.pycsw.enabled }}
+  CATALOGUE_ENGINE: geonode.catalogue.backends.pycsw_http
+  CATALOGUE_URL: "http://{{ include "pycsw_pod_name" . }}:{{ .Values.pycsw.port }}"
+  {{ else }}
+  CATALOGUE_ENGINE: geonode.catalogue.backends.pycsw_local
+  {{ end}}
   # OAuth2
   # TODO (mwall) implement OAUTH2
   OAUTH2_API_KEY: ""
@@ -171,10 +169,8 @@ data:
   # GEOSERVER CONFIGURATION #
   GEOSERVER_WEB_UI_LOCATION: "{{ include "public_url" . }}/geoserver/"
   GEOSERVER_PUBLIC_LOCATION: "{{ include "public_url" . }}/geoserver/"
-  GEOSERVER_PUBLIC_SCHEMA: {{ .Values.geonode.ingress.externalScheme | quote }}
+  GEOSERVER_PUBLIC_SCHEMA: {{ .Values.geonode.general.externalScheme | quote }}
   GEOSERVER_LOCATION: "http://{{ include "geoserver_pod_name" . }}:{{ .Values.geoserver.port }}/geoserver/"
-  GEOSERVER_ADMIN_USER: {{ .Values.geoserver.admin_username | quote }}
-  GEOSERVER_ADMIN_PASSWORD: {{ .Values.geoserver.admin_password | quote }}
 
   OGC_REQUEST_TIMEOUT: {{ .Values.geonode.general.ogc_request_timeout | quote }}
   OGC_REQUEST_MAX_RETRIES: '1'

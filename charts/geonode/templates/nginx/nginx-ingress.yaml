@@ -1,3 +1,6 @@
+
+{{if (eq .Values.geonode.ingress.enabled true) }}
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -16,14 +19,14 @@ metadata:
     {{ end }}
 spec:
   ingressClassName: {{ .Values.geonode.ingress.ingressClassName }}
-  {{ if (eq .Values.geonode.ingress.externalScheme "https") }}
+  {{ if (eq .Values.geonode.general.externalScheme "https") }}
   tls:
   - hosts:
-    -  {{ .Values.geonode.ingress.externalDomain }}
+    -  {{ .Values.geonode.general.externalDomain }}
     secretName: {{ .Values.geonode.ingress.tlsSecret }}
   {{ end }}
   rules:
-  - host: {{ .Values.geonode.ingress.externalDomain }}
+  - host: {{ .Values.geonode.general.externalDomain }}
     http:
       paths:
       - pathType: Prefix
@@ -52,8 +55,11 @@ spec:
     solvers:
     - selector:
         dnsNames:
-          - {{ .Values.geonode.ingress.externalDomain }}
+          - {{ .Values.geonode.general.externalDomain }}
       http01:
         ingress:
           ingressClassName: {{ .Values.geonode.ingress.ingressClassName }}
+{{ end }}
+
+
 {{ end }}

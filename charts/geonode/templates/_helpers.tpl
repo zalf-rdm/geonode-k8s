@@ -1,5 +1,4 @@
 
-
 # define pod names (equal service names)
 {{- define "geoserver_pod_name" -}}
 {{ .Release.Name }}-{{ .Values.geoserver.pod_name }}
@@ -17,11 +16,7 @@
 {{ .Release.Name }}-{{ .Values.nginx.pod_name }}
 {{- end -}}
 
-
-
 # Database definitions
-
-
 {{- define "database_hostname" -}}
 {{- if (index .Values "postgres-operator" "enabled") -}}
 {{ include "postgres_pod_name" . }}
@@ -47,7 +42,7 @@
 {{- end -}}
 {{- end -}}
 
-# secret key reference for the password of user:  .Values.postgres.geonodedatabase_and_username
+# secret key reference for the password of user:  .Values.postgres.geonode_databasename_and_username
 {{- define "database_geonode_password_secret_key_ref" -}}
 {{- if (index .Values "postgres-operator" "enabled") -}}
 "{{ .Values.postgres.geonode_databasename_and_username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do"
@@ -56,7 +51,7 @@
 {{- end -}}
 {{- end -}}
 
-# secret key reference for the password of user: .Values.postgres.geodatabasename_and_username
+# secret key reference for the password of user: .Values.postgres.geonode_databasename_and_username
 {{- define "database_geodata_password_secret_key_ref" -}}
 {{- if (index .Values "postgres-operator" "enabled") -}}
 "{{ .Values.postgres.geodata_databasename_and_username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do"
@@ -64,15 +59,16 @@
 "{{ .Release.Name }}-geodata-external-secrets"
 {{- end -}}
 {{- end -}}
+{{- define "pycsw_pod_name" -}}
+{{ .Release.Name }}-{{ .Values.pycsw.pod_name }}
+{{- end -}}
 
 # Volume names
 {{- define "persistant_volume_name" -}}
 persistence
 {{- end -}}
 
-
 # ports and endpoints
-
 {{- define "rabbit_host" -}}
 {{ .Release.Name }}-rabbitmq:5672
 {{- end -}}
@@ -82,9 +78,8 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
 {{- end -}}
 
 {{- define "public_url" -}}
-{{ .Values.geonode.ingress.externalScheme }}://{{ .Values.geonode.ingress.externalDomain }}
+{{ .Values.geonode.general.externalScheme }}://{{ .Values.geonode.general.externalDomain }}
 {{- end -}}
-
 
 # function
 {{- define "boolean2str" -}}

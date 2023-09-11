@@ -1,5 +1,5 @@
 
-![Version: 4.1.x](https://img.shields.io/badge/Version-4.1.x-informational?style=flat-square)
+![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square)
 
 # Helm Chart for Geonode
 
@@ -26,7 +26,7 @@ Due to growing needs for high availability and scalability this repository aims 
 Geonode-k8s
 -----------
 
-This repository provides a helm chart for **geonode(4.1.x)** including additional services as:
+This repository provides a helm chart for **geonode(4.1.2)** including additional services as:
 - geoserver: source server for sharing geospatial data  (https://geoserver.org/)
 - rabbitmq: message broker (scalable)
 - postgresql database: using zalando postgres-operator for distributed database for geonode and postgis db for geoserver (https://github.com/zalando/postgres-operator) (scalable)
@@ -35,7 +35,7 @@ This repository provides a helm chart for **geonode(4.1.x)** including additiona
 
 This helm chart provides the possibility to run most of the services redundant to increase performance on the one hand and increase fail safe on the other hand.
 
-To get an overview of the available configuration check out the values [docs](deployment/geonode/README.md). If you want to run the helm chart first on a minikube cluster check out the [minikube](docs/minikube-installation.md) guide. Also check the minikube-values.yaml for basic configuration. 
+To get an overview of the available configuration check out the values [docs](charts/geonode/README.md). If you want to run the helm chart first on a minikube cluster check out the [minikube](docs/minikube-installation.md) guide. Also check the minikube-values.yaml for basic configuration. 
 
 If you want to go straight for a production installation follow the [installation](#install) guide.
 
@@ -54,18 +54,23 @@ Install
 * [Helm](https://helm.sh/)
 
 The chart will automatically install required dependencies, i.e. a RabbitMQ broker and a Postgres database with `postgis` extensions installed, and link them up.
-This helm chart now supports geonode v4.1.x.
+
+| GeoNode-k8s chart version | GeoNode version(s) | geonode container image | geoserver container image | 
+|---------------------------|--------------------|-------------------------|---------------------------|
+| 1.0.0 | [4.1.2](https://github.com/GeoNode/geonode/releases/tag/4.1.2) | [52north/geonode:4.1.2](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
+
 
 ## Install chart dependencies
 
 Update helm dependencies via:
 
 ```bash
-helm dependency update deployment/geonode
+helm repo add geonode https://zalf-rdm.github.io/geonode-k8s/
+helm repo update
 ```
 
 ## Override desired values in your own override file
-Define your own values.yaml to configure your geonode installation. Use the [docs](deployment/geonode/README.md) to understand the parameters.
+Define your own values.yaml to configure your geonode installation. Use the [docs](charts/geonode/README.md) to understand the parameters.
 
 ```bash
 vi my-values.yaml
@@ -73,12 +78,12 @@ vi my-values.yaml
 
 ## Install chart
 ```bash
-helm upgrade --cleanup-on-fail   --install --namespace geonode --create-namespace --values my-values.yaml geonode deployment/geonode
+helm upgrade --cleanup-on-fail   --install --namespace geonode --create-namespace --values my-values.yaml geonode charts/geonode
 ```
 
 ## Delete Installation
 ```bash
-helm delete --namespace geonode geonode deployment/geonode
+helm delete --namespace geonode geonode charts/geonode
 ```
 
 ## Contribution
@@ -93,7 +98,7 @@ Feel free to [create an issue](https://github.com/zalf-rdm/geonode-k8s/issues/ne
 ### Documentation
 
 Ensure values.yaml documentation is up-to-date. 
-The [parameter documentation](deployment/geonode/README.md) is generated via [`helm-docs`](https://github.com/norwoodj/helm-docs).
+The [parameter documentation](charts/geonode/README.md) is generated via [`helm-docs`](https://github.com/norwoodj/helm-docs).
 There is a pre-commit hook configuration so please ensure you install it into your local working copy via 
 
 ```

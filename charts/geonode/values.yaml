@@ -1,0 +1,643 @@
+global:
+  # -- storageClass used by helm dependencies pvc
+  storageClass:
+  # -- storage access mode used by helm dependency pvc
+  accessMode: ReadWriteMany
+
+
+# geonode configuration
+geonode:
+  # -- pod name
+  pod_name: geonode
+  # -- container name
+  container_name: geonode
+  # -- number of geonode replicas (! not working properly yet)
+  replicaCount: 1
+
+  persistant:
+    # -- size of persistant geonode storage
+    storageSize: 10Gi
+
+  image:
+    # -- used geonode image
+    name: 52north/geonode
+    # -- tag of used geonode image
+    tag: '4.1.2'
+
+  # -- additions to tasks.py init script, must be additional code written in python
+  tasks_pre_script: |
+    print("tasks_pre_script not defined ...")
+  # -- additions to tasks.py script at the beginning of the tasks.py, must be additional code written in python
+  tasks_post_script: |
+    print("tasks_post_script not defined ...")
+
+  secret:
+    # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
+    existingSecretName: ""
+    superUser:
+      # -- admin username
+      username: admin
+      # -- admin panel password
+      password: geonode
+      # -- admin user password
+      email: support@example.com
+    mail:
+      # -- define mail user to send mails from
+      user: "changeme"
+      # -- set password for mailuser in geonode
+      password: "changeme"
+      # -- define from mail-addr 
+      from: "changeme@web.de"
+    ldap:
+      # -- ldap password
+      bind_password: password
+
+
+  resources:
+    requests:
+      # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "1Gi"
+      # -- requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: 1
+    limits:
+      # -- limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "2Gi"
+      # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: 2
+
+  ingress:
+    # -- enables external access 
+    enabled: True
+    # -- define kubernetes ingress class for geonode ingress
+    ingressClassName:
+    # -- adds ingress annotations for nginx ingress class to increase uploadsize and timeout time
+    addNginxIngressAnnotation: false
+    # -- tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/ (for the use of cert-manager, configure the acme section properly). is used when geonode.general.externalScheme is set to 'https'
+    tlsSecret: geonode-tls-secret
+
+  acme:
+    # -- enables cert-manager to do ACME challenges (aka certificates via letsencrypt)
+    enabled: False
+    # -- the email to be used to gain certificates
+    email: support@example.com
+    # -- ACME staging environment (use acme-staging to avoid running into rate limits)
+    #stageUrl: https://acme-v02.api.letsencrypt.org/directory
+    stageUrl: https://acme-staging-v02.api.letsencrypt.org/directory
+
+  sentry:
+    # -- enable sentry integration for geonode
+    enabled: False
+    # -- sentry dsn url
+    dsn: ""
+    # -- sentry environment
+    environment: "development"
+    # -- sentry build number
+    build_number: 0
+
+  uwsgi:
+    # --  the max size of a request (request-body excluded)
+    buffer_size: 32768
+    # -- forcefully kill workers after 60 seconds (MOSTLY REASON FOR TIMEOUTS WHILE UPLOAD)
+    harakiri: 800
+    # -- Restart workers after this many requests
+    max_requests: 1000
+    # -- Restart workers after this many seconds
+    max_worker_lifetime: 3600
+    # -- Restart workers after this much resident memory
+    reload_on_rss: 2048
+    # -- How long to wait before forcefully killing workers
+    worker_reload_mercy: 60
+
+    # -- Maximum number of workers allowed
+    processes: 128
+    # -- Minimum number of workers allowed
+    cheaper: 8
+    # -- Workers created at startup
+    cheaper_initial: 16
+    # -- Length of a cycle in seconds
+    cheaper_overload: 1
+    # -- How many workers to spawn at a time
+    cheaper_step: 16
+    # -- How many cycles to wait before killing workers
+    cheaper_busyness_multiplier: 30
+    # -- Below this threshold, kill workers (if stable for multiplier cycles)
+    cheaper_busyness_min: 20
+    # -- Above this threshold, spawn new workers
+    cheaper_busyness_max: 70
+    # -- Spawn emergency workers if more than this many requests are waiting in the queue
+    cheaper_busyness_backlog_alert: 16
+    # -- How many emergency workers to create if there are too many requests in the queue
+    cheaper_busyness_backlog_step: 2
+
+  general:
+
+    # -- external ingress schema. If set to 'https', make sure to configure TLS either by 
+    # configuring tls certificate or using cert-manager. Available options: (http|https)
+    externalScheme: http
+    # -- external ingress hostname 
+    externalDomain: geonode
+
+    # -- max upload document size in MB
+    max_document_size: 10
+    # -- to describe
+    api_limit_per_page: 1000
+    # -- django debug mode
+    debug: False
+    # -- enable django static debug
+    debug_static: False
+    # -- the settings module to load
+    settings_module: geonode.settings
+
+    # -- FREETEXT_KEYWORDS_READONLY Make Free-Text Keywords writable from users. Or read-only when set to False.
+    freetext_keywords_readonly: false
+    # -- OGC_REQUEST_TIMEOUT
+    ogc_request_timeout: 600
+    # -- OGC_REQUEST_MAX_RETRIES
+    ogc_request_max_retries: 1
+    # -- OGC_REQUEST_BACKOFF_FACTOR
+    ogc_request_backoff_factor: 0.3
+    # -- OGC_REQUEST_POOL_MAXSIZE
+    ogc_request_pool_maxsize: 10
+    # -- OGC_REQUEST_POOL_CONNECTIONS
+    ogc_request_pool_connections: 10
+
+    publishing:
+      # -- RESOURCE_PUBLISHING By default, the GeoNode application allows GeoNode staff members to publish/unpublish resources.
+      # By default, resources are published when created. When this setting is set to True the staff members will be able to unpublish
+      # a resource (and eventually publish it back).
+      resource_publishing_by_staff: false
+      # -- ADMIN_MODERATE_UPLOADS When this variable is set to True, every uploaded resource must be approved before becoming visible to the public users.
+      # Until a resource is in PENDING APPROVAL state, only the superusers, owner and group members can access it, unless specific edit permissions have been set for other users or groups.
+      # A Group Manager can approve the resource, but he cannot publish it whenever the setting RESOURCE_PUBLISHING is set to True. Otherwise,
+      # if RESOURCE_PUBLISHING (helm: resource_publishing_by_staff) is set to False, the resource becomes accessible as soon as it is approved.
+      admin_moderate_uploads: false
+
+    display:
+      # -- DISPLAY_RATINGS If set to False ratings are hidden.
+      rating: true
+      # -- DISPLAY_COMMENTS If set to False comments are hidden.
+      comments: true
+      # -- DISPLAY_SOCIAL If set to False social sharing is hidden.
+      social: true
+      # -- DISPLAY_WMS_LINKS If set to False direct WMS link to GeoServer is hidden.
+      wms_link: true
+      # -- DISPLAY_ORIGINAL_DATASET_LINK If set to False original dataset download is hidden.
+      dataset_link: true
+
+  mail:
+    # -- enables mail configuration for geonode
+    enabled: False
+    # -- set mail backend in geonode settings
+    backend: "django.core.mail.backends.smtp.EmailBackend"
+    # -- set mail host for genode mail
+    host: smtp.gmail.com
+    # -- mail port fo geonode mail
+    port: '587'
+    # -- activate tls for geonode mail (only tls or ssl can be true not both)
+    tls: true
+    # -- enable ssl for geonode mail (only tls or ssl can be true not both)
+    use_ssl: False
+
+  ldap:
+    # -- enable ldap AUTHENTICATION_BACKENDS in DJANGO Geonode
+    enabled: False
+    # -- ldap uri
+    uri: ldap://example.com
+    # -- ldap user bind dn
+    bind_dn: "CN=Users,DC=ad,DC=example,DC=com"
+    # -- ldap user search dn
+    user_search_dn: "OU=User,DC=ad,DC=example,DC=com"
+    # -- ldap user filterstr
+    user_search_filterstr: "(sAMAccountName=%(user)s)"
+    # -- Mirror groups with ldap (see https://docs.geonode.org/en/master/advanced/contrib/index.html)
+    mirror_groups: True
+    # -- always update local user database from ldap
+    always_update_user: True
+    # -- TODO ADD mirror groups_except AUTH_LDAP_MIRROR_GROUPS_EXCEPT
+    # mirror_groups_except: 
+    # -- ldap group search dn
+    group_search_dn: "OU=Groups,DC=ad,DC=example,DC=com"
+    # -- ldap group filterstr
+    group_search_filterstr: "(objectClass=group)"
+    # -- given name attribute used from ldap
+    attr_map_first_name: "givenName"
+    # -- last name attribute used from ldap
+    attr_map_last_name: "sn"
+    # -- email attribute used from ldap 
+    attr_map_email_addr: mailPrimaryAddress
+
+  # -- Find docs for register values under:
+  # - https://docs.geonode.org/en/3.3.x/basic/settings/index.html 
+  # - https://github.com/pinax/django-user-accounts/blob/master/docs/settings.rst
+  # - https://django-allauth.readthedocs.io/en/latest/configuration.html
+  # @ignored
+  register:
+    # -- allow user registration on geonode
+    # Default: True
+    # If True, creation of new accounts is allowed. When the signup view is called, the template account/signup.html will be displayed, usually showing a form to collect the new user data.
+    # If False, creation of new accounts is disabled. When the signup view is called, the template account/signup_closed.html will be displayed.
+    open_signup: True
+    # -- set email as required for registration
+    email_required: True
+    # -- approve given email with registration
+    approval_required: False
+    # -- send confirm email on get
+    confirm_email_on_get: True
+    # -- enable email verification
+    # Determines the e-mail verification method during signup – choose one of "mandatory", "optional", or "none".
+    # Setting this to “mandatory” requires email_required to be True
+    # When set to “mandatory” the user is blocked from logging in until the email address is verified. Choose “optional” or “none” to allow logins with an unverified e-mail address. In case of “optional”, the e-mail verification mail is still sent, whereas in case of “none” no e-mail verification mails are sent.
+    email_verification: "mandatory"
+    # -- If True, new user accounts will be created as inactive. The user must use the activation link to activate his account.
+    conformation_required: True
+    # -- Specifies the login method to use – whether the user logs in by entering their username, e-mail address, or either one of both. Setting this to “email” requires email_required=True
+    authentication_method: "username_email"
+    # -- group name to add new registered users to, requires auto_assign_registered_members_to_registered: True.
+    registered_members_group_name:
+    # -- if set to True new registered user will be add to defined group in registered_members_group_name
+    auto_assign_registered_members_to_registered: True
+    # -- show email addr in profile view
+    show_profile_email: True
+
+  # TODO add haystack chart
+  haystack:
+    # -- enable hystack
+    enabled: False
+    # -- hystack url
+    engine_url: http://elasticsearch:9200/
+    # -- hystack index name
+    engine_index_name: haystack
+    # -- hystack results per page
+    search_results_per_page: '200'
+
+  # configure memcached as django cache. .Values.memcached.... to configure memcached replicas, architecture and so on (see https://docs.djangoproject.com/en/4.0/topics/cache/)
+  memcached:
+    # -- enable memcache, this will spawn one or more seperate memcache container(s) and configure django geonode repsectivly. Dynamic caching (see https://docs.djangoproject.com/en/4.0/topics/cache/)
+    enabled: True
+    # -- memcached lock expire time
+    lock_expire: '3600'
+    # -- memcached lock timeout
+    lock_timeout: '10'
+
+  # TODO not tested yey
+  monitoring:
+    enabled: False
+    data_tls: 365
+    user_analytics_enabled: True
+    user_analytics_gzip: True
+    centralized_dashboard_enabled: False
+
+  celery:
+    # -- celery container name
+    container_name: celery
+    resources:
+      requests:
+        # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+        memory: "1Gi"
+        # -- requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+        cpu: 1
+      limits:
+        # -- limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+        memory: "2Gi"
+        # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+        cpu: 2
+
+# CONFIGURATION FOR GEOSERVER DEPLOYMENT# 
+geoserver:
+  # -- geoserver pod name
+  pod_name: geoserver
+  # -- geoserver container name
+  container_name: geoserver
+  image:
+    # -- geoserver image docker image (default in zalf namespace because geonode one was not up to date)
+    name: geonode/geoserver
+    # -- geoserver docker image tag
+    tag: '2.23.0'
+  # -- geoserver port
+  port: 8080
+
+  secret:
+    # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
+    existingSecretName: ""
+    # -- geoserver admin username
+    admin_username: admin
+    # -- geoserver admin password
+    admin_password: "geoserver"
+
+  resources:
+    requests:
+      # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "1Gi"
+      # -- requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: 1
+    limits:
+      # -- limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "4Gi"
+      # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: 2
+
+# CONFIGURATION FOR NGINX DEPLOYMENT
+nginx:
+  # -- nginx pod name
+  pod_name: nginx
+  # -- nginx container name
+  container_name: nginx
+  # -- nginx container replicas
+  replicaCount: 1
+  image:
+    # -- nginx docker image
+    name: nginx
+    # -- nginx docker image tag
+    tag: '1.25'
+  # -- max file upload size
+  maxClientBodySize: 2G
+  resources:
+    requests:
+      # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "1Gi"
+      # -- requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: "500m"
+    limits:
+      # -- limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "1Gi"
+      # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: "800m"
+
+# pycsw integration is based on https://github.com/geopython/pycsw/blob/master/docker/kubernetes
+pycsw:
+  # -- enable single pycsw pod
+  enabled: True
+  # -- pycsw pod name
+  pod_name: pysw
+  # -- pycsw container replicas
+  replicaCount: 1
+  # -- pycsw container name
+  container_name: pycsw
+  image:
+    # -- pycsw docker image
+    name: geopython/pycsw
+    # -- pycsw docker image tag
+    tag: '2.6.1'
+  # -- pycsw endpoint port
+  port: 8000
+  # -- pycsw url below geonode.ingress.externalDomain
+  endpoint: /catalogue/csw
+  resources:
+    requests:
+      # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "1Gi"
+      # -- requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: "500m"
+    limits:
+      # -- limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      memory: "1Gi"
+      # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+      cpu: "500m"
+  # -- pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/
+  # @default -- copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py
+  mappings: |-
+    MD_CORE_MODEL = {
+      "typename": "pycsw:CoreMetadata",
+      "outputschema": "http://pycsw.org/metadata",
+      "mappings": {
+          "pycsw:Identifier": "uuid",
+          "pycsw:Typename": "csw_typename",
+          "pycsw:Schema": "csw_schema",
+
+          "pycsw:MdSource": "csw_mdsource",
+          "pycsw:InsertDate": "csw_insert_date",
+          "pycsw:XML": "metadata_xml",
+          "pycsw:AnyText": "csw_anytext",
+          "pycsw:Language": "language",
+          "pycsw:Title": "title",
+          "pycsw:Abstract": "raw_abstract",
+          "pycsw:Keywords": "keyword_csv",
+          "pycsw:KeywordType": "keywordstype",
+          "pycsw:Format": "spatial_representation_type_string",
+          "pycsw:Source": "source",
+          "pycsw:Date": "date",
+          "pycsw:Modified": "date",
+          "pycsw:Type": "csw_type",
+          "pycsw:BoundingBox": "csw_wkt_geometry",
+          "pycsw:CRS": "csw_crs",
+          "pycsw:AlternateTitle": "alternate",
+          "pycsw:RevisionDate": "date",
+          "pycsw:CreationDate": "date",
+          "pycsw:PublicationDate": "date",
+          "pycsw:Organization": "organizationname",
+          "pycsw:OrganizationName": "organizationname",
+          "pycsw:SecurityConstraints": "securityconstraints",
+          "pycsw:ParentIdentifier": "parentidentifier",
+          "pycsw:TopicCategory": "topiccategory",
+          "pycsw:ResourceLanguage": "language",
+          "pycsw:GeographicDescriptionCode": "geodescode",
+          "pycsw:Denominator": "denominator",
+          "pycsw:DistanceValue": "distancevalue",
+          "pycsw:DistanceUOM": "distanceuom",
+          "pycsw:TempExtent_begin": "temporal_extent_start",
+          "pycsw:TempExtent_end": "temporal_extent_end",
+          "pycsw:ServiceType": "servicetype",
+          "pycsw:ServiceTypeVersion": "servicetypeversion",
+          "pycsw:Operation": "operation",
+          "pycsw:CouplingType": "couplingtype",
+          "pycsw:OperatesOn": "operateson",
+          "pycsw:OperatesOnIdentifier": "operatesonidentifier",
+          "pycsw:OperatesOnName": "operatesoname",
+          "pycsw:Degree": "degree",
+          "pycsw:AccessConstraints": "restriction_code",
+          "pycsw:OtherConstraints": "raw_constraints_other",
+          "pycsw:Classification": "classification",
+          "pycsw:ConditionApplyingToAccessAndUse": "conditionapplyingtoaccessanduse",
+          "pycsw:Lineage": "lineage",
+          "pycsw:ResponsiblePartyRole": "responsiblepartyrole",
+          "pycsw:SpecificationTitle": "specificationtitle",
+          "pycsw:SpecificationDate": "specificationdate",
+          "pycsw:SpecificationDateType": "specificationdatetype",
+          "pycsw:Creator": "creator",
+          "pycsw:Publisher": "publisher",
+          "pycsw:Contributor": "contributor",
+          "pycsw:Relation": "relation",
+          "pycsw:Links": "download_links",
+      },
+    }
+  # pycsw.config -- pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/
+  # @default -- based of pycsw example.cfg: https://github.com/geopython/pycsw/blob/master/docker/pycsw.cfg
+  config: |-
+    [server]
+        home=/home/pycsw
+        url=$(PYCSW_SERVER_URL)
+        mimetype=application/xml; charset=UTF-8
+        encoding=UTF-8
+        language= en-US
+        maxrecords=10
+        # loglevel=
+        # logfile=
+        # ogc_schemas_base=
+        # federatedcatalogues=
+        # pretty_print=
+        gzip_compresslevel=1
+        # domainquerytype=
+        # domaincounts=
+        # spatial_ranking=
+        profiles=apiso
+        # workers=
+        timeout=30
+    [manager]
+        transactions=false
+        # allowed_ips=
+        # csw_harvest_pagesize=
+    [metadata:main]
+        identification_title=GeoNode pycsw Geospatial Catalogue
+        identification_abstract=GeoNode-k8s pycsw Geospatial Catalogue
+        identification_keywords=catalogue,discovery,metadata, geonode
+        identification_keywords_type=theme
+        identification_fees=None
+        identification_accessconstraints=None
+        provider_name=GeoNode Kubernetes
+        provider_url=https://pycsw.org/
+        contact_name=Lastname, Firstname
+        contact_position=Position Title
+        contact_address=Mailing Address
+        contact_city=City
+        contact_stateorprovince=Administrative Area
+        contact_postalcode=Zip or Postal Code
+        contact_country=Country
+        contact_phone=+xx-xxx-xxx-xxxx
+        contact_fax=+xx-xxx-xxx-xxxx
+        contact_email=Email Address
+        contact_url=Contact URL
+        contact_hours=Hours of Service
+        contact_instructions=During hours of service.  Off on weekends.
+        contact_role=pointOfContact
+    [repository]
+        database=${PYCSW_REPOSITORY_DATABASE_URI}
+        mappings=/etc/pycsw/pycsw-mappings.py
+        table=base_resourcebase
+        # filter=
+    [metadata:inspire]
+        enabled="true"
+        languages_supported=eng,gre
+        default_language=eng
+        date=YYYY-MM-DD
+        gemet_keywords=Utility and governmental services
+        conformity_service=notEvaluated
+        contact_name=Organization Name
+        contact_email=Email Address
+        temp_extent=YYYY-MM-DD/YYYY-MM-DD
+
+
+# MEMCACHED CONFIGURATION
+# https://artifacthub.io/packages/helm/bitnami/memcached
+memcached:
+  # -- memcached replica. Loadbalanaced via kubernetes. (only one entry in django settings.py) im memcached is activated under geonode.memcached.enabled this takes place
+  architecture: high-availability
+  replicaCount: 1
+
+# VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml
+rabbitmq:
+  enabled: true
+  # -- rabbitmq raplica count
+  replicaCount: 1
+  auth:
+    username: rabbituser
+    password: rabbitpassword
+    erlangCookie: jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu
+    existingPasswordSecret: ""
+    existingErlangSecret: ""
+  persistence:
+    enabled: False
+
+  requests:
+    # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+    memory: "1Gi"
+    # -- requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+    cpu: "500m"
+  limits:
+    # -- limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+    memory: "1Gi"
+    # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+    cpu: "750m"
+
+postgres:
+  # -- postgres username
+  username: postgres
+  # -- database schema
+  schema: public
+  # -- geonode database name and username
+  geonode_databasename_and_username: geonode
+  # -- geoserver database name and username
+  geodata_databasename_and_username: geodata
+
+  # configuration for postgres operator database manifest
+  operator_manifest:
+    # -- pod name for postgres containers == teamID for mainifest
+    pod_name: postgresql
+    # -- Database storage size
+    storageSize: 3Gi
+    # -- number of database instances
+    numberOfInstances: 1
+    # -- postgres version
+    postgres_version: 15
+    # database passwords are set randomly 
+    # infos @ https://postgres-operator.readthedocs.io/en/refactoring-sidecars/user/
+    # get password after creation via: kubectl get secret {{ .Release.name }}.{{ .Release.name }}-{{ container_name }}.credentials -o 'jsonpath={.data.password}' | base64 -d
+
+  external_postgres:
+    enabled: False
+    hostname: my-external-postgres.com
+    port: 5432
+    secret:
+      # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
+      existingSecretName: ""
+      postgres_password: postgres
+      geonode_password: geonode
+      geodata_password: geogeonode
+
+# VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator/values.yaml
+postgres-operator:
+  # -- enable postgres-operator (this or postgresql.enabled NOT both )
+  enabled: True
+  # -- ???
+  operatorApiUrl: "http://{{ .Release.Name }}-postgres-operator:8080"
+  configLoggingRestApi:
+    # --  REST API listener listens to this port
+    api_port: 8080
+  # -- postgress pv storageclass
+  storageClass:
+  # -- not setting the podServiceAccount name will leed to generation of this name. This allows to run multiple postgres-operators in a single kubernetes cluster. just seperating them by namespace.
+  podServiceAccount:
+    name: ""
+
+
+# VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml
+postgres-operator-ui:
+  enabled: False
+  replicaCount: 1
+  envs:
+    operatorApiUrl: "http://{{ $.Release.Name }}-postgres-operator:8080"
+  service:
+    type: ClusterIP
+    port: 80
+  ingress:
+    enabled: False
+    ingressClassName:
+    hosts:
+    - host: postgres-ui
+      paths: [""]
+
+# -- (map of fixture files) Fixture files which shall be made available under /usr/src/geonode/geonode/fixtures (refer to https://docs.djangoproject.com/en/4.2/howto/initial-data/)
+geonodeFixtures:
+  # @gignore
+  somefixture.json: |
+    [
+      {
+        "pk": 0,
+        "model": "myapp.sample"
+        "description": "nice little content"
+      }
+    ]
+
+# -- A base64 encoded favicon
+# @default -- AAABAAMAEBAAAAEAIABoBA ... AAAA==
+favicon: |
+  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k/+y7vn/su75/7Lu+f+y7vn/su75/7Hs9/8uLi3/ncUs/57GLP+exiz/nsYs/57GLP+exiv/cowr/ywsLf8sLCz/25tP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3J1Q/y4uLf/bnE//3Z1Q/92dUP/dnVD/3Z1Q/92dUP+FZT7/b42T/7Lu+f+y7vn/su75/7Lu+f+y7vn/sez3/y4uLf+dxSz/nsYs/57GLP+exiz/mb8r/1ZmLP9IPjL/LCws/ywsLP/bm0//3Z1Q/92dUP/dnVD/3Z1Q/92dUP/cnVD/Li4t/9ucT//dnVD/3Z1Q/92dUP/dnVD/3Z1Q/4VlPv9vjZP/su75/7Lu+f+y7vn/su75/7Lu+f+x7Pf/Li4t/53FLP+exiz/nsYs/4qsK/8/Riz/b1Y5/9OWTv8sLCz/LCws/9ubT//dnVD/3Z1Q/92dUP/dnVD/3Z1Q/9ydUP8uLi3/25xP/92dUP/dnVD/3Z1Q/92dUP/dnVD/hWU+/2+Nk/+y7vn/su75/7Lu+f+y7vn/su75/7Hs9/8uLi3/ncUs/57GK/9zjCz/ODcu/5tyQv/dnVD/25tP/ywsLP8sLCz/25tP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3J1Q/y4uLf/bnE//3Z1Q/92dUP/dnVD/3Z1Q/92dUP+FZT7/b42T/7Lu+f+y7vn/su75/7Lu+f+y7vn/sez3/y4uLf+Yvyv/VmYs/0k/Mv+/ikn/3Z1Q/92dUP/bm0//LCws/ywsLP/bm0//3Z1Q/92dUP/dnVD/3Z1Q/92dUP/cnVD/Li4t/9ucT//dnVD/3Z1Q/82STP+edUP/blY5/zw2L/8zNTb/RVFT/1dqbf9og4j/epyj/4u1vf+cztf/LS0t/z9GLP9vVjn/1ZhO/92dUP/dnVD/3Z1Q/9ubT/8sLCz/LCws/9ubT//dnVD/3Z1Q/92dUP/dnVD/3Z1Q/9ydUP8uLi3/qnxF/3xfPP9NQTP/NDc3/1Vna/95nKL/YHh8/11vLP+CoSv/dI0s/2V5LP9WZSz/R1Es/zk9LP8tLS3/m3JC/92dUP/dnVD/3Z1Q/92dUP/dnVD/25tP/ywsLP8sLCz/25tP/92dUP/dnVD/3Z1Q/92dUP/cnE//lnBB/y0tLf9LWVv/b42S/5PByf+v6vX/su75/7Lu+f9vjZP/ZXks/57GLP+exiz/nsYs/57GLP+exiz/ncUr/y4uLf/cnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/bm0//LCws/ywsLP/bm0//3Z1Q/92dUP/dnVD/y5FM/19NNv9ETSz/LS0t/7Hs9/+y7vn/su75/7Lu+f+y7vn/su75/2+Nk/9leSz/nsYs/57GLP+exiz/nsYs/57GLP+dxSz/Li4t/9ydUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/9ubT/8sLCz/LCws/9ubT//dnVD/3Z1Q/6F2Q/87Ny7/Znsr/5vDK/8uLi3/sez3/7Lu+f+y7vn/su75/7Lu+f+y7vn/b42T/2V5LP+exiz/nsYs/57GLP+exiz/nsYs/53FLP8uLi3/3J1Q/92dUP/dnVD/3Z1Q/92dUP/CjEr/dVs6/ywsLP8sLCz/25tP/9CVTf9pUzj/P0Ys/4enK/+exiz/ncUs/y4uLf+x7Pf/su75/7Lu+f+y7vn/su75/7Lu+f9vjZP/ZXks/57GLP+exiz/nsYs/57GLP+exiz/ncUs/y4uLf/cnVD/3Z1Q/9ycT/+vf0b/YU43/zxCQ/9ykZf/LCws/ywsLP+oe0X/Pzkw/2ByLP+awSv/nsYs/57GLP+dxSz/Li4t/7Hs9/+y7vn/su75/7Lu+f+y7vn/su75/2+Nk/9leSz/nsYs/57GLP+exiz/nsYs/57GLP+dxSz/Li4t/9ydUP/dnVD/jGk//0JLTf+CqbD/r+r1/7Dr9v8sLCz/LCwt/zxBLP+CoSv/nsYs/57GLP+exiz/nsYs/53FLP8uLi3/sez3/7Lu+f+y7vn/su75/7Lu+f+x7Pf/UmRn/05aLP+dxSv/nsYs/57GLP+exiz/nsYs/53FLP8uLi3/3J1Q/92dUP+DYz7/cY+V/7Lu+f+y7vn/sOv2/ywsLP8sLC3/l70r/57GLP+exiz/nsYs/57GLP+exiz/ncUs/y4uLf+x7Pf/su75/7Lu+f+y7vn/su75/2qGjP80NFz/MzNX/2V5K/+exiz/nsYs/57GLP+exiz/ncUs/y4uLf/cnVD/3Z1Q/4NjPv9xj5X/su75/7Lu+f+w6/b/LCws/ywsLf+cxCz/nsYs/57GLP+exiz/nsYs/57GLP+dxSz/Li4t/7Hs9/+y7vn/su75/7Lu+f+CqbD/MDFI/0hI2/9ISNj/MDFE/3iT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cP+CqK//p9/o/7Lu+f+y7vn/su75/7Ht+P9ujJH/Li8t/53FLP+exiz/nsYs/57GLP+dxSv/jbAr/3CJLP9RXyz/PkUs/zc7LP8vMSz/Kysr0iwsLP9kTzf/sIBG/82STP/cnE//3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3J1Q/y8uLf+DZD7/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/9OWTf+zgkf/RDwx/zg9Pv+NuMD/pdzm/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/7Ht+P9ujJH/Li8t/53FLP+exiz/nsYs/57GLP+exiz/nsYs/57GLP+dxSv/lLgr/4KgLP9QXCz/LCwt/ywsLP+CYz3/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3J1Q/y8uLf+DZD7/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/cnE//TkIz/z5FSP+x7fj/su75/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/7Ht+P9ujJH/Li8t/53FLP+exiz/nsYs/57GLP+exiz/nsYs/57GLP+exiz/nsYs/53FLP9jdyz/LCwt/ywsLP+CYz3/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3J1Q/y8uLf+DZD7/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/cnE//TkIz/z5FSP+x7fj/su75/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/7Ht+P9ujJH/Li8t/53FLP+exiz/nsYs/57GLP+exiz/nsYs/57GLP+exiz/nsYr/5K2K/9SYCz/LCwt/ywsLP+CYz3/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3J1Q/y8uLf+DZD7/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/cnE//TkIz/z5FSP+x7fj/su75/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/7Ht+P9ujJH/Li8t/53FLP+exiz/nsYs/57GLP+exiz/nsYs/57GLP+cxCv/gJ4r/0tWLP8tLiz/LS0t/ywsLP+CYz3/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3J1Q/y8uLf+DZD7/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/cnE//TkIz/z5FSP+x7fj/su75/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/7Ht+P9ujJH/Li8t/53FLP+exiz/nsYs/57GLP+exiz/nsYs/5vDK/9rgiv/Njos/z03L/9aSTX/LCws/ywsLP+CYz3/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3J1Q/y8uLf+DZD7/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/cnE//TkIz/z5FSP+x7fj/su75/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/7Ht+P9ujJH/Li8t/53FLP+exiz/nsYs/57GLP+dxSv/krcr/15xK/80My3/XEo1/8ePS/+CYz3/LCws/ywsLP+CYz3/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3J1Q/y8uLf+DZD7/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/cnE//TkIz/z5FSP+x7fj/su75/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/7Ht+P9ujJH/Li8t/53FLP+exiz/nsYs/5zEK/+Aniv/SVQs/zYyLv+EZD7/z5RN/9ycT/+CYz3/LCws/ywsLP+CYz3/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3J1Q/y8uLf+DZD7/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/cnE//TkIz/z5FSP+x7fj/su75/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/7Ht+P9ujJH/Li8t/53FLP+exiz/nsYr/3CJLP81OSz/Qjow/7OBR//Ymk//3Z1Q/9ycT/+CYz3/LCws/ywsLP+CYz3/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3J1Q/y8uLf+DZD7/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/cnE//TkIz/z5FSP+x7fj/su75/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/7Ht+P9ujJH/Li8t/5zEK/+RtSv/WWks/y8uLf9iTjb/x45L/92dUP/dnVD/3Z1Q/9ycT/+CYz3/LCws/ywsLP+CYz3/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3J1Q/y8uLf+DZD7/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/9CUTP+vf0b/Qzsx/zc7PP9/pav/irW9/5bGzv+i1+H/rejy/7Lu+f+y7vn/su75/7Ht+P9ujJH/Li8t/4KhLP9KVCz/OjYu/4JiPf/Mkkz/3Z1Q/92dUP/dnVD/3Z1Q/9ycT/+CYz3/LCws/ywsLP+CYz3/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3J1Q/y8uLf+DZD7/3JxP/92dUP/dnVD/3Z1Q/8+UTP+ZcUL/Yk43/z44MP83My//Li0t/y0tLf8xMjP/Mzc3/zY7O/85P0D/PENE/0pXWv9fdXr/cpKY/4evt/9gd3v/LS0t/zM2LP9JPjL/soFG/9maT//dnVD/3Z1Q/92dUP/dnVD/3Z1Q/9ycT/+CYz3/LCws/ywsLP+CYz3/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3J1Q/y8uLf98Xzz/x49L/7eER/+HZj7/VUY0/y8uLv81OTr/PUVG/0xbXv9ykpj/PERG/zg8LP99miv/bYUr/15wLP9NWiz/QUks/z1DLP85Piz/Njks/zI0LP8uLyz/LS0t/1lINf/Ci0r/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/9ycT/+CYz3/LCws/ywsLP+CYz3/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/0JVN/y4uLf9GPDH/TEAy/zEwLv8+Rkj/Vmhr/22Kj/+GrrX/ndDZ/7Dr9v+x7fj/RlFU/ztALP+dxSz/nsYs/57GLP+dxiv/m8Ir/5K2K/+HqCv/fZsr/3SOK/9NWCz/Li4t/8+UTf/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/9ycT/+CYz3/LCws/ywsLP+CYz3/3JxP/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/9ycT/+5hkj/U0Uz/y0tLf8/SEn/bIiN/5PCyv+l3Ob/q+Tv/7Ds9/+y7vn/su75/7Lu+f+x7fj/RlFU/ztALP+dxSz/nsYs/57GLP+exiz/nsYs/57GLP+exiz/nsYs/53FK/9keCz/Ly4t/9ydUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/9ycT/+CYz3/LCws/ywsLP+CYz3/3JxP/92dUP/dnVD/3Z1Q/92dUP/cnE//0pZN/591Q/8+ODD/OT4s/y0tLf9ujJH/se34/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/7Lu+f+x7fj/RlFU/ztALP+dxSz/nsYs/57GLP+exiz/nsYs/57GLP+exiz/nsYs/53FLP9keCz/Ly4t/9ydUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/9ycT/+CYz3/LCws/ywsLP+CYz3/3JxP/92dUP/dnVD/3Z1Q/9ucT/+5hkj/bVU5/zMyLf9UYyz/hqcr/y4vLf9ujJH/se34/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/7Lu+f+x7fj/RlFU/ztALP+dxSz/nsYs/57GLP+exiz/nsYs/57GLP+exiz/nsYs/53FLP9keCz/Ly4t/9ydUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/9WYTv9yWDr/LCws/ywsLP+CYz3/3JxP/92dUP/dnVD/3Z1Q/510Qv8/ODD/NDYs/3SOK/+Zvyv/ncQr/y4vLf9ujJH/se34/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/7Lu+f+x7fj/RlFU/ztALP+dxSz/nsYs/57GLP+exiz/nsYs/57GLP+exiz/nsYs/53FLP9keCz/Ly4t/9ydUP/dnVD/3Z1Q/92dUP/dnVD/3Z1Q/92dUP/WmE7/m3JB/0xAMv8zMS7/LCws/ywsLP+CYz3/3JxP/9ucT//EjUr/blY5/y4vLP9LViz/i6wr/57GLP+exiz/ncUs/y4vLf9ujJH/se34/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/7Lu+f+x7fj/RlFU/ztALP+dxSz/nsYs/57GLP+exiz/nsYs/57GLP+exiz/nsYs/53FLP9keCz/Ly4t/9ydUP/dnVD/3Z1Q/9ycT//XmU7/x49L/5lxQv9JPzL/NTk5/0VRU/9HU1X/LCws/ywsLP+CYz3/2ZpP/6B2Q/9QQzP/Oj0s/2Z6K/+Ttyv/ncUr/57GLP+exiz/ncUs/y4vLf9ujJH/se34/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/7Lu+f+x7fj/RlFU/ztALP+dxSz/nsYs/57GLP+exiz/nsYs/57GLP+exiz/nsYs/53FLP9keCz/Ly4t/9ydUP/dnVD/3Z1Q/9OWTf9/YTz/Sj8y/zY7O/9ddHj/hKyz/6jf6f9tipD/LCws/ywsLP9wVzn/aFI4/zUyLv9KVCz/iqsr/5zDK/+exiz/nsYs/57GLP+exiz/ncUs/y4vLf9ujJH/se34/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/7Lu+f+x7fj/RlFU/ztALP+dxSz/nsYs/57GLP+exiz/nsYs/57GLP+exiz/nsYs/53FLP9keCz/Ly4t/9ydUP/dnVD/3Z1Q/8WNSv8vLi3/aIOI/6DV3/+t5/H/se34/7Ht+P9tipD/LCws/ywsLf8tLC3/NTgs/1ttK/+WvCv/nsYs/57GLP+exiz/nsYs/57GLP+exiz/ncUs/y4vLf9ujJH/se34/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/7Ht+P+j2OL/QElL/zg8LP+Stiv/ncUr/57GLP+exiz/nsYs/57GLP+exiz/nsYs/53FLP9keCz/Ly4t/9ydUP/dnVD/3Z1Q/8SNSv8uLi//mcrT/7Lu+f+y7vn/su75/7Ht+P9tipD/LCws/ywsLf9DSyz/epYr/53EK/+exiz/nsYs/57GLP+exiz/nsYs/57GLP+exiz/ncUs/y4vLf9ujJH/se34/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/6vl8P9gd3z/MDI6/y8wM/9bbSz/l70r/57GLP+exiz/nsYs/57GLP+exiz/nsYs/53FLP9keCz/Ly4t/9ydUP/dnVD/3Z1Q/8SNSv8uLi//mcrT/7Lu+f+y7vn/su75/7Ht+P9tipD/LCws/ywsLf9idSz/nMQr/57GLP+exiz/nsYs/57GLP+exiz/nsYs/57GLP+exiz/ncUs/y4vLf9ujJH/se34/7Lu+f+y7vn/su75/7Lu+f+y7vn/su75/3COlP8vMTX/Pj6f/z4+oP8vMTD/Z30r/57GLP+exiz/nsYs/57GLP+exiz/nsYs/53FLP9keCz/Ly4t/9ydUP/dnVD/3Z1Q/8SNSv8uLi//mcrT/7Lu+f+y7vn/su75/7Ht+P9tipD/LCws/ywsLf9jdyz/ncUs/57GLP+exiz/nsYs/57GLP+exiz/nsYs/57GLP+exiz/ncUs/y4vLf9ujJH/se34/7Lu+f+y7vn/su75/7Lu+f+v6/X/gqiw/y0uMP85OYD/SUng/0lJ4f84OHr/Li4w/3eRK/+cxCv/nsYs/57GLP+exiz/nsYs/53FLP9keCz/Ly4t/9ydUP/dnVD/3Z1Q/8SNSv8uLi//mcrT/7Lu+f+y7vn/su75/7Ht+P9tipD/LCws/ywsLf9jdyz/ncUs/57GLP+exiz/nsYs/57GLP+exiz/nsYs/57GLP+exiz/ncUs/y4vLf9ujJH/se34/7Lu+f+y7vn/su75/7Ht+P+Pu8P/O0JE/zQ0Xv9HR9T/S0vo/0tL6P9HRtH/NDRg/zc8LP+CoSv/ncUr/57GLP+exiz/nsYs/53FLP9keCz/Ly4t/9ydUP/dnVD/3Z1Q/8SNSv8uLi//mcrT/7Lu+f+y7vn/su75/7Ht+P9tipD/LCws/ywsLf9jdyz/ncUs/57GLP+exiz/nsYs/57GLP+exiz/nsYs/57GLP+exiz/ncUs/y4vLf9ujJH/se34/7Lu+f+y7vn/su75/6jg6v9LWVz/MTFH/0hH1v9LSuj/S0vo/0tL6P9KSuf/R0fU/zAwQ/9JUyz/krcr/57GLP+exiz/nsYs/53FLP9keCz/Ly4t/9ydUP/dnVD/3Z1Q/8SNSv8uLi//mcrT/7Lu+f+y7vn/su75/7Ht+P9tipD/LCws/ywsLf9cbSz/k7cr/5rBK/+dxSv/nsYs/57GLP+exiz/nsYs/57GLP+exiz/ncUs/y4vLf9ujJH/se34/7Lu+f+y7vn/sOv2/22Kj/8uLjv/QkK4/0tL6P9LS+j/S0vo/0tL6P9LS+j/S0vo/0NDvf8uLjr/YXQs/5zDK/+exiz/nsYs/53FLP9keCz/Ly4t/9ydUP/dnVD/3Z1Q/8SNSv8uLi//mcrT/7Lu+f+y7vn/r+r1/6jf6f9mgIT/LCws/ywsLOI1OCz+SVMs/1tsK/9vhyv/gqAr/5S5K/+dxSv/nsYs/57GLP+exiz/ncUs/y4vLf9ujJH/se34/7Ht+P+h1t//eJuh/zEzN/86Oob/SUnh/0tL6P9LS+j/S0vo/0tL6P9LS+j/S0vo/0pK4/86OoX/MTIx/2uCK/+Psyv/ncUr/53F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

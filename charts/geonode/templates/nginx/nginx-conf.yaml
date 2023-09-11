@@ -48,7 +48,7 @@ data:
         application/json;
 
       location = /favicon.ico {
-        alias /mnt/volumes/statics/static/favicon.ico;
+        alias /mnt/volumes/statics/static/img/favicon.ico;
       }
 
       # GeoServer
@@ -110,12 +110,34 @@ data:
         proxy_http_version 1.1;
       }
 
+      {{ if .Values.pycsw.enabled }}
+      # external PYCSW forward 
+      location {{ .Values.pycsw.endpoint }} {
+        client_max_body_size {{ .Values.nginx.maxClientBodySize }};
+
+        # compression
+        gzip on;
+        gzip_types
+          text/xml
+          text/plain
+          application/xml
+          application/xml+rss
+          application/json;
+
+        proxy_pass http://{{ include "pycsw_pod_name" . }}:{{ .Values.pycsw.port }};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+      }
+      {{ end }}
+
       location / {
         client_max_body_size {{ .Values.nginx.maxClientBodySize }};
 
         # FIXME: Work around /proxy sometimes using a mix of public/internal URL to geonode...
         rewrite_log on;
-        #rewrite ^/proxy/(.*)url=http?://{{ .Values.geonode.ingress.externalDomain  }}(:\d+)?/geoserver(.*) /proxy/$1url=http://geoserver:{{ .Values.geoserver.port }}$3 last;
+        #rewrite ^/proxy/(.*)url=http?://{{ .Values.geonode.general.externalDomain  }}(:\d+)?/geoserver(.*) /proxy/$1url=http://geoserver:{{ .Values.geoserver.port }}$3 last;
 
         if ($request_method = OPTIONS) {
           add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, OPTIONS";

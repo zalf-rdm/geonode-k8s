@@ -1,0 +1,93 @@
+{{ if .Values.pycsw.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ include "pycsw_pod_name" . }}"
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.pycsw.replicaCount }}
+  selector:
+    matchLabels:
+      org.geonode.instance: "{{ include "pycsw_pod_name" . }}"
+  serviceName: "{{ include "pycsw_pod_name" . }}"
+  template:
+    metadata:
+      labels:
+        org.geonode.instance: "{{ include "pycsw_pod_name" . }}"
+      annotations:
+        checksum/pycsw-env: {{ include (print $.Template.BasePath "/pycsw/pycsw-env.yaml") . | sha256sum }}
+        checksum/pycsw-cfg: {{ include (print $.Template.BasePath "/pycsw/pycsw-cfg.yaml") . | sha256sum }}
+        checksum/pycsw-mappings-py: {{ include (print $.Template.BasePath "/pycsw/pycsw-mappings-py.yaml") . | sha256sum }}
+    spec:
+      terminationGracePeriodSeconds: 3
+      initContainers:
+      # Wait for GeoNode to be up and running, else there can be a race conddition where pycsw creates the database table,
+      # and lets crash init process of geonode
+      - name: pycsw-wait-for-geonode
+        image: alpine/curl
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sh","-c"]
+        args: ['while [ $(curl -ksw "%{http_code}" "$GEONODE_ENDPOINT:8001" -o /dev/null) -ne 200 ]; do sleep 5; echo "health check failed . Waiting for GeoNode ($GEONODE_ENDPOINT:8001) ..."; done']
+        env:
+        - name: GEONODE_ENDPOINT
+          value: "{{ include "geonode_pod_name" . }}"
+
+      containers:
+      - name: {{ .Values.pycsw.container_name }}
+        image: "{{ .Values.pycsw.image.name }}:{{ .Values.pycsw.image.tag }}"
+        envFrom:
+          - configMapRef:
+              name: {{ include "pycsw_pod_name" . }}-env
+        env: 
+        - name: PYCSW_SERVER_URL
+          value: "{{ .Values.geonode.ingress.externalScheme}}://{{ .Values.geonode.ingress.externalDomain }}{{ .Values.pycsw.endpoint }}"
+        - name: GEONODE_DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.postgres.geonode_databasename_and_username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
+              key: password
+        - name: PYCSW_REPOSITORY_DATABASE_URI
+          value: "postgresql://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"
+
+       
+        ports:
+        - containerPort: {{ .Values.pycsw.port }}
+        volumeMounts:
+        - name: pycsw-cfg
+          mountPath: "/etc/pycsw/pycsw.cfg"
+          subPath: pycsw.cfg
+          readOnly: true
+        - name: pycsw-mappings-py
+          mountPath: /etc/pycsw/pycsw-mappings.py
+          subPath: pycsw-mappings.py
+          readOnly: true
+        resources:
+          requests:
+            memory: {{ .Values.pycsw.resources.requests.memory }}
+            cpu: {{ .Values.pycsw.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.pycsw.resources.limits.memory }}
+            cpu: {{ .Values.pycsw.resources.limits.cpu }}
+        # livenessProbe:
+        #   httpGet:
+        #     path: /
+        #     port: {{ .Values.pycsw.port }}
+        #   initialDelaySeconds: 3
+        #   periodSeconds: 10
+
+      volumes:
+      - name: pycsw-cfg
+        configMap:
+          name: {{ .Release.Name }}-pycsw-cfg
+          defaultMode: 0744
+          items:
+          - key: pycsw.cfg
+            path: "pycsw.cfg"
+      - name: pycsw-mappings-py
+        configMap:
+          name: {{ .Release.Name }}-pycsw-mappings-py
+          defaultMode: 0744
+          items:
+          - key: pycsw-mappings.py
+            path: "pycsw-mappings.py"
+{{ end }}

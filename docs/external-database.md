@@ -77,7 +77,7 @@ To deploy run helm and give passwords as helm arguments like:
 export GEONODE_K8S_POSTGRES_PASSWORD="password"
 export GEONODE_K8S_GEONODE_PASSOWRD="password"
 export GEONODE_K8S_GEODATA_PASSWORD="password"
-helm upgrade --cleanup-on-fail --install --namespace geonode --create-namespace --values minikube-values-external-db.yaml --set postgres.external_postgres.postgres_password=${GEONODE_K8S_POSTGRES_PASSWORD} --set postgres.external_postgres.geonode_password=${GEONODE_K8S_GEONODE_PASSOWRD} --set postgres.external_postgres.geodata_password=${GEONODE_K8S_GEODATA_PASSWORD} geonode deployment/geonode
+helm upgrade --cleanup-on-fail --install --namespace geonode --create-namespace --values minikube-values-external-db.yaml --set postgres.external_postgres.postgres_password=${GEONODE_K8S_POSTGRES_PASSWORD} --set postgres.external_postgres.geonode_password=${GEONODE_K8S_GEONODE_PASSOWRD} --set postgres.external_postgres.geodata_password=${GEONODE_K8S_GEODATA_PASSWORD} geonode charts/geonode
 ```
 
 If run on minikube follow the original [minikube docs](minikube-installation.md) for accessing the geonode installation through `minikube tunnel`.

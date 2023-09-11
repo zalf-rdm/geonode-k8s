@@ -4,7 +4,7 @@ metadata:
   name: {{ include "geoserver_pod_name" . }}-env
   namespace: {{ .Release.Namespace }}
 data:
-  GEONODE_LB_HOST_IP: {{ .Values.geonode.ingress.externalDomain | quote }}
+  GEONODE_LB_HOST_IP: {{ .Values.geonode.general.externalDomain | quote }}
   GEONODE_HOST_IP: localhost
 
   DJANGO_URL: http://{{ include "geonode_pod_name" .}}/
@@ -17,6 +17,3 @@ data:
   DATABASE_PORT: "{{ include "database_port" . }}"
   GEONODE_GEODATABASE: {{ .Values.postgres.geonode_databasename_and_username | quote  }}
   GEONODE_GEODATABASE_SCHEMA: {{ .Values.postgres.schema | quote }}
-
-  GEOSERVER_ADMIN_USER: {{ .Values.geoserver.admin_username | quote }}
-  GEOSERVER_ADMIN_PASSWORD: {{ .Values.geoserver.admin_password | quote }}
