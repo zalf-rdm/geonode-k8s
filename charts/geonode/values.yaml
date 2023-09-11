@@ -1,9 +1,9 @@
-
 global:
   # -- storageClass used by helm dependencies pvc
   storageClass:
   # -- storage access mode used by helm dependency pvc
   accessMode: ReadWriteMany
+
 
 # geonode configuration
 geonode:
@@ -30,6 +30,28 @@ geonode:
   # -- additions to tasks.py script at the beginning of the tasks.py, must be additional code written in python
   tasks_post_script: |
     print("tasks_post_script not defined ...")
+
+  secret:
+    # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
+    existingSecretName: ""
+    superUser:
+      # -- admin username
+      username: admin
+      # -- admin panel password
+      password: geonode
+      # -- admin user password
+      email: support@example.com
+    mail:
+      # -- define mail user to send mails from
+      user: "changeme"
+      # -- set password for mailuser in geonode
+      password: "changeme"
+      # -- define from mail-addr 
+      from: "changeme@web.de"
+    ldap:
+      # -- ldap password
+      bind_password: password
+
 
   resources:
     requests:
@@ -108,6 +130,7 @@ geonode:
     cheaper_busyness_backlog_step: 2
 
   general:
+
     # -- external ingress schema. If set to 'https', make sure to configure TLS either by 
     # configuring tls certificate or using cert-manager. Available options: (http|https)
     externalScheme: http
@@ -137,14 +160,6 @@ geonode:
     ogc_request_pool_maxsize: 10
     # -- OGC_REQUEST_POOL_CONNECTIONS
     ogc_request_pool_connections: 10
-
-    superUser:
-      # -- admin username
-      username: admin
-      # -- admin panel password
-      password: geonode
-      # -- admin user password
-      email: support@example.com
 
     publishing:
       # -- RESOURCE_PUBLISHING By default, the GeoNode application allows GeoNode staff members to publish/unpublish resources.
@@ -182,12 +197,6 @@ geonode:
     tls: true
     # -- enable ssl for geonode mail (only tls or ssl can be true not both)
     use_ssl: False
-    # -- define mail user to send mails from
-    user: "changeme"
-    # -- set password for mailuser in geonode
-    password: "changeme"
-    # -- define from mail-addr 
-    from: "changeme@web.de"
 
   ldap:
     # -- enable ldap AUTHENTICATION_BACKENDS in DJANGO Geonode
@@ -196,8 +205,6 @@ geonode:
     uri: ldap://example.com
     # -- ldap user bind dn
     bind_dn: "CN=Users,DC=ad,DC=example,DC=com"
-    # -- ldap password
-    bind_password: password
     # -- ldap user search dn
     user_search_dn: "OU=User,DC=ad,DC=example,DC=com"
     # -- ldap user filterstr
@@ -244,7 +251,7 @@ geonode:
     # -- If True, new user accounts will be created as inactive. The user must use the activation link to activate his account.
     conformation_required: True
     # -- Specifies the login method to use – whether the user logs in by entering their username, e-mail address, or either one of both. Setting this to “email” requires email_required=True
-    authentication_method: "user_email"
+    authentication_method: "username_email"
     # -- group name to add new registered users to, requires auto_assign_registered_members_to_registered: True.
     registered_members_group_name:
     # -- if set to True new registered user will be add to defined group in registered_members_group_name
@@ -308,10 +315,14 @@ geoserver:
     tag: '2.23.0'
   # -- geoserver port
   port: 8080
-  # -- geoserver admin username
-  admin_username: admin
-  # -- geoserver admin password
-  admin_password: "geoserver"
+
+  secret:
+    # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
+    existingSecretName: ""
+    # -- geoserver admin username
+    admin_username: admin
+    # -- geoserver admin password
+    admin_password: "geoserver"
 
   resources:
     requests:
@@ -531,6 +542,8 @@ rabbitmq:
     username: rabbituser
     password: rabbitpassword
     erlangCookie: jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu
+    existingPasswordSecret: ""
+    existingErlangSecret: ""
   persistence:
     enabled: False
 
@@ -573,9 +586,12 @@ postgres:
     enabled: False
     hostname: my-external-postgres.com
     port: 5432
-    postgres_password: postgres
-    geonode_password: geonode
-    geodata_password: geogeonode
+    secret:
+      # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
+      existingSecretName: ""
+      postgres_password: postgres
+      geonode_password: geonode
+      geodata_password: geogeonode
 
 # VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator/values.yaml
 postgres-operator:

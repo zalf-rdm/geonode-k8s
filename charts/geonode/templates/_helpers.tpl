@@ -42,7 +42,7 @@
 {{- end -}}
 {{- end -}}
 
-# secret key reference for the password of user:  .Values.postgres.geonodedatabase_and_username
+# secret key reference for the password of user:  .Values.postgres.geonode_databasename_and_username
 {{- define "database_geonode_password_secret_key_ref" -}}
 {{- if (index .Values "postgres-operator" "enabled") -}}
 "{{ .Values.postgres.geonode_databasename_and_username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do"
@@ -51,7 +51,7 @@
 {{- end -}}
 {{- end -}}
 
-# secret key reference for the password of user: .Values.postgres.geodatabasename_and_username
+# secret key reference for the password of user: .Values.postgres.geonode_databasename_and_username
 {{- define "database_geodata_password_secret_key_ref" -}}
 {{- if (index .Values "postgres-operator" "enabled") -}}
 "{{ .Values.postgres.geodata_databasename_and_username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do"

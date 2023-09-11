@@ -60,9 +60,6 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | geonode.general.publishing.admin_moderate_uploads | bool | `false` | ADMIN_MODERATE_UPLOADS When this variable is set to True, every uploaded resource must be approved before becoming visible to the public users. Until a resource is in PENDING APPROVAL state, only the superusers, owner and group members can access it, unless specific edit permissions have been set for other users or groups. A Group Manager can approve the resource, but he cannot publish it whenever the setting RESOURCE_PUBLISHING is set to True. Otherwise, if RESOURCE_PUBLISHING (helm: resource_publishing_by_staff) is set to False, the resource becomes accessible as soon as it is approved. |
 | geonode.general.publishing.resource_publishing_by_staff | bool | `false` | RESOURCE_PUBLISHING By default, the GeoNode application allows GeoNode staff members to publish/unpublish resources. By default, resources are published when created. When this setting is set to True the staff members will be able to unpublish a resource (and eventually publish it back). |
 | geonode.general.settings_module | string | `"geonode.settings"` | the settings module to load |
-| geonode.general.superUser.email | string | `"support@example.com"` | admin user password |
-| geonode.general.superUser.password | string | `"geonode"` | admin panel password |
-| geonode.general.superUser.username | string | `"admin"` | admin username |
 | geonode.haystack.enabled | bool | `false` | enable hystack |
 | geonode.haystack.engine_index_name | string | `"haystack"` | hystack index name |
 | geonode.haystack.engine_url | string | `"http://elasticsearch:9200/"` | hystack url |
@@ -78,7 +75,6 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | geonode.ldap.attr_map_first_name | string | `"givenName"` | given name attribute used from ldap |
 | geonode.ldap.attr_map_last_name | string | `"sn"` | last name attribute used from ldap |
 | geonode.ldap.bind_dn | string | `"CN=Users,DC=ad,DC=example,DC=com"` | ldap user bind dn |
-| geonode.ldap.bind_password | string | `"password"` | ldap password |
 | geonode.ldap.enabled | bool | `false` | enable ldap AUTHENTICATION_BACKENDS in DJANGO Geonode |
 | geonode.ldap.group_search_dn | string | `"OU=Groups,DC=ad,DC=example,DC=com"` | ldap group search dn |
 | geonode.ldap.group_search_filterstr | string | `"(objectClass=group)"` | ldap group filterstr |
@@ -88,13 +84,10 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | geonode.ldap.user_search_filterstr | string | `"(sAMAccountName=%(user)s)"` | ldap user filterstr |
 | geonode.mail.backend | string | `"django.core.mail.backends.smtp.EmailBackend"` | set mail backend in geonode settings |
 | geonode.mail.enabled | bool | `false` | enables mail configuration for geonode |
-| geonode.mail.from | string | `"changeme@web.de"` | define from mail-addr  |
 | geonode.mail.host | string | `"smtp.gmail.com"` | set mail host for genode mail |
-| geonode.mail.password | string | `"changeme"` | set password for mailuser in geonode |
 | geonode.mail.port | string | `"587"` | mail port fo geonode mail |
 | geonode.mail.tls | bool | `true` | activate tls for geonode mail (only tls or ssl can be true not both) |
 | geonode.mail.use_ssl | bool | `false` | enable ssl for geonode mail (only tls or ssl can be true not both) |
-| geonode.mail.user | string | `"changeme"` | define mail user to send mails from |
 | geonode.memcached.enabled | bool | `true` | enable memcache, this will spawn one or more seperate memcache container(s) and configure django geonode repsectivly. Dynamic caching (see https://docs.djangoproject.com/en/4.0/topics/cache/) |
 | geonode.memcached.lock_expire | string | `"3600"` | memcached lock expire time |
 | geonode.memcached.lock_timeout | string | `"10"` | memcached lock timeout |
@@ -110,6 +103,14 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | geonode.resources.limits.memory | string | `"2Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.resources.requests.cpu | int | `1` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.resources.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| geonode.secret.existingSecretName | string | `""` | name of an existing Secret to use. Set, if you want to separately maintain the Secret. |
+| geonode.secret.ldap.bind_password | string | `"password"` | ldap password |
+| geonode.secret.mail.from | string | `"changeme@web.de"` | define from mail-addr  |
+| geonode.secret.mail.password | string | `"changeme"` | set password for mailuser in geonode |
+| geonode.secret.mail.user | string | `"changeme"` | define mail user to send mails from |
+| geonode.secret.superUser.email | string | `"support@example.com"` | admin user password |
+| geonode.secret.superUser.password | string | `"geonode"` | admin panel password |
+| geonode.secret.superUser.username | string | `"admin"` | admin username |
 | geonode.sentry.build_number | int | `0` | sentry build number |
 | geonode.sentry.dsn | string | `""` | sentry dsn url |
 | geonode.sentry.enabled | bool | `false` | enable sentry integration for geonode |
@@ -133,8 +134,6 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | geonode.uwsgi.reload_on_rss | int | `2048` | Restart workers after this much resident memory |
 | geonode.uwsgi.worker_reload_mercy | int | `60` | How long to wait before forcefully killing workers |
 | geonodeFixtures | map of fixture files | `{"somefixture.json":"[\n  {\n    \"pk\": 0,\n    \"model\": \"myapp.sample\"\n    \"description\": \"nice little content\"\n  }\n]\n"}` | Fixture files which shall be made available under /usr/src/geonode/geonode/fixtures (refer to https://docs.djangoproject.com/en/4.2/howto/initial-data/) |
-| geoserver.admin_password | string | `"geoserver"` | geoserver admin password |
-| geoserver.admin_username | string | `"admin"` | geoserver admin username |
 | geoserver.container_name | string | `"geoserver"` | geoserver container name |
 | geoserver.image.name | string | `"geonode/geoserver"` | geoserver image docker image (default in zalf namespace because geonode one was not up to date) |
 | geoserver.image.tag | string | `"2.23.0"` | geoserver docker image tag |
@@ -144,6 +143,9 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | geoserver.resources.limits.memory | string | `"4Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geoserver.resources.requests.cpu | int | `1` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geoserver.resources.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| geoserver.secret.admin_password | string | `"geoserver"` | geoserver admin password |
+| geoserver.secret.admin_username | string | `"admin"` | geoserver admin username |
+| geoserver.secret.existingSecretName | string | `""` | name of an existing Secret to use. Set, if you want to separately maintain the Secret. |
 | global.accessMode | string | `"ReadWriteMany"` | storage access mode used by helm dependency pvc |
 | global.storageClass | string | `nil` | storageClass used by helm dependencies pvc |
 | memcached.architecture | string | `"high-availability"` | memcached replica. Loadbalanaced via kubernetes. (only one entry in django settings.py) im memcached is activated under geonode.memcached.enabled this takes place |
@@ -173,11 +175,12 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | postgres-operator.podServiceAccount | object | `{"name":""}` | not setting the podServiceAccount name will leed to generation of this name. This allows to run multiple postgres-operators in a single kubernetes cluster. just seperating them by namespace. |
 | postgres-operator.storageClass | string | `nil` | postgress pv storageclass |
 | postgres.external_postgres.enabled | bool | `false` |  |
-| postgres.external_postgres.geodata_password | string | `"geogeonode"` |  |
-| postgres.external_postgres.geonode_password | string | `"geonode"` |  |
 | postgres.external_postgres.hostname | string | `"my-external-postgres.com"` |  |
 | postgres.external_postgres.port | int | `5432` |  |
-| postgres.external_postgres.postgres_password | string | `"postgres"` |  |
+| postgres.external_postgres.secret.existingSecretName | string | `""` | name of an existing Secret to use. Set, if you want to separately maintain the Secret. |
+| postgres.external_postgres.secret.geodata_password | string | `"geogeonode"` |  |
+| postgres.external_postgres.secret.geonode_password | string | `"geonode"` |  |
+| postgres.external_postgres.secret.postgres_password | string | `"postgres"` |  |
 | postgres.geodata_databasename_and_username | string | `"geodata"` | geoserver database name and username |
 | postgres.geonode_databasename_and_username | string | `"geonode"` | geonode database name and username |
 | postgres.operator_manifest.numberOfInstances | int | `1` | number of database instances |
@@ -201,6 +204,8 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | pycsw.resources.requests.cpu | string | `"500m"` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | pycsw.resources.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | rabbitmq.auth.erlangCookie | string | `"jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu"` |  |
+| rabbitmq.auth.existingErlangSecret | string | `""` |  |
+| rabbitmq.auth.existingPasswordSecret | string | `""` |  |
 | rabbitmq.auth.password | string | `"rabbitpassword"` |  |
 | rabbitmq.auth.username | string | `"rabbituser"` |  |
 | rabbitmq.enabled | bool | `true` |  |

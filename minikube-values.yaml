@@ -16,8 +16,9 @@ geonode:
   ingress:
     enabled: False
 
-  superUser:
-    password: geonode
+  secret:
+    superUser:
+      password: geonode
 
   mail:
     enabled: False
