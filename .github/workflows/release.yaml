@@ -3,7 +3,7 @@ name: Release Charts
 on:
   push:
     branches:
-    - main
+    - issue#77_bug_missing_github_token_when_building_gh_page_for_usage_in_artifacts
 
 jobs:
   release:
