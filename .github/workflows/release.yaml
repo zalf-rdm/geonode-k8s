@@ -3,7 +3,7 @@ name: Release Charts
 on:
   push:
     branches:
-    - main
+    - issue#77_bug_missing_github_token_when_building_gh_page_for_usage_in_artifacts
 
 jobs:
   release:
@@ -23,6 +23,8 @@ jobs:
 
     - name: Install Helm
       uses: azure/setup-helm@v3
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Run chart-releaser
       uses: helm/chart-releaser-action@v1.5.0
