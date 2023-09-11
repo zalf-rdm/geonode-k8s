@@ -20,9 +20,9 @@ geonode:
 
   image:
     # -- used geonode image
-    name: mwall2bitflow/geonode
+    name: 52north/geonode
     # -- tag of used geonode image
-    tag: '4.1.x'
+    tag: '4.1.2'
 
   # -- additions to tasks.py init script, must be additional code written in python
   tasks_pre_script: |
@@ -94,7 +94,6 @@ geonode:
     # -- sentry build number
     build_number: 0
 
-  # -- geonode uwsgi configuration
   uwsgi:
     # --  the max size of a request (request-body excluded)
     buffer_size: 32768
@@ -231,6 +230,7 @@ geonode:
   # - https://docs.geonode.org/en/3.3.x/basic/settings/index.html 
   # - https://github.com/pinax/django-user-accounts/blob/master/docs/settings.rst
   # - https://django-allauth.readthedocs.io/en/latest/configuration.html
+  # @ignored
   register:
     # -- allow user registration on geonode
     # Default: True
@@ -259,7 +259,6 @@ geonode:
     # -- show email addr in profile view
     show_profile_email: True
 
-
   # TODO add haystack chart
   haystack:
     # -- enable hystack
@@ -271,7 +270,6 @@ geonode:
     # -- hystack results per page
     search_results_per_page: '200'
 
-
   # configure memcached as django cache. .Values.memcached.... to configure memcached replicas, architecture and so on (see https://docs.djangoproject.com/en/4.0/topics/cache/)
   memcached:
     # -- enable memcache, this will spawn one or more seperate memcache container(s) and configure django geonode repsectivly. Dynamic caching (see https://docs.djangoproject.com/en/4.0/topics/cache/)
@@ -281,7 +279,7 @@ geonode:
     # -- memcached lock timeout
     lock_timeout: '10'
 
-
+  # TODO not tested yey
   monitoring:
     enabled: False
     data_tls: 365
@@ -290,6 +288,7 @@ geonode:
     centralized_dashboard_enabled: False
 
   celery:
+    # -- celery container name
     container_name: celery
     resources:
       requests:
@@ -299,11 +298,11 @@ geonode:
         cpu: 1
       limits:
         # -- limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
-        memory: "1Gi"
+        memory: "2Gi"
         # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
-        cpu: 1
+        cpu: 2
 
-# -- CONFIGURATION FOR GEOSERVER DEPLOYMENT
+# CONFIGURATION FOR GEOSERVER DEPLOYMENT# 
 geoserver:
   # -- geoserver pod name
   pod_name: geoserver
@@ -325,7 +324,6 @@ geoserver:
     # -- geoserver admin password
     admin_password: "geoserver"
 
-  # -- geoserver kube resources
   resources:
     requests:
       # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
@@ -339,7 +337,6 @@ geoserver:
       cpu: 2
 
 # CONFIGURATION FOR NGINX DEPLOYMENT
-# MAY MOVE TO CHART
 nginx:
   # -- nginx pod name
   pod_name: nginx
@@ -354,7 +351,6 @@ nginx:
     tag: '1.25'
   # -- max file upload size
   maxClientBodySize: 2G
-
   resources:
     requests:
       # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
@@ -397,8 +393,8 @@ pycsw:
       memory: "1Gi"
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: "500m"
-  # -- pycsw local mappings, copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py
-  # @default -- MD_CORE_MODEL = { ... }
+  # -- pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/
+  # @default -- copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py
   mappings: |-
     MD_CORE_MODEL = {
       "typename": "pycsw:CoreMetadata",
@@ -407,6 +403,7 @@ pycsw:
           "pycsw:Identifier": "uuid",
           "pycsw:Typename": "csw_typename",
           "pycsw:Schema": "csw_schema",
+
           "pycsw:MdSource": "csw_mdsource",
           "pycsw:InsertDate": "csw_insert_date",
           "pycsw:XML": "metadata_xml",
@@ -463,9 +460,9 @@ pycsw:
           "pycsw:Links": "download_links",
       },
     }
-  # -- pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/
-  # @default -- [server] ...
-  config: |
+  # pycsw.config -- pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/
+  # @default -- based of pycsw example.cfg: https://github.com/geopython/pycsw/blob/master/docker/pycsw.cfg
+  config: |-
     [server]
         home=/home/pycsw
         url=$(PYCSW_SERVER_URL)
@@ -487,8 +484,8 @@ pycsw:
         timeout=30
     [manager]
         transactions=false
-        # allowed_ips={{ .Values.pycsw.config.manager.allowed_ips }}{{ end }}
-        # csw_harvest_pagesize={{ .Values.pycsw.config.manager.csw_harvest_pagesize }}{{ end }}
+        # allowed_ips=
+        # csw_harvest_pagesize=
     [metadata:main]
         identification_title=GeoNode pycsw Geospatial Catalogue
         identification_abstract=GeoNode-k8s pycsw Geospatial Catalogue
@@ -536,7 +533,7 @@ memcached:
   architecture: high-availability
   replicaCount: 1
 
-# -- VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml
+# VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml
 rabbitmq:
   enabled: true
   # -- rabbitmq raplica count
@@ -571,7 +568,7 @@ postgres:
   # -- geoserver database name and username
   geodata_databasename_and_username: geodata
 
-  # -- configuration for postgres operator database manifest
+  # configuration for postgres operator database manifest
   operator_manifest:
     # -- pod name for postgres containers == teamID for mainifest
     pod_name: postgresql
@@ -612,7 +609,7 @@ postgres-operator:
     name: ""
 
 
-# -- VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml
+# VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml
 postgres-operator-ui:
   enabled: False
   replicaCount: 1

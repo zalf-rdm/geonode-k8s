@@ -1,5 +1,5 @@
 
-![Version: 4.1.x](https://img.shields.io/badge/Version-4.1.x-informational?style=flat-square)
+![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square)
 
 # Helm Chart for Geonode
 
@@ -26,7 +26,7 @@ Due to growing needs for high availability and scalability this repository aims 
 Geonode-k8s
 -----------
 
-This repository provides a helm chart for **geonode(4.1.x)** including additional services as:
+This repository provides a helm chart for **geonode(4.1.2)** including additional services as:
 - geoserver: source server for sharing geospatial data  (https://geoserver.org/)
 - rabbitmq: message broker (scalable)
 - postgresql database: using zalando postgres-operator for distributed database for geonode and postgis db for geoserver (https://github.com/zalando/postgres-operator) (scalable)
@@ -54,7 +54,11 @@ Install
 * [Helm](https://helm.sh/)
 
 The chart will automatically install required dependencies, i.e. a RabbitMQ broker and a Postgres database with `postgis` extensions installed, and link them up.
-This helm chart now supports geonode v4.1.x.
+
+| GeoNode-k8s chart version | GeoNode version(s) | container image | 
+|---------------------------|-----------------|--------------------|
+| 1.0.0 | [4.1.2](https://github.com/GeoNode/geonode/releases/tag/4.1.2) | [52north/geonode:4.1.2](https://hub.docker.com/r/52north/geonode/tags)
+
 
 ## Install chart dependencies
 

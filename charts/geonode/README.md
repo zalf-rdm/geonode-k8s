@@ -10,7 +10,7 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| mwallschlaeger | <marcel.wallschlaeger@zalf.de> |  |
+| mwallschlaeger | <marcel.wallschlaeger@zalf.de> | <https://github.com/mwallschlaeger> |
 
 ## Source Code
 
@@ -34,9 +34,9 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | geonode.acme.email | string | `"support@example.com"` | the email to be used to gain certificates |
 | geonode.acme.enabled | bool | `false` | enables cert-manager to do ACME challenges (aka certificates via letsencrypt) |
 | geonode.acme.stageUrl | string | `"https://acme-staging-v02.api.letsencrypt.org/directory"` | ACME staging environment (use acme-staging to avoid running into rate limits) stageUrl: https://acme-v02.api.letsencrypt.org/directory |
-| geonode.celery.container_name | string | `"celery"` |  |
-| geonode.celery.resources.limits.cpu | int | `1` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| geonode.celery.resources.limits.memory | string | `"1Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| geonode.celery.container_name | string | `"celery"` | celery container name |
+| geonode.celery.resources.limits.cpu | int | `2` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| geonode.celery.resources.limits.memory | string | `"2Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.celery.resources.requests.cpu | int | `1` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.celery.resources.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.container_name | string | `"geonode"` | container name |
@@ -64,8 +64,8 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | geonode.haystack.engine_index_name | string | `"haystack"` | hystack index name |
 | geonode.haystack.engine_url | string | `"http://elasticsearch:9200/"` | hystack url |
 | geonode.haystack.search_results_per_page | string | `"200"` | hystack results per page |
-| geonode.image.name | string | `"mwall2bitflow/geonode"` | used geonode image |
-| geonode.image.tag | string | `"4.1.x"` | tag of used geonode image |
+| geonode.image.name | string | `"52north/geonode"` | used geonode image |
+| geonode.image.tag | string | `"4.1.2"` | tag of used geonode image |
 | geonode.ingress.addNginxIngressAnnotation | bool | `false` | adds ingress annotations for nginx ingress class to increase uploadsize and timeout time |
 | geonode.ingress.enabled | bool | `true` | enables external access  |
 | geonode.ingress.ingressClassName | string | `nil` | define kubernetes ingress class for geonode ingress |
@@ -98,17 +98,6 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | geonode.monitoring.user_analytics_gzip | bool | `true` |  |
 | geonode.persistant.storageSize | string | `"10Gi"` | size of persistant geonode storage |
 | geonode.pod_name | string | `"geonode"` | pod name |
-| geonode.register | object | `{"approval_required":false,"authentication_method":"username_email","auto_assign_registered_members_to_registered":true,"confirm_email_on_get":true,"conformation_required":true,"email_required":true,"email_verification":"mandatory","open_signup":true,"registered_members_group_name":null,"show_profile_email":true}` | Find docs for register values under: - https://docs.geonode.org/en/3.3.x/basic/settings/index.html  - https://github.com/pinax/django-user-accounts/blob/master/docs/settings.rst - https://django-allauth.readthedocs.io/en/latest/configuration.html |
-| geonode.register.approval_required | bool | `false` | approve given email with registration |
-| geonode.register.authentication_method | string | `"username_email"` | Specifies the login method to use – whether the user logs in by entering their username, e-mail address, or either one of both. Setting this to “email” requires email_required=True |
-| geonode.register.auto_assign_registered_members_to_registered | bool | `true` | if set to True new registered user will be add to defined group in registered_members_group_name |
-| geonode.register.confirm_email_on_get | bool | `true` | send confirm email on get |
-| geonode.register.conformation_required | bool | `true` | If True, new user accounts will be created as inactive. The user must use the activation link to activate his account. |
-| geonode.register.email_required | bool | `true` | set email as required for registration |
-| geonode.register.email_verification | string | `"mandatory"` | enable email verification Determines the e-mail verification method during signup – choose one of "mandatory", "optional", or "none". Setting this to “mandatory” requires email_required to be True When set to “mandatory” the user is blocked from logging in until the email address is verified. Choose “optional” or “none” to allow logins with an unverified e-mail address. In case of “optional”, the e-mail verification mail is still sent, whereas in case of “none” no e-mail verification mails are sent. |
-| geonode.register.open_signup | bool | `true` | allow user registration on geonode Default: True If True, creation of new accounts is allowed. When the signup view is called, the template account/signup.html will be displayed, usually showing a form to collect the new user data. If False, creation of new accounts is disabled. When the signup view is called, the template account/signup_closed.html will be displayed. |
-| geonode.register.registered_members_group_name | string | `nil` | group name to add new registered users to, requires auto_assign_registered_members_to_registered: True. |
-| geonode.register.show_profile_email | bool | `true` | show email addr in profile view |
 | geonode.replicaCount | int | `1` | number of geonode replicas (! not working properly yet) |
 | geonode.resources.limits.cpu | int | `2` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.resources.limits.memory | string | `"2Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
@@ -128,7 +117,6 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | geonode.sentry.environment | string | `"development"` | sentry environment |
 | geonode.tasks_post_script | string | `"print(\"tasks_post_script not defined ...\")\n"` | additions to tasks.py script at the beginning of the tasks.py, must be additional code written in python |
 | geonode.tasks_pre_script | string | `"print(\"tasks_pre_script not defined ...\")\n"` | additions to tasks.py init script, must be additional code written in python |
-| geonode.uwsgi | object | `{"buffer_size":32768,"cheaper":8,"cheaper_busyness_backlog_alert":16,"cheaper_busyness_backlog_step":2,"cheaper_busyness_max":70,"cheaper_busyness_min":20,"cheaper_busyness_multiplier":30,"cheaper_initial":16,"cheaper_overload":1,"cheaper_step":16,"harakiri":800,"max_requests":1000,"max_worker_lifetime":3600,"processes":128,"reload_on_rss":2048,"worker_reload_mercy":60}` | geonode uwsgi configuration |
 | geonode.uwsgi.buffer_size | int | `32768` | the max size of a request (request-body excluded) |
 | geonode.uwsgi.cheaper | int | `8` | Minimum number of workers allowed |
 | geonode.uwsgi.cheaper_busyness_backlog_alert | int | `16` | Spawn emergency workers if more than this many requests are waiting in the queue |
@@ -146,13 +134,11 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | geonode.uwsgi.reload_on_rss | int | `2048` | Restart workers after this much resident memory |
 | geonode.uwsgi.worker_reload_mercy | int | `60` | How long to wait before forcefully killing workers |
 | geonodeFixtures | map of fixture files | `{"somefixture.json":"[\n  {\n    \"pk\": 0,\n    \"model\": \"myapp.sample\"\n    \"description\": \"nice little content\"\n  }\n]\n"}` | Fixture files which shall be made available under /usr/src/geonode/geonode/fixtures (refer to https://docs.djangoproject.com/en/4.2/howto/initial-data/) |
-| geoserver | object | `{"container_name":"geoserver","image":{"name":"geonode/geoserver","tag":"2.23.0"},"pod_name":"geoserver","port":8080,"resources":{"limits":{"cpu":2,"memory":"4Gi"},"requests":{"cpu":1,"memory":"1Gi"}},"secret":{"admin_password":"geoserver","admin_username":"admin","existingSecretName":""}}` | CONFIGURATION FOR GEOSERVER DEPLOYMENT |
 | geoserver.container_name | string | `"geoserver"` | geoserver container name |
 | geoserver.image.name | string | `"geonode/geoserver"` | geoserver image docker image (default in zalf namespace because geonode one was not up to date) |
 | geoserver.image.tag | string | `"2.23.0"` | geoserver docker image tag |
 | geoserver.pod_name | string | `"geoserver"` | geoserver pod name |
 | geoserver.port | int | `8080` | geoserver port |
-| geoserver.resources | object | `{"limits":{"cpu":2,"memory":"4Gi"},"requests":{"cpu":1,"memory":"1Gi"}}` | geoserver kube resources |
 | geoserver.resources.limits.cpu | int | `2` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geoserver.resources.limits.memory | string | `"4Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geoserver.resources.requests.cpu | int | `1` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
@@ -174,7 +160,15 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | nginx.resources.limits.memory | string | `"1Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | nginx.resources.requests.cpu | string | `"500m"` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | nginx.resources.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| postgres-operator-ui | object | `{"enabled":false,"envs":{"operatorApiUrl":"http://{{ $.Release.Name }}-postgres-operator:8080"},"ingress":{"enabled":false,"hosts":[{"host":"postgres-ui","paths":[""]}],"ingressClassName":null},"replicaCount":1,"service":{"port":80,"type":"ClusterIP"}}` | VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml |
+| postgres-operator-ui.enabled | bool | `false` |  |
+| postgres-operator-ui.envs.operatorApiUrl | string | `"http://{{ $.Release.Name }}-postgres-operator:8080"` |  |
+| postgres-operator-ui.ingress.enabled | bool | `false` |  |
+| postgres-operator-ui.ingress.hosts[0].host | string | `"postgres-ui"` |  |
+| postgres-operator-ui.ingress.hosts[0].paths[0] | string | `""` |  |
+| postgres-operator-ui.ingress.ingressClassName | string | `nil` |  |
+| postgres-operator-ui.replicaCount | int | `1` |  |
+| postgres-operator-ui.service.port | int | `80` |  |
+| postgres-operator-ui.service.type | string | `"ClusterIP"` |  |
 | postgres-operator.configLoggingRestApi.api_port | int | `8080` | REST API listener listens to this port |
 | postgres-operator.enabled | bool | `true` | enable postgres-operator (this or postgresql.enabled NOT both ) |
 | postgres-operator.operatorApiUrl | string | `"http://{{ .Release.Name }}-postgres-operator:8080"` | ??? |
@@ -189,20 +183,19 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | postgres.external_postgres.secret.postgres_password | string | `"postgres"` |  |
 | postgres.geodata_databasename_and_username | string | `"geodata"` | geoserver database name and username |
 | postgres.geonode_databasename_and_username | string | `"geonode"` | geonode database name and username |
-| postgres.operator_manifest | object | `{"numberOfInstances":1,"pod_name":"postgresql","postgres_version":15,"storageSize":"3Gi"}` | configuration for postgres operator database manifest |
 | postgres.operator_manifest.numberOfInstances | int | `1` | number of database instances |
 | postgres.operator_manifest.pod_name | string | `"postgresql"` | pod name for postgres containers == teamID for mainifest |
 | postgres.operator_manifest.postgres_version | int | `15` | postgres version |
 | postgres.operator_manifest.storageSize | string | `"3Gi"` | Database storage size |
 | postgres.schema | string | `"public"` | database schema |
 | postgres.username | string | `"postgres"` | postgres username |
-| pycsw.config | string | [server] ... | pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/ |
+| pycsw.config | string | based of pycsw example.cfg: https://github.com/geopython/pycsw/blob/master/docker/pycsw.cfg | pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/ |
 | pycsw.container_name | string | `"pycsw"` | pycsw container name |
 | pycsw.enabled | bool | `true` | enable single pycsw pod |
 | pycsw.endpoint | string | `"/catalogue/csw"` | pycsw url below geonode.ingress.externalDomain |
 | pycsw.image.name | string | `"geopython/pycsw"` | pycsw docker image |
 | pycsw.image.tag | string | `"2.6.1"` | pycsw docker image tag |
-| pycsw.mappings | string | MD_CORE_MODEL = { ... } | pycsw local mappings, copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py |
+| pycsw.mappings | string | copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py | pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/ |
 | pycsw.pod_name | string | `"pysw"` | pycsw pod name |
 | pycsw.port | int | `8000` | pycsw endpoint port |
 | pycsw.replicaCount | int | `1` | pycsw container replicas |
@@ -210,9 +203,15 @@ Helm Chart for Geonode a web-based application and platform for developing geosp
 | pycsw.resources.limits.memory | string | `"1Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | pycsw.resources.requests.cpu | string | `"500m"` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | pycsw.resources.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| rabbitmq | object | `{"auth":{"erlangCookie":"jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu","existingErlangSecret":"","existingPasswordSecret":"","password":"rabbitpassword","username":"rabbituser"},"enabled":true,"limits":{"cpu":"750m","memory":"1Gi"},"persistence":{"enabled":false},"replicaCount":1,"requests":{"cpu":"500m","memory":"1Gi"}}` | VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml |
+| rabbitmq.auth.erlangCookie | string | `"jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu"` |  |
+| rabbitmq.auth.existingErlangSecret | string | `""` |  |
+| rabbitmq.auth.existingPasswordSecret | string | `""` |  |
+| rabbitmq.auth.password | string | `"rabbitpassword"` |  |
+| rabbitmq.auth.username | string | `"rabbituser"` |  |
+| rabbitmq.enabled | bool | `true` |  |
 | rabbitmq.limits.cpu | string | `"750m"` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | rabbitmq.limits.memory | string | `"1Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| rabbitmq.persistence.enabled | bool | `false` |  |
 | rabbitmq.replicaCount | int | `1` | rabbitmq raplica count |
 | rabbitmq.requests.cpu | string | `"500m"` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | rabbitmq.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
