@@ -7,7 +7,6 @@ data:
     # add these import lines to the top of your geonode settings file
     {{ if .Values.geonode.sentry.enabled }}
     import sentry_sdk
-
     BUILD_NUMBER = os.environ.get("BUILD_NUMBER", "0")
     AUTHENTICATION_BACKENDS += ('allauth.account.auth_backends.AuthenticationBackend',)
 
@@ -38,6 +37,7 @@ data:
     from django_auth_ldap import config as ldap_config
     from geonode_ldap.config import GeonodeNestedGroupOfNamesType
     import ldap
+    from distutils.util import strtobool
 
     LDAP_ENABLED = strtobool(os.getenv("LDAP_ENABLED", "False"))
     if LDAP_ENABLED:
