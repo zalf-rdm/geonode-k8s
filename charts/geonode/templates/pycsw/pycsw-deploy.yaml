@@ -44,12 +44,11 @@ spec:
         - name: GEONODE_DATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.postgres.geonode_databasename_and_username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do
+              name: {{ include "database_geonode_password_secret_key_ref" . }}
               key: password
         - name: PYCSW_REPOSITORY_DATABASE_URI
           value: "postgresql://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"
 
-       
         ports:
         - containerPort: {{ .Values.pycsw.port }}
         volumeMounts:
