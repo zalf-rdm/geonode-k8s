@@ -1,8 +1,8 @@
 # geonode-k8s
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square)
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square)
 
-Helm Chart for Geonode a web-based application and platform for developing geospatial information systems (GIS) and for deploying spatial data infrastructures (SDI)
+Helm Chart for Geonode. Supported versions: Geonode: 4.1.2, Geoserver: 2.23, pyCSW: 2.61
 
 **Homepage:** <https://geonode.org/>
 
