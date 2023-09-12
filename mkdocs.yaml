@@ -1,6 +1,6 @@
 site_name: GeoNode-k8s a Geonode Helm Chart docs
 theme:
-  name: GeoNode-k8s
+  name: readthedocs
   highlightjs: true
 plugins:
 - search
