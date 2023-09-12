@@ -1,7 +1,7 @@
 apiVersion: v2
 name: geonode-k8s
-version: 1.0.0
-description: Helm Chart for Geonode a web-based application and platform for developing geospatial information systems (GIS) and for deploying spatial data infrastructures (SDI)
+version: 1.0.1
+description: "Helm Chart for Geonode. Supported versions: Geonode: 4.1.2, Geoserver: 2.23, pyCSW: 2.61"
 keywords:
 - geonode
 - geospatial
