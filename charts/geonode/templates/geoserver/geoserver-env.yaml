@@ -15,5 +15,5 @@ data:
 
   DATABASE_HOST: "{{ include "database_hostname" . }}"
   DATABASE_PORT: "{{ include "database_port" . }}"
-  GEONODE_GEODATABASE: {{ .Values.postgres.geonode_databasename_and_username | quote  }}
+  GEONODE_GEODATABASE: {{ .Values.postgres.geodata_databasename_and_username | quote  }}
   GEONODE_GEODATABASE_SCHEMA: {{ .Values.postgres.schema | quote }}
