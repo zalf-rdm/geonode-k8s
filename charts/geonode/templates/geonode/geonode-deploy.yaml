@@ -200,7 +200,6 @@ spec:
             name: {{ default "geoserver-secret" .Values.geoserver.secret.existingSecretName | quote }}
 
         env:
-        env:
         - name: IS_CELERY
           value: 'True'
         - name: GEONODE_DATABASE_PASSWORD
