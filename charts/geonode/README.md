@@ -1,8 +1,8 @@
 # geonode-k8s
 
-![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=flat-square)
+![Version: 1.0.3](https://img.shields.io/badge/Version-1.0.3-informational?style=flat-square)
 
-Helm Chart for Geonode. Supported versions: Geonode: 4.1.2, Geoserver: 2.23, pyCSW: 2.61
+Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23, pyCSW: 2.61
 
 **Homepage:** <https://geonode.org/>
 
@@ -65,7 +65,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.2, Geoserver: 2.23, pyC
 | geonode.haystack.engine_url | string | `"http://elasticsearch:9200/"` | hystack url |
 | geonode.haystack.search_results_per_page | string | `"200"` | hystack results per page |
 | geonode.image.name | string | `"52north/geonode"` | used geonode image |
-| geonode.image.tag | string | `"4.1.2"` | tag of used geonode image |
+| geonode.image.tag | string | `"4.1.3"` | tag of used geonode image |
 | geonode.ingress.addNginxIngressAnnotation | bool | `false` | adds ingress annotations for nginx ingress class to increase uploadsize and timeout time |
 | geonode.ingress.enabled | bool | `true` | enables external access  |
 | geonode.ingress.ingressClassName | string | `nil` | define kubernetes ingress class for geonode ingress |

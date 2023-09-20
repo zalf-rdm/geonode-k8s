@@ -1,5 +1,5 @@
 
-![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=flat-square)
+![Version: 1.0.3](https://img.shields.io/badge/Version-1.0.3-informational?style=flat-square)
 
 # Helm Chart for Geonode
 
@@ -26,13 +26,13 @@ Due to growing needs for high availability and scalability this repository aims 
 Geonode-k8s
 -----------
 
-This repository provides a helm chart for **geonode(4.1.2)** including additional services as:
+This repository provides a helm chart for **geonode** including additional services as:
 - geoserver: source server for sharing geospatial data  (https://geoserver.org/)
 - rabbitmq: message broker (scalable)
 - postgresql database: using zalando postgres-operator for distributed database for geonode and postgis db for geoserver (https://github.com/zalando/postgres-operator) (scalable)
 - memcached (optional): as django cache (scalable)
 - nginx: webserver to deliver static content (scalable)
-
+- pycsw: CSW interface (scalable)
 This helm chart provides the possibility to run most of the services redundant to increase performance on the one hand and increase fail safe on the other hand.
 
 To get an overview of the available configuration check out the values [docs](charts/geonode/README.md). If you want to run the helm chart first on a minikube cluster check out the [minikube](docs/minikube-installation.md) guide. Also check the minikube-values.yaml for basic configuration. 
@@ -42,9 +42,11 @@ If you want to go straight for a production installation follow the [installatio
 Furhter docs:
 - [https-ingress](docs/https-ingress.md)
 - [access-geonode-database-from-outside-of-kubernetes](docs/access-geonode-database-from-outside.md)
+- [use-database-outside-of-this-helm-chart](docs/external-database.md)
 - [configure-nginx-ingress-body-size-timeout](docs/nginx-ingress-class.md)
 - [run-with-external-postgresql-database](docs/external-database.md)
-
+- [custom-secret-handling](docs/provide-custom-secret.md)
+- [how-to-configure-external-pycsw](docs/pycsw.md)
 Install
 -------
 
@@ -55,11 +57,12 @@ Install
 
 The chart will automatically install required dependencies, i.e. a RabbitMQ broker and a Postgres database with `postgis` extensions installed, and link them up.
 
-| GeoNode-k8s chart version | GeoNode version(s) | geonode container image | geoserver container image | 
+| GeoNode-k8s<br /> chart version | GeoNode<br /> version(s) | geonode container image | geoserver container image | 
 |---------------------------|--------------------|-------------------------|---------------------------|
 | [1.0.0](https://github.com/zalf-rdm/geonode-k8s/releases/tag/1.0.0) | [4.1.2](https://github.com/GeoNode/geonode/releases/tag/4.1.2) | [52north/geonode:4.1.2](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
 | [1.0.1](https://github.com/zalf-rdm/geonode-k8s/releases/tag/1.0.1) | [4.1.2](https://github.com/GeoNode/geonode/releases/tag/4.1.2) | [52north/geonode:4.1.2](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
 | [1.0.2](https://github.com/zalf-rdm/geonode-k8s/releases/tag/1.0.2) | [4.1.2](https://github.com/GeoNode/geonode/releases/tag/4.1.2) | [52north/geonode:4.1.2](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
+| [1.0.3](https://github.com/zalf-rdm/geonode-k8s/releases/tag/1.0.2) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
 
 ## Install chart dependencies
 
