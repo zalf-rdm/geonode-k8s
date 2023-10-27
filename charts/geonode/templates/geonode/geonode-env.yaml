@@ -21,13 +21,8 @@ data:
   # GeoNode APIs
   API_LOCKDOWN: 'False'
   TASTYPIE_APIKEY: ""
-  # TODO (mwall) set this automatically with helm magics not fully implemented
-  {{ if  ( eq .Release.Revision 1 )}}
-  IS_FIRST_START: 'True'
-  {{ else }}
-  IS_FIRST_START: 'False'
-  {{ end }}
-  FORCE_REINIT: 'False'
+  FORCE_REINIT: {{ .Values.geonode.general.force_reinit | quote }}
+
   # set this to true breaks upload
   ASYNC_SIGNALS: 'True'
   CACHE_BUSTING_STATIC_ENABLED: 'False'
@@ -125,11 +120,6 @@ data:
   {{ else }}
   CATALOGUE_ENGINE: geonode.catalogue.backends.pycsw_local
   {{ end}}
-  # OAuth2
-  # TODO (mwall) implement OAUTH2
-  OAUTH2_API_KEY: ""
-  OAUTH2_CLIENT_ID: ""
-  OAUTH2_CLIENT_SECRET: ""
 
   DJANGO_SETTINGS_MODULE: {{ .Values.geonode.general.settings_module }}
   DEFAULT_BACKEND_DATASTORE: datastore

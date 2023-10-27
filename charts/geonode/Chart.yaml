@@ -1,21 +1,21 @@
 apiVersion: v2
 name: geonode-k8s
-version: 1.0.3
+version: 1.0.4
 description: "Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23, pyCSW: 2.61"
 keywords:
-- geonode
-- geospatial
-- geodata
-- SDI
-- http
-- web
-- python
-- geoserver
-- postresql
-- postgis
-- rabbitmq
-- memcached
-- django
+  - geonode
+  - geospatial
+  - geodata
+  - SDI
+  - http
+  - web
+  - python
+  - geoserver
+  - postresql
+  - postgis
+  - rabbitmq
+  - memcached
+  - django
 icon: https://www.osgeo.org/wp-content/uploads/GeoNode-370x206.png
 annotations:
   artifacthub.io/links: |
@@ -29,26 +29,26 @@ annotations:
   artifacthub.io/license: "GPL3"
 home: https://geonode.org/
 sources:
-- https://github.com/zalf-rdm/geonode-k8s
-- https://github.com/geonode/geonode
+  - https://github.com/zalf-rdm/geonode-k8s
+  - https://github.com/geonode/geonode
 maintainers:
-- name: mwallschlaeger
-  email: marcel.wallschlaeger@zalf.de
-  url: https://github.com/mwallschlaeger
+  - name: mwallschlaeger
+    email: marcel.wallschlaeger@zalf.de
+    url: https://github.com/mwallschlaeger
 dependencies:
-- name: postgres-operator-ui
-  version: ~1.9.0
-  repository: https://opensource.zalando.com/postgres-operator/charts/postgres-operator-ui/
-  condition: postgres-operator-ui.enabled
-- name: postgres-operator
-  version: ~1.9.0
-  repository: https://opensource.zalando.com/postgres-operator/charts/postgres-operator/
-  condition: postgres-operator.enabled
-- name: rabbitmq
-  version: ~10.1.7
-  repository: https://charts.bitnami.com/bitnami
-  condition: rabbitmq.enabled
-- name: memcached
-  repository: https://charts.bitnami.com/bitnami
-  condition: geonode.memcached.enaled
-  version: ~6.x.x
+  - name: postgres-operator-ui
+    version: ~1.9.0
+    repository: https://opensource.zalando.com/postgres-operator/charts/postgres-operator-ui/
+    condition: postgres-operator-ui.enabled
+  - name: postgres-operator
+    version: ~1.9.0
+    repository: https://opensource.zalando.com/postgres-operator/charts/postgres-operator/
+    condition: postgres-operator.enabled
+  - name: rabbitmq
+    version: ~10.1.7
+    repository: https://charts.bitnami.com/bitnami
+    condition: rabbitmq.enabled
+  - name: memcached
+    repository: https://charts.bitnami.com/bitnami
+    condition: geonode.memcached.enaled
+    version: ~6.x.x

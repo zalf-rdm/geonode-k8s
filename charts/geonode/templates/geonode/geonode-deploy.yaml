@@ -31,6 +31,7 @@ spec:
         org.geonode.instance: "{{ include "geonode_pod_name" . }}"
       annotations:
         checksum/geonode-env: {{ include (print $.Template.BasePath "/geonode/geonode-env.yaml") . | sha256sum }}
+        checksum/geonode-secret: {{ include (print $.Template.BasePath "/geonode/geonode-secret.yaml") . | sha256sum }}
         checksum/geonode-local-settings: {{ include (print $.Template.BasePath "/geonode/geonode-local-settings.yaml") . | sha256sum }}
         checksum/geonode-uwsig: {{ include (print $.Template.BasePath "/geonode/geonode-uwsgi-ini-conf.yaml") . | sha256sum }}
     spec:
