@@ -15,7 +15,9 @@ spec:
       labels:
         org.geonode.instance: "{{ include "geoserver_pod_name" . }}"
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/geoserver/geoserver-env.yaml") . | sha256sum }}
+        checksum/geoserver-env: {{ include (print $.Template.BasePath "/geoserver/geoserver-env.yaml") . | sha256sum }}
+        checksum/geoserver-secret: {{ include (print $.Template.BasePath "/geoserver/geoserver-secret.yaml") . | sha256sum }}
+
     spec:
       terminationGracePeriodSeconds: 3
       initContainers:

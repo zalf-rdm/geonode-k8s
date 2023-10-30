@@ -4,7 +4,6 @@ global:
   # -- storage access mode used by helm dependency pvc
   accessMode: ReadWriteMany
 
-
 # geonode configuration
 geonode:
   # -- pod name
@@ -22,7 +21,7 @@ geonode:
     # -- used geonode image
     name: 52north/geonode
     # -- tag of used geonode image
-    tag: '4.1.3'
+    tag: "4.1.3"
 
   # -- additions to tasks.py init script, must be additional code written in python
   tasks_pre_script: |
@@ -46,12 +45,16 @@ geonode:
       user: "changeme"
       # -- set password for mailuser in geonode
       password: "changeme"
-      # -- define from mail-addr 
+      # -- define from mail-addr
       from: "changeme@web.de"
     ldap:
       # -- ldap password
       bind_password: password
-
+    oauth2:
+      # -- oauth2 geoserver clientID (OAUTH2_CLIENT_ID)
+      clientId: Jrchz2oPY3akmzndmgUTYrs9gczlgoV20YPSvqaV
+      # -- oauth2 geoserver secret (OAUTH2_CLIENT_SECRET)
+      clientSecret: rCnp5txobUo83EpQEblM8fVj3QT5zb5qRfxNsuPzCqZaiRyIoxM4jdgMiZKFfePBHYXCLd7B8NlkfDBY9HKeIQPcy5Cp08KQNpRHQbjpLItDHv12GvkSeXp6OxaUETv3
 
   resources:
     requests:
@@ -66,7 +69,7 @@ geonode:
       cpu: 2
 
   ingress:
-    # -- enables external access 
+    # -- enables external access
     enabled: True
     # -- define kubernetes ingress class for geonode ingress
     ingressClassName:
@@ -130,13 +133,15 @@ geonode:
     cheaper_busyness_backlog_step: 2
 
   general:
-
-    # -- external ingress schema. If set to 'https', make sure to configure TLS either by 
+    # -- external ingress schema. If set to 'https', make sure to configure TLS either by
     # configuring tls certificate or using cert-manager. Available options: (http|https)
     externalScheme: http
-    # -- external ingress hostname 
+    # -- external ingress hostname
     externalDomain: geonode
 
+    # -- set force reinit true so that changing passwords etc. in Values.yaml will take effect after restarting the pod
+    # this on the other hand will increase pod initializing time, only change if you know what you are doing
+    force_reinit: true
     # -- max upload document size in MB
     max_document_size: 10
     # -- to describe
@@ -192,7 +197,7 @@ geonode:
     # -- set mail host for genode mail
     host: smtp.gmail.com
     # -- mail port fo geonode mail
-    port: '587'
+    port: "587"
     # -- activate tls for geonode mail (only tls or ssl can be true not both)
     tls: true
     # -- enable ssl for geonode mail (only tls or ssl can be true not both)
@@ -214,7 +219,7 @@ geonode:
     # -- always update local user database from ldap
     always_update_user: True
     # -- TODO ADD mirror groups_except AUTH_LDAP_MIRROR_GROUPS_EXCEPT
-    # mirror_groups_except: 
+    # mirror_groups_except:
     # -- ldap group search dn
     group_search_dn: "OU=Groups,DC=ad,DC=example,DC=com"
     # -- ldap group filterstr
@@ -223,11 +228,11 @@ geonode:
     attr_map_first_name: "givenName"
     # -- last name attribute used from ldap
     attr_map_last_name: "sn"
-    # -- email attribute used from ldap 
+    # -- email attribute used from ldap
     attr_map_email_addr: mailPrimaryAddress
 
   # -- Find docs for register values under:
-  # - https://docs.geonode.org/en/3.3.x/basic/settings/index.html 
+  # - https://docs.geonode.org/en/3.3.x/basic/settings/index.html
   # - https://github.com/pinax/django-user-accounts/blob/master/docs/settings.rst
   # - https://django-allauth.readthedocs.io/en/latest/configuration.html
   # @ignored
@@ -268,16 +273,16 @@ geonode:
     # -- hystack index name
     engine_index_name: haystack
     # -- hystack results per page
-    search_results_per_page: '200'
+    search_results_per_page: "200"
 
   # configure memcached as django cache. .Values.memcached.... to configure memcached replicas, architecture and so on (see https://docs.djangoproject.com/en/4.0/topics/cache/)
   memcached:
     # -- enable memcache, this will spawn one or more seperate memcache container(s) and configure django geonode repsectivly. Dynamic caching (see https://docs.djangoproject.com/en/4.0/topics/cache/)
     enabled: True
     # -- memcached lock expire time
-    lock_expire: '3600'
+    lock_expire: "3600"
     # -- memcached lock timeout
-    lock_timeout: '10'
+    lock_timeout: "10"
 
   # TODO not tested yey
   monitoring:
@@ -302,7 +307,7 @@ geonode:
         # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
         cpu: 2
 
-# CONFIGURATION FOR GEOSERVER DEPLOYMENT# 
+# CONFIGURATION FOR GEOSERVER DEPLOYMENT#
 geoserver:
   # -- geoserver pod name
   pod_name: geoserver
@@ -312,7 +317,7 @@ geoserver:
     # -- geoserver image docker image (default in zalf namespace because geonode one was not up to date)
     name: geonode/geoserver
     # -- geoserver docker image tag
-    tag: '2.23.0'
+    tag: "2.23.0"
   # -- geoserver port
   port: 8080
 
@@ -348,7 +353,7 @@ nginx:
     # -- nginx docker image
     name: nginx
     # -- nginx docker image tag
-    tag: '1.25'
+    tag: "1.25"
   # -- max file upload size
   maxClientBodySize: 2G
   resources:
@@ -377,7 +382,7 @@ pycsw:
     # -- pycsw docker image
     name: geopython/pycsw
     # -- pycsw docker image tag
-    tag: '2.6.1'
+    tag: "2.6.1"
   # -- pycsw endpoint port
   port: 8000
   # -- pycsw url below geonode.ingress.externalDomain
@@ -525,7 +530,6 @@ pycsw:
         contact_email=Email Address
         temp_extent=YYYY-MM-DD/YYYY-MM-DD
 
-
 # MEMCACHED CONFIGURATION
 # https://artifacthub.io/packages/helm/bitnami/memcached
 memcached:
@@ -578,7 +582,7 @@ postgres:
     numberOfInstances: 1
     # -- postgres version
     postgres_version: 15
-    # database passwords are set randomly 
+    # database passwords are set randomly
     # infos @ https://postgres-operator.readthedocs.io/en/refactoring-sidecars/user/
     # get password after creation via: kubectl get secret {{ .Release.name }}.{{ .Release.name }}-{{ container_name }}.credentials -o 'jsonpath={.data.password}' | base64 -d
 
@@ -608,7 +612,6 @@ postgres-operator:
   podServiceAccount:
     name: ""
 
-
 # VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml
 postgres-operator-ui:
   enabled: False
@@ -622,8 +625,8 @@ postgres-operator-ui:
     enabled: False
     ingressClassName:
     hosts:
-    - host: postgres-ui
-      paths: [""]
+      - host: postgres-ui
+        paths: [""]
 
 # -- (map of fixture files) Fixture files which shall be made available under /usr/src/geonode/geonode/fixtures (refer to https://docs.djangoproject.com/en/4.2/howto/initial-data/)
 geonodeFixtures:
