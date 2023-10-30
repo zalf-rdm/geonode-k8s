@@ -61,9 +61,9 @@ The chart will automatically install required dependencies, i.e. a RabbitMQ brok
 |---------------------------|--------------------|-------------------------|---------------------------|
 | [1.0.0](https://github.com/zalf-rdm/geonode-k8s/releases/tag/1.0.0) | [4.1.2](https://github.com/GeoNode/geonode/releases/tag/4.1.2) | [52north/geonode:4.1.2](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
 | [1.0.1](https://github.com/zalf-rdm/geonode-k8s/releases/tag/1.0.1) | [4.1.2](https://github.com/GeoNode/geonode/releases/tag/4.1.2) | [52north/geonode:4.1.2](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
-| [1.0.2](https://github.com/zalf-rdm/geonode-k8s/releases/tag/1.0.2) | [4.1.2](https://github.com/GeoNode/geonode/releases/tag/4.1.2) | [52north/geonode:4.1.2](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
-| [1.0.3](https://github.com/zalf-rdm/geonode-k8s/releases/tag/1.0.2) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
-| [1.0.4](https://github.com/zalf-rdm/geonode-k8s/releases/tag/1.0.2) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
+| [1.0.2](https://github.com/zalf-rdm/geonode-k8s/releases/tag/geonode-k8s-1.0.2) | [4.1.2](https://github.com/GeoNode/geonode/releases/tag/4.1.2) | [52north/geonode:4.1.2](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
+| [1.0.3](https://github.com/zalf-rdm/geonode-k8s/releases/tag/geonode-k8s-1.0.3) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
+| [1.0.4](https://github.com/zalf-rdm/geonode-k8s/releases/tag/geonode-k8s-1.0.4) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
 
 ## Install chart dependencies
 
