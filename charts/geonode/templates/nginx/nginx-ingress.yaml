@@ -7,11 +7,13 @@ metadata:
   name:  "{{ include "nginx_pod_name" . }}-ingress"
   annotations:
     description: Configures routes for external access
-    {{ .Values.geonode.ingress.annotations | toYaml }}
+    {{- if .Values.geonode.ingress.annotations -}}
+    {{ .Values.geonode.ingress.annotations | toYaml | nindent 4 }}
+    {{- end -}}
     {{ if (eq .Values.geonode.acme.enabled true) }}
     cert-manager.io/issuer: letsencrypt
     acme.cert-manager.io/http01-edit-in-place: "true"
-    {{ end}}
+    {{- end }}
 spec:
   ingressClassName: {{ .Values.geonode.ingress.ingressClassName }}
   {{ if (eq .Values.geonode.general.externalScheme "https") }}
