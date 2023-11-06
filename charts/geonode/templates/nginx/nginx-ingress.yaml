@@ -7,16 +7,11 @@ metadata:
   name:  "{{ include "nginx_pod_name" . }}-ingress"
   annotations:
     description: Configures routes for external access
+    {{ .Values.geonode.ingress.annotations | toYaml }}
     {{ if (eq .Values.geonode.acme.enabled true) }}
     cert-manager.io/issuer: letsencrypt
     acme.cert-manager.io/http01-edit-in-place: "true"
     {{ end}}
-    {{ if ( .Values.geonode.ingress.addNginxIngressAnnotation) }}
-    nginx.ingress.kubernetes.io/proxy-body-size: "2g"
-    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-    {{ end }}
 spec:
   ingressClassName: {{ .Values.geonode.ingress.ingressClassName }}
   {{ if (eq .Values.geonode.general.externalScheme "https") }}
