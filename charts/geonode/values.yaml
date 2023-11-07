@@ -30,6 +30,9 @@ geonode:
   tasks_post_script: |
     print("tasks_post_script not defined ...")
 
+  accesscontrol:
+    lockdown: False
+
   secret:
     # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
     existingSecretName: ""

@@ -71,7 +71,7 @@ data:
   GEOIP_PATH: /mnt/volumes/statics/geoip.db
 
   # Session/Access Control
-  LOCKDOWN_GEONODE: 'False'
+  LOCKDOWN_GEONODE: {{ .Values.geonode.accesscontrol.lockdown | quote }}
   CORS_ORIGIN_ALLOW_ALL: 'True'
   X_FRAME_OPTIONS: ALLOW-FROM ALL
   SESSION_EXPIRED_CONTROL_ENABLED: 'True'
