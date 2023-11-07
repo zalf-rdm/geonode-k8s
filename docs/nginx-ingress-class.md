@@ -1,5 +1,13 @@
 # nginx-ingress Configuration
 
+The annotations documented below gives you hints on nginx configuration options you may have to set with regard on your deployment.
+
+> :bulb: **Note:**
+>
+> Configure all nginx annotations via JSON object in the `.Values.ingress.annotations` setting.
+>
+> Have a look at [the list of available nginx-annotations](https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/nginx-configuration/annotations.md) (check the version first) for the ingress-nginx controller.
+
 ## Increasing the max upload size for kubernetes nginx-ingress
 
 If you run the nginx ingress controller on your cluster, you may ran into an issue where you are unable to upload larger files into your geonode instance.
