@@ -31,6 +31,7 @@ geonode:
     print("tasks_post_script not defined ...")
 
   accesscontrol:
+    # -- Enable/Disable lockdown mode of GeoNode
     lockdown: "False"
 
   secret:
@@ -370,6 +371,8 @@ nginx:
       memory: "1Gi"
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: "800m"
+  # -- name of an existing ConfigMap to use. Set, if you want to separately maintain the ConfigMap.
+  existingConfigMapName: ""
 
 # pycsw integration is based on https://github.com/geopython/pycsw/blob/master/docker/kubernetes
 pycsw:
