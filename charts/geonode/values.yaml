@@ -31,6 +31,7 @@ geonode:
     print("tasks_post_script not defined ...")
 
   accesscontrol:
+    # -- Enable/Disable lockdown mode of GeoNode
     lockdown: "False"
 
   secret:
@@ -370,6 +371,11 @@ nginx:
       memory: "1Gi"
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: "800m"
+  external_cors:
+    # -- Add Access-Control-Allow-Origin directive to allow integration from an external domain
+    enabled: false
+    # -- Target domain for CORS
+    domain: ""
 
 # pycsw integration is based on https://github.com/geopython/pycsw/blob/master/docker/kubernetes
 pycsw:
