@@ -371,8 +371,11 @@ nginx:
       memory: "1Gi"
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: "800m"
-  # -- name of an existing ConfigMap to use. Set, if you want to separately maintain the ConfigMap.
-  existingConfigMapName: ""
+  external_cors:
+    # -- Add Access-Control-Allow-Origin directive to allow integration from an external domain
+    enabled: false
+    # -- Target domain for CORS
+    domain: ""
 
 # pycsw integration is based on https://github.com/geopython/pycsw/blob/master/docker/kubernetes
 pycsw:

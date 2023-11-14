@@ -1,4 +1,3 @@
-{{- if empty .Values.nginx.existingConfigMapName }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -56,6 +55,9 @@ data:
       location /geoserver {
         client_max_body_size {{ .Values.nginx.maxClientBodySize }};
 
+{{- if .Values.nginx.external_cors.enabled }}
+        proxy_set_header Access-Control-Allow-Origin {{ .Values.nginx.external_cors.domain }};
+{{ end }}
         proxy_set_header Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -88,6 +90,9 @@ data:
           access_log off;
           add_header Pragma "public";
           add_header Cache-Control "max-age=31536000, public";
+{{- if .Values.nginx.external_cors.enabled }}
+          add_header Access-Control-Allow-Origin {{ .Values.nginx.external_cors.domain }};
+{{ end }}
         }
       }
 
@@ -105,6 +110,9 @@ data:
         # proxy_pass http://unix:/tmp/flower.sock:/;
         proxy_pass http://$upstream;
         proxy_redirect off;
+{{- if .Values.nginx.external_cors.enabled }}
+        proxy_set_header Access-Control-Allow-Origin {{ .Values.nginx.external_cors.domain }};
+{{ end }}
         proxy_set_header Host $host;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -127,6 +135,9 @@ data:
 
         proxy_pass http://{{ include "pycsw_pod_name" . }}:{{ .Values.pycsw.port }};
         proxy_set_header Host $host;
+{{- if .Values.nginx.external_cors.enabled }}
+        proxy_set_header Access-Control-Allow-Origin {{ .Values.nginx.external_cors.domain }};
+{{ end }}
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
@@ -141,6 +152,9 @@ data:
         #rewrite ^/proxy/(.*)url=http?://{{ .Values.geonode.general.externalDomain  }}(:\d+)?/geoserver(.*) /proxy/$1url=http://geoserver:{{ .Values.geoserver.port }}$3 last;
 
         if ($request_method = OPTIONS) {
+{{- if .Values.nginx.external_cors.enabled }}
+          add_header Access-Control-Allow-Origin {{ .Values.nginx.external_cors.domain }};
+{{ end }}
           add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, OPTIONS";
           add_header Access-Control-Allow-Headers "Authorization, Content-Type, Accept";
           add_header Access-Control-Allow-Credentials true;
@@ -150,6 +164,9 @@ data:
           return 200;
         }
 
+{{- if .Values.nginx.external_cors.enabled }}
+        add_header Access-Control-Allow-Origin {{ .Values.nginx.external_cors.domain }};
+{{ end }}
         add_header Access-Control-Allow-Credentials false;
         add_header Access-Control-Allow-Headers "Content-Type, Accept, Authorization, Origin, User-Agent";
         add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, OPTIONS";
@@ -164,6 +181,9 @@ data:
         proxy_set_header            X-Forwarded-Host $server_name;
         proxy_set_header            X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header            X-Forwarded-Proto $scheme;
+{{- if .Values.nginx.external_cors.enabled }}
+        proxy_set_header Access-Control-Allow-Origin {{ .Values.nginx.external_cors.domain }};
+{{ end }}
 
         # uwsgi_params
         include /etc/nginx/uwsgi_params;
@@ -183,7 +203,9 @@ data:
           access_log off;
           add_header Pragma "public";
           add_header Cache-Control "max-age=31536000, public";
+{{- if .Values.nginx.external_cors.enabled }}
+          add_header Access-Control-Allow-Origin {{ .Values.nginx.external_cors.domain }};
+{{ end }}
         }
       }
     }
-{{ end }}

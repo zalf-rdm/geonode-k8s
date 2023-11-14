@@ -52,11 +52,7 @@ spec:
       volumes:
       - name: nginx-confd
         configMap:
-{{- if empty .Values.nginx.existingConfigMapName }}
           name: {{ .Release.Name }}-nginx-confd
-{{ else }}
-          name: {{ .Values.nginx.existingConfigMapName }}
-{{ end }}
       - name: geonode-favicon
         configMap:
           name: {{ .Release.Name }}-geonode-favicon

@@ -155,7 +155,8 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23, pyC
 | memcached.architecture | string | `"high-availability"` | memcached replica. Loadbalanaced via kubernetes. (only one entry in django settings.py) im memcached is activated under geonode.memcached.enabled this takes place |
 | memcached.replicaCount | int | `1` |  |
 | nginx.container_name | string | `"nginx"` | nginx container name |
-| nginx.existingConfigMapName | string | `""` | name of an existing ConfigMap to use. Set, if you want to separately maintain the ConfigMap. |
+| nginx.external_cors.domain | string | `""` | Target domain for CORS |
+| nginx.external_cors.enabled | bool | `false` | Add Access-Control-Allow-Origin directive to allow integration from an external domain |
 | nginx.image.name | string | `"nginx"` | nginx docker image |
 | nginx.image.tag | string | `"1.25"` | nginx docker image tag |
 | nginx.maxClientBodySize | string | `"2G"` | max file upload size |
