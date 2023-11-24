@@ -50,5 +50,5 @@ dependencies:
     condition: rabbitmq.enabled
   - name: memcached
     repository: https://charts.bitnami.com/bitnami
-    condition: geonode.memcached.enaled
+    condition: geonode.memcached.enabled
     version: ~6.x.x
