@@ -6,9 +6,9 @@ metadata:
 data:
   GEONODE_LB_HOST_IP: {{ .Values.geonode.general.externalDomain | quote }}
 {{ if (eq .Values.geonode.general.externalScheme "https") }}
-  GEONODE_LB_HOST_PORT: "443"
+  GEONODE_LB_PORT: "443"
 {{else}}  
-  GEONODE_LB_HOST_PORT: "80"
+  GEONODE_LB_PORT: "80"
 {{end}}
   GEONODE_HOST_IP: localhost
 
