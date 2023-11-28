@@ -5,11 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   GEONODE_LB_HOST_IP: {{ .Values.geonode.general.externalDomain | quote }}
-{{ if (eq .Values.geonode.general.externalScheme "https") }}
-  GEONODE_LB_PORT: "443"
-{{else}}  
-  GEONODE_LB_PORT: "80"
-{{end}}
+  SUBSTITUTION_URL: "{{ include "public_url" . }}/"
   GEONODE_HOST_IP: localhost
 
   DJANGO_URL: http://{{ include "geonode_pod_name" .}}/
