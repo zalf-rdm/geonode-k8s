@@ -5,6 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   GEONODE_LB_HOST_IP: {{ .Values.geonode.general.externalDomain | quote }}
+  SUBSTITUTION_URL: "{{ include "public_url" . }}/"
   GEONODE_HOST_IP: localhost
 
   DJANGO_URL: http://{{ include "geonode_pod_name" .}}/
