@@ -93,7 +93,7 @@ spec:
         - secretRef:
             name: {{ default "geonode-secret" .Values.geonode.secret.existingSecretName | quote }}
         - secretRef:
-            name: {{ default "geoserver-secret" .Values.geoserver.secret.existingSecretName | quote }}
+            name: {{ .Values.geoserver.secret.existingSecretName | default (include "geoserver_secret_name" .) | quote }}
 
         env:
         - name: GEONODE_DATABASE_PASSWORD
@@ -198,7 +198,7 @@ spec:
         - secretRef:
             name: {{ default "geonode-secret" .Values.geonode.secret.existingSecretName | quote }}
         - secretRef:
-            name: {{ default "geoserver-secret" .Values.geoserver.secret.existingSecretName | quote }}
+            name: {{ .Values.geoserver.secret.existingSecretName | default (include "geoserver_secret_name" .) | quote }}
 
         env:
         - name: IS_CELERY

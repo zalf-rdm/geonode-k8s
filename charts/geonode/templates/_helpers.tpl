@@ -16,6 +16,12 @@
 {{ .Release.Name }}-{{ .Values.nginx.pod_name }}
 {{- end -}}
 
+# define secret names
+{{- define "geoserver_secret_name" -}}
+{{ .Release.Name }}-geoserver-secret
+{{- end -}}
+
+
 # Database definitions
 {{- define "database_hostname" -}}
 {{- if (index .Values "postgres-operator" "enabled") -}}

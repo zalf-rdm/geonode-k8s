@@ -68,7 +68,7 @@ spec:
         - configMapRef:
             name:  {{ include "geoserver_pod_name" . }}-env
         - secretRef:
-            name: {{ default "geoserver-secret" .Values.geoserver.secret.existingSecretName | quote }}
+            name: {{ .Values.geoserver.secret.existingSecretName | default (include "geoserver_secret_name" .) | quote }}
 
         env:
           # read auto generated password from secret
