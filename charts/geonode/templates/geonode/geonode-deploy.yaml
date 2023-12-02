@@ -91,7 +91,7 @@ spec:
         - configMapRef:
             name: {{ include "geonode_pod_name" . }}-env
         - secretRef:
-            name: {{ default "geonode-secret" .Values.geonode.secret.existingSecretName | quote }}
+            name: {{ .Values.geonode.secret.existingSecretName | default (include "geonode_secret_name" .) | quote }}
         - secretRef:
             name: {{ .Values.geoserver.secret.existingSecretName | default (include "geoserver_secret_name" .) | quote }}
 
@@ -196,7 +196,7 @@ spec:
         - configMapRef:
             name: {{ include "geonode_pod_name" . }}-env
         - secretRef:
-            name: {{ default "geonode-secret" .Values.geonode.secret.existingSecretName | quote }}
+            name: {{ .Values.geonode.secret.existingSecretName | default (include "geonode_secret_name" .) | quote }}
         - secretRef:
             name: {{ .Values.geoserver.secret.existingSecretName | default (include "geoserver_secret_name" .) | quote }}
 

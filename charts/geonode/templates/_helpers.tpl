@@ -21,6 +21,10 @@
 {{ .Release.Name }}-geoserver-secret
 {{- end -}}
 
+{{- define "geonode_secret_name" -}}
+{{ .Release.Name }}-geonode-secret
+{{- end -}}
+
 
 # Database definitions
 {{- define "database_hostname" -}}
