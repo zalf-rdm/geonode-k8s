@@ -1,5 +1,5 @@
 
-![Version: 1.0.5](https://img.shields.io/badge/Version-1.0.5-informational?style=flat-square)
+![Version: 1.0.6](https://img.shields.io/badge/Version-1.0.6-informational?style=flat-square)
 
 # Helm Chart for Geonode
 
@@ -65,6 +65,7 @@ The chart will automatically install required dependencies, i.e. a RabbitMQ brok
 | [1.0.3](https://github.com/zalf-rdm/geonode-k8s/releases/tag/geonode-k8s-1.0.3) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
 | [1.0.4](https://github.com/zalf-rdm/geonode-k8s/releases/tag/geonode-k8s-1.0.4) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
 | [1.0.5](https://github.com/zalf-rdm/geonode-k8s/releases/tag/geonode-k8s-1.0.5) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
+| [1.0.6](https://github.com/zalf-rdm/geonode-k8s/releases/tag/geonode-k8s-1.0.6) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
 
 ## Install chart dependencies
 
