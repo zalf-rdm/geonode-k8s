@@ -47,8 +47,10 @@
 {{- define "database_postgres_password_secret_key_ref" -}}
 {{- if (index .Values "postgres-operator" "enabled") -}}
 "{{ .Values.postgres.username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do"
-{{- else if .Values.postgres.external_postgres.enabled -}}
+{{- else if and .Values.postgres.external_postgres.enabled (not .Values.postgres.external_postgres.secret.existingSecretName ) -}}
 "{{ .Release.Name }}-postgres-external-secrets"
+{{- else -}}
+"{{.Values.postgres.external_postgres.secret.existingSecretName }}"
 {{- end -}}
 {{- end -}}
 
@@ -56,19 +58,24 @@
 {{- define "database_geonode_password_secret_key_ref" -}}
 {{- if (index .Values "postgres-operator" "enabled") -}}
 "{{ .Values.postgres.geonode_databasename_and_username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do"
-{{- else if .Values.postgres.external_postgres.enabled -}}
+{{- else if and .Values.postgres.external_postgres.enabled (not .Values.postgres.external_postgres.secret.existingSecretName ) -}}
 "{{ .Release.Name }}-geonode-external-secrets"
+{{- else -}}
+"{{.Values.postgres.external_postgres.secret.existingSecretName }}"
 {{- end -}}
 {{- end -}}
 
-# secret key reference for the password of user: .Values.postgres.geonode_databasename_and_username
+# secret key reference for the password of user: .Values.postgres.geodata_databasename_and_username
 {{- define "database_geodata_password_secret_key_ref" -}}
 {{- if (index .Values "postgres-operator" "enabled") -}}
 "{{ .Values.postgres.geodata_databasename_and_username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do"
-{{- else if .Values.postgres.external_postgres.enabled -}}
+{{- else if and .Values.postgres.external_postgres.enabled (not .Values.postgres.external_postgres.secret.existingSecretName ) -}}
 "{{ .Release.Name }}-geodata-external-secrets"
+{{- else -}}
+"{{.Values.postgres.external_postgres.secret.existingSecretName }}"
 {{- end -}}
 {{- end -}}
+
 {{- define "pycsw_pod_name" -}}
 {{ .Release.Name }}-{{ .Values.pycsw.pod_name }}
 {{- end -}}

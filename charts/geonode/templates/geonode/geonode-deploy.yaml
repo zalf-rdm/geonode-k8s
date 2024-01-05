@@ -100,17 +100,17 @@ spec:
           valueFrom:
             secretKeyRef:
               name: {{ include "database_geonode_password_secret_key_ref" . }}
-              key: password
+              key: geonode_password
         - name: GEONODE_GEODATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ include "database_geodata_password_secret_key_ref" . }}
-              key: password
+              key: geodata_password
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ include "database_postgres_password_secret_key_ref" . }}
-              key: password
+              key: postgres_password
         - name: GEODATABASE_URL
           value: "postgis://$(GEONODE_GEODATABASE):$(GEONODE_GEODATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_GEODATABASE)"
         - name: DATABASE_URL
@@ -207,17 +207,17 @@ spec:
           valueFrom:
             secretKeyRef:
               name: {{ include "database_geonode_password_secret_key_ref" . }}
-              key: password
+              key: geonode_password
         - name: GEONODE_GEODATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ include "database_geodata_password_secret_key_ref" . }}
-              key: password
+              key: geodata_password
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ include "database_postgres_password_secret_key_ref" . }}
-              key: password
+              key: postgres_password
         - name: GEODATABASE_URL
           value: "postgis://$(GEONODE_GEODATABASE):$(GEONODE_GEODATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_GEODATABASE)"
         - name: DATABASE_URL
