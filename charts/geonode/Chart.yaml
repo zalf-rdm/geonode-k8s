@@ -1,6 +1,6 @@
 apiVersion: v2
 name: geonode-k8s
-version: 1.0.7
+version: 1.0.8
 description: "Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, pyCSW: 2.6.1"
 keywords:
   - geonode
