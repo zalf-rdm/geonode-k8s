@@ -68,6 +68,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | geonode.haystack.search_results_per_page | string | `"200"` | hystack results per page |
 | geonode.image.name | string | `"52north/geonode"` | used geonode image |
 | geonode.image.tag | string | `"4.1.3"` | tag of used geonode image |
+| geonode.imagePullSecret | string | `""` | secret to use to pull geonode image |
 | geonode.ingress.annotations | object | `{}` | adds ingress annotations for nginx ingress class |
 | geonode.ingress.enabled | bool | `true` | enables external access |
 | geonode.ingress.ingressClassName | string | `nil` | define kubernetes ingress class for geonode ingress |
@@ -141,6 +142,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | geoserver.container_name | string | `"geoserver"` | geoserver container name |
 | geoserver.image.name | string | `"geonode/geoserver"` | geoserver image docker image (default in zalf namespace because geonode one was not up to date) |
 | geoserver.image.tag | string | `"2.23.0"` | geoserver docker image tag |
+| geoserver.imagePullSecret | string | `""` | secret to use to pull geoserver image |
 | geoserver.pod_name | string | `"geoserver"` | geoserver pod name |
 | geoserver.port | int | `8080` | geoserver port |
 | geoserver.resources.limits.cpu | int | `2` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
@@ -159,6 +161,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | nginx.external_cors.enabled | bool | `false` | Add Access-Control-Allow-Origin directive to allow integration from an external domain |
 | nginx.image.name | string | `"nginx"` | nginx docker image |
 | nginx.image.tag | string | `"1.25"` | nginx docker image tag |
+| nginx.imagePullSecret | string | `""` | secret to use to pull nginx image |
 | nginx.maxClientBodySize | string | `"2G"` | max file upload size |
 | nginx.pod_name | string | `"nginx"` | nginx pod name |
 | nginx.replicaCount | int | `1` | nginx container replicas |
@@ -201,6 +204,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | pycsw.endpoint | string | `"/catalogue/csw"` | pycsw url below geonode.ingress.externalDomain |
 | pycsw.image.name | string | `"geopython/pycsw"` | pycsw docker image |
 | pycsw.image.tag | string | `"2.6.1"` | pycsw docker image tag |
+| pycsw.imagePullSecret | string | `""` | secret to use to pull pycsw image |
 | pycsw.mappings | string | copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py | pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/ |
 | pycsw.pod_name | string | `"pysw"` | pycsw pod name |
 | pycsw.port | int | `8000` | pycsw endpoint port |
