@@ -49,6 +49,11 @@ spec:
         - name: geoserver-notifier-xml
           mountPath: /overrides
 
+{{- if not (empty .Values.geoserver.imagePullSecret) }}
+      imagePullSecrets:
+      - name: {{ .Values.geoserver.imagePullSecret }}
+{{ end }}
+
       containers:
       - name: {{ .Values.geoserver.container_name }}
         image: "{{ .Values.geoserver.image.name }}:{{ .Values.geoserver.image.tag }}"

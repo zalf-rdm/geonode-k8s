@@ -23,6 +23,9 @@ geonode:
     # -- tag of used geonode image
     tag: "4.1.3"
 
+  # -- pull secret to use for geonode image
+  imagePullSecret: ""
+
   # -- additions to tasks.py init script, must be additional code written in python
   tasks_pre_script: |
     print("tasks_pre_script not defined ...")
@@ -330,6 +333,9 @@ geoserver:
   # -- geoserver port
   port: 8080
 
+  # -- pull secret to use for geoserver image
+  imagePullSecret: ""
+
   secret:
     # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
     existingSecretName: ""
@@ -358,6 +364,10 @@ nginx:
   container_name: nginx
   # -- nginx container replicas
   replicaCount: 1
+
+  # -- pull secret to use for nginx image
+  imagePullSecret: ""
+
   image:
     # -- nginx docker image
     name: nginx
@@ -392,6 +402,10 @@ pycsw:
   replicaCount: 1
   # -- pycsw container name
   container_name: pycsw
+
+  # -- pull secret to use for pycsw image
+  imagePullSecret: ""
+
   image:
     # -- pycsw docker image
     name: geopython/pycsw

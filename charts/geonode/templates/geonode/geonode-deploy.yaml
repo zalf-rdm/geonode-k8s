@@ -37,6 +37,11 @@ spec:
     spec:
       terminationGracePeriodSeconds: 3
 
+{{- if not (empty .Values.geonode.imagePullSecret) }}
+      imagePullSecrets:
+      - name: {{ .Values.geonode.imagePullSecret }}
+{{ end }}
+
       initContainers:
       # Wait for Postgres and rabbit
       - name: geonode-wait-for-db-and-rabbit

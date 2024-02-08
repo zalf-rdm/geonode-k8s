@@ -18,6 +18,11 @@ spec:
     spec:
       terminationGracePeriodSeconds: 3
 
+{{- if not (empty .Values.nginx.imagePullSecret) }}
+      imagePullSecrets:
+      - name: {{ .Values.nginx.imagePullSecret }}
+{{ end }}
+
       containers:
       - name: {{ .Values.nginx.container_name }}
         image: "{{ .Values.nginx.image.name }}:{{ .Values.nginx.image.tag }}"
