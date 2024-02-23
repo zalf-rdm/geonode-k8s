@@ -180,6 +180,8 @@ data:
   DATABASE_HOST: {{ include "database_hostname" . | quote }}
   DATABASE_PORT: {{ include "database_port" . | quote }}
 
+  # enables ssl encrypted psql connection (required by postgres-operator databases)
+  PGSSLMODE: "require"
   POSTGRES_USER: {{ .Values.postgres.username | quote }}
   GEONODE_DATABASE: {{ .Values.postgres.geonode_databasename_and_username | quote }}
   GEONODE_GEODATABASE: {{ .Values.postgres.geodata_databasename_and_username | quote }}

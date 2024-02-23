@@ -81,7 +81,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: {{ include "database_geodata_password_secret_key_ref" . }}
-                key: geodata_password
+                key: {{ include "database_geodata_password_key_ref" . }}
 
         volumeMounts:
         - name: "{{ include "persistant_volume_name" . }}"
