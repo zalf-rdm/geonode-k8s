@@ -26,6 +26,7 @@
 {{- end -}}
 
 
+
 # Database definitions
 {{- define "database_hostname" -}}
 {{- if (index .Values "postgres-operator" "enabled") -}}
@@ -76,6 +77,34 @@
 {{- end -}}
 {{- end -}}
 
+# define password key name in geonode postgres secret
+{{- define "database_geonode_password_key_ref" -}}
+{{- if (index .Values "postgres-operator" "enabled") -}}
+password
+{{- else if .Values.postgres.external_postgres.enabled -}}
+geonode-password
+{{- end -}}
+{{- end -}}
+
+# define password key name in geodata postgres secret
+{{- define "database_geodata_password_key_ref" -}}
+{{- if (index .Values "postgres-operator" "enabled") -}}
+password
+{{- else if .Values.postgres.external_postgres.enabled -}}
+geodata-password
+{{- end -}}
+{{- end -}}
+
+# define password key name in postgres postgres secret
+{{- define "database_postgres_password_key_ref" -}}
+{{- if (index .Values "postgres-operator" "enabled") -}}
+password
+{{- else if .Values.postgres.external_postgres.enabled -}}
+postgres-password
+{{- end -}}
+{{- end -}}
+
+
 {{- define "pycsw_pod_name" -}}
 {{ .Release.Name }}-{{ .Values.pycsw.pod_name }}
 {{- end -}}
@@ -102,4 +131,3 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
 {{- define "boolean2str" -}}
 {{ . | ternary "True" "False" }}
 {{- end -}}
-
