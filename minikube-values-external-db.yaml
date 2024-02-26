@@ -47,9 +47,9 @@ postgres:
     hostname: "external-postgres.com"
     port: 5432
     secret:
-      postgres_password: please-fill-out
-      geonode_password: please-fill-out
-      geodata_password: please-fill-out
+      postgres_password:
+      geonode_password:
+      geodata_password:
 
 postgres-operator:
   enabled: False
