@@ -38,18 +38,18 @@ rabbitmq:
     password: rabbit_password
 
 postgres:
+  type: external
   username: postgres
   geonode_databasename_and_username: geonode
   geodata_databasename_and_username: geodata
 
-  external_postgres:
-    enabled: True
+  external:
     hostname: "external-postgres.com"
     port: 5432
     secret:
-      postgres_password:
-      geonode_password:
-      geodata_password:
+      postgres_password: please-fill-out
+      geonode_password: please-fill-out
+      geodata_password: please-fill-out
+
 postgres-operator:
   enabled: False
-

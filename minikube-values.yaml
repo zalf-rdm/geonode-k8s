@@ -34,14 +34,12 @@ geonode:
 pycsw:
   enabled: False
 
-postgres-operator-ui:
-  enabled: False
-
 postgres-operator:
   enabled: True
 
 postgres:
-  operator_manifest:
+  type: operator
+  operator:
     storageSize: 2Gi
     numberOfInstances: 1
     postgres_version: 15
