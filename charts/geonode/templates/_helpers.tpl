@@ -1,19 +1,23 @@
 
 # define pod names (equal service names)
 {{- define "geoserver_pod_name" -}}
-{{ .Release.Name }}-{{ .Values.geoserver.pod_name }}
+{{ .Release.Name }}-geoserver
 {{- end -}}
 
 {{- define "geonode_pod_name" -}}
-{{ .Release.Name }}-{{ .Values.geonode.pod_name }}
+{{ .Release.Name }}-geonode
 {{- end -}}
 
 {{- define "postgres_pod_name" -}}
-{{ .Release.Name }}-{{ .Values.postgres.operator_manifest.pod_name }}
+{{ .Release.Name }}-postgres
 {{- end -}}
 
 {{- define "nginx_pod_name" -}}
-{{ .Release.Name }}-{{ .Values.nginx.pod_name }}
+{{ .Release.Name }}-nginx
+{{- end -}}
+
+{{- define "pycsw_pod_name" -}}
+{{ .Release.Name }}-pycsw
 {{- end -}}
 
 # define secret names
@@ -102,11 +106,6 @@ password
 {{- else if .Values.postgres.external_postgres.enabled -}}
 postgres-password
 {{- end -}}
-{{- end -}}
-
-
-{{- define "pycsw_pod_name" -}}
-{{ .Release.Name }}-{{ .Values.pycsw.pod_name }}
 {{- end -}}
 
 # Volume names
