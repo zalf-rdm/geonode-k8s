@@ -99,7 +99,6 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | geonode.monitoring.user_analytics_enabled | bool | `true` |  |
 | geonode.monitoring.user_analytics_gzip | bool | `true` |  |
 | geonode.persistant.storageSize | string | `"10Gi"` | size of persistant geonode storage |
-| geonode.pod_name | string | `"geonode"` | pod name |
 | geonode.replicaCount | int | `1` | number of geonode replicas (! not working properly yet) |
 | geonode.resources.limits.cpu | int | `2` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.resources.limits.memory | string | `"2Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
@@ -142,7 +141,6 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | geoserver.image.name | string | `"geonode/geoserver"` | geoserver image docker image (default in zalf namespace because geonode one was not up to date) |
 | geoserver.image.tag | string | `"2.23.0"` | geoserver docker image tag |
 | geoserver.imagePullSecret | string | `""` | pull secret to use for geoserver image |
-| geoserver.pod_name | string | `"geoserver"` | geoserver pod name |
 | geoserver.port | int | `8080` | geoserver port |
 | geoserver.resources.limits.cpu | int | `2` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geoserver.resources.limits.memory | string | `"4Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
@@ -162,7 +160,6 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | nginx.image.tag | string | `"1.25"` | nginx docker image tag |
 | nginx.imagePullSecret | string | `""` | pull secret to use for nginx image |
 | nginx.maxClientBodySize | string | `"2G"` | max file upload size |
-| nginx.pod_name | string | `"nginx"` | nginx pod name |
 | nginx.replicaCount | int | `1` | nginx container replicas |
 | nginx.resources.limits.cpu | string | `"800m"` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | nginx.resources.limits.memory | string | `"1Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
@@ -196,7 +193,6 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | pycsw.image.tag | string | `"2.6.1"` | pycsw docker image tag |
 | pycsw.imagePullSecret | string | `""` | pull secret to use for pycsw image |
 | pycsw.mappings | string | copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py | pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/ |
-| pycsw.pod_name | string | `"pysw"` | pycsw pod name |
 | pycsw.port | int | `8000` | pycsw endpoint port |
 | pycsw.replicaCount | int | `1` | pycsw container replicas |
 | pycsw.resources.limits.cpu | string | `"500m"` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
