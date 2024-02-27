@@ -33,77 +33,77 @@
 
 # Database definitions
 {{- define "database_hostname" -}}
-{{- if (index .Values "postgres-operator" "enabled") -}}
+{{- if (eq .Values.postgres.type "operator") -}}
 {{ include "postgres_pod_name" . }}
-{{- else if .Values.postgres.external_postgres.enabled -}}
-{{- .Values.postgres.external_postgres.hostname -}}
+{{- else if (eq .Values.postgres.type "external") -}}
+{{- .Values.postgres.external.hostname -}}
 {{- end -}}
 {{- end -}}
 
 {{- define "database_port" -}}
-{{- if (index .Values "postgres-operator" "enabled") -}}
+{{- if (eq .Values.postgres.type "operator") -}}
 5432
-{{- else if .Values.postgres.external_postgres.enabled -}}
-{{ .Values.postgres.external_postgres.port }}
+{{- else if (eq .Values.postgres.type "external") -}}
+{{ .Values.postgres.external.port }}
 {{- end -}}
 {{- end -}}
 
 # secret key reference for the password of user:  .Values.postgres.username
 {{- define "database_postgres_password_secret_key_ref" -}}
-{{- if (index .Values "postgres-operator" "enabled") -}}
+{{- if (eq .Values.postgres.type "operator") -}}
 "{{ .Values.postgres.username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do"
-{{- else if and .Values.postgres.external_postgres.enabled (not .Values.postgres.external_postgres.secret.existingSecretName ) -}}
+{{- else if and (eq .Values.postgres.type "external") (not .Values.postgres.external.secret.existingSecretName ) -}}
 "{{ .Release.Name }}-postgres-external-secrets"
 {{- else -}}
-"{{.Values.postgres.external_postgres.secret.existingSecretName }}"
+"{{.Values.postgres.external.secret.existingSecretName }}"
 {{- end -}}
 {{- end -}}
 
 # secret key reference for the password of user:  .Values.postgres.geonode_databasename_and_username
 {{- define "database_geonode_password_secret_key_ref" -}}
-{{- if (index .Values "postgres-operator" "enabled") -}}
+{{- if (eq .Values.postgres.type "operator") -}}
 "{{ .Values.postgres.geonode_databasename_and_username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do"
-{{- else if and .Values.postgres.external_postgres.enabled (not .Values.postgres.external_postgres.secret.existingSecretName ) -}}
+{{- else if and (eq .Values.postgres.type "external") (not .Values.postgres.external.secret.existingSecretName ) -}}
 "{{ .Release.Name }}-geonode-external-secrets"
 {{- else -}}
-"{{.Values.postgres.external_postgres.secret.existingSecretName }}"
+"{{.Values.postgres.external.secret.existingSecretName }}"
 {{- end -}}
 {{- end -}}
 
 # secret key reference for the password of user: .Values.postgres.geodata_databasename_and_username
 {{- define "database_geodata_password_secret_key_ref" -}}
-{{- if (index .Values "postgres-operator" "enabled") -}}
+{{- if (eq .Values.postgres.type "operator") -}}
 "{{ .Values.postgres.geodata_databasename_and_username }}.{{ include "postgres_pod_name" . }}.credentials.postgresql.acid.zalan.do"
-{{- else if and .Values.postgres.external_postgres.enabled (not .Values.postgres.external_postgres.secret.existingSecretName ) -}}
+{{- else if and (eq .Values.postgres.type "external") (not .Values.postgres.external.secret.existingSecretName ) -}}
 "{{ .Release.Name }}-geodata-external-secrets"
-{{- else -}}
-"{{.Values.postgres.external_postgres.secret.existingSecretName }}"
+{{- else if .Values.postgres.external.secret.existingSecretName -}}
+"{{.Values.postgres.external.secret.existingSecretName }}"
 {{- end -}}
 {{- end -}}
 
 # define password key name in geonode postgres secret
 {{- define "database_geonode_password_key_ref" -}}
-{{- if (index .Values "postgres-operator" "enabled") -}}
+{{- if (eq .Values.postgres.type "operator") -}}
 password
-{{- else if .Values.postgres.external_postgres.enabled -}}
+{{- else if (eq .Values.postgres.type "external") -}}
 geonode-password
 {{- end -}}
 {{- end -}}
 
 # define password key name in geodata postgres secret
 {{- define "database_geodata_password_key_ref" -}}
-{{- if (index .Values "postgres-operator" "enabled") -}}
+{{- if (eq .Values.postgres.type "operator") -}}
 password
-{{- else if .Values.postgres.external_postgres.enabled -}}
+{{- else if (eq .Values.postgres.type "external") -}}
 geodata-password
 {{- end -}}
 {{- end -}}
 
 # define password key name in postgres postgres secret
 {{- define "database_postgres_password_key_ref" -}}
-{{- if (index .Values "postgres-operator" "enabled") -}}
+{{- if (eq .Values.postgres.type "operator") -}}
 password
-{{- else if .Values.postgres.external_postgres.enabled -}}
+{{- else if (eq .Values.postgres.type "external") -}}
 postgres-password
 {{- end -}}
 {{- end -}}
