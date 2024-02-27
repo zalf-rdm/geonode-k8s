@@ -94,7 +94,7 @@ helm upgrade --cleanup-on-fail   --install --namespace geonode --create-namespac
 
 ## Delete Installation
 ```bash
-helm delete --namespace geonode geonode charts/geonode
+helm delete --namespace geonode geonode geonode
 ```
 
 ## Contribution
