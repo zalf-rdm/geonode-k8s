@@ -23,7 +23,6 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 |------------|------|---------|
 | https://charts.bitnami.com/bitnami | memcached | ~6.x.x |
 | https://charts.bitnami.com/bitnami | rabbitmq | ~10.1.7 |
-| https://opensource.zalando.com/postgres-operator/charts/postgres-operator-ui/ | postgres-operator-ui | ~1.9.0 |
 | https://opensource.zalando.com/postgres-operator/charts/postgres-operator/ | postgres-operator | ~1.9.0 |
 
 ## Values
@@ -31,7 +30,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | favicon | string | AAABAAMAEBAAAAEAIABoBA ... AAAA== | A base64 encoded favicon |
-| geonode.accesscontrol.lockdown | bool | `false` | Enable/Disable lockdown mode of GeoNode |
+| geonode.accesscontrol.lockdown | string | `"False"` | Enable/Disable lockdown mode of GeoNode |
 | geonode.acme.email | string | `"support@example.com"` | the email to be used to gain certificates |
 | geonode.acme.enabled | bool | `false` | enables cert-manager to do ACME challenges (aka certificates via letsencrypt) |
 | geonode.acme.stageUrl | string | `"https://acme-staging-v02.api.letsencrypt.org/directory"` | ACME staging environment (use acme-staging to avoid running into rate limits) stageUrl: https://acme-v02.api.letsencrypt.org/directory |
@@ -68,7 +67,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | geonode.haystack.search_results_per_page | string | `"200"` | hystack results per page |
 | geonode.image.name | string | `"52north/geonode"` | used geonode image |
 | geonode.image.tag | string | `"4.1.3"` | tag of used geonode image |
-| geonode.imagePullSecret | string | `""` | secret to use to pull geonode image |
+| geonode.imagePullSecret | string | `""` | pull secret to use for geonode image |
 | geonode.ingress.annotations | object | `{}` | adds ingress annotations for nginx ingress class |
 | geonode.ingress.enabled | bool | `true` | enables external access |
 | geonode.ingress.ingressClassName | string | `nil` | define kubernetes ingress class for geonode ingress |
@@ -142,7 +141,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | geoserver.container_name | string | `"geoserver"` | geoserver container name |
 | geoserver.image.name | string | `"geonode/geoserver"` | geoserver image docker image (default in zalf namespace because geonode one was not up to date) |
 | geoserver.image.tag | string | `"2.23.0"` | geoserver docker image tag |
-| geoserver.imagePullSecret | string | `""` | secret to use to pull geoserver image |
+| geoserver.imagePullSecret | string | `""` | pull secret to use for geoserver image |
 | geoserver.pod_name | string | `"geoserver"` | geoserver pod name |
 | geoserver.port | int | `8080` | geoserver port |
 | geoserver.resources.limits.cpu | int | `2` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
@@ -161,7 +160,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | nginx.external_cors.enabled | bool | `false` | Add Access-Control-Allow-Origin directive to allow integration from an external domain |
 | nginx.image.name | string | `"nginx"` | nginx docker image |
 | nginx.image.tag | string | `"1.25"` | nginx docker image tag |
-| nginx.imagePullSecret | string | `""` | secret to use to pull nginx image |
+| nginx.imagePullSecret | string | `""` | pull secret to use for nginx image |
 | nginx.maxClientBodySize | string | `"2G"` | max file upload size |
 | nginx.pod_name | string | `"nginx"` | nginx pod name |
 | nginx.replicaCount | int | `1` | nginx container replicas |
@@ -169,34 +168,25 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | nginx.resources.limits.memory | string | `"1Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | nginx.resources.requests.cpu | string | `"500m"` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | nginx.resources.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| postgres-operator-ui.enabled | bool | `false` |  |
-| postgres-operator-ui.envs.operatorApiUrl | string | `"http://{{ $.Release.Name }}-postgres-operator:8080"` |  |
-| postgres-operator-ui.ingress.enabled | bool | `false` |  |
-| postgres-operator-ui.ingress.hosts[0].host | string | `"postgres-ui"` |  |
-| postgres-operator-ui.ingress.hosts[0].paths[0] | string | `""` |  |
-| postgres-operator-ui.ingress.ingressClassName | string | `nil` |  |
-| postgres-operator-ui.replicaCount | int | `1` |  |
-| postgres-operator-ui.service.port | int | `80` |  |
-| postgres-operator-ui.service.type | string | `"ClusterIP"` |  |
 | postgres-operator.configLoggingRestApi.api_port | int | `8080` | REST API listener listens to this port |
 | postgres-operator.enabled | bool | `true` | enable postgres-operator (this or postgresql.enabled NOT both ) |
 | postgres-operator.operatorApiUrl | string | `"http://{{ .Release.Name }}-postgres-operator:8080"` | ??? |
 | postgres-operator.podServiceAccount | object | `{"name":""}` | not setting the podServiceAccount name will leed to generation of this name. This allows to run multiple postgres-operators in a single kubernetes cluster. just seperating them by namespace. |
 | postgres-operator.storageClass | string | `nil` | postgress pv storageclass |
-| postgres.external_postgres.enabled | bool | `false` |  |
-| postgres.external_postgres.hostname | string | `"my-external-postgres.com"` |  |
-| postgres.external_postgres.port | int | `5432` |  |
-| postgres.external_postgres.secret.existingSecretName | string | `""` | name of an existing Secret to use. Set, if you want to separately maintain the Secret. |
-| postgres.external_postgres.secret.geodata_password | string | `"geogeonode"` |  |
-| postgres.external_postgres.secret.geonode_password | string | `"geonode"` |  |
-| postgres.external_postgres.secret.postgres_password | string | `"postgres"` |  |
+| postgres.external.hostname | string | `"my-external-postgres.com"` |  |
+| postgres.external.port | int | `5432` |  |
+| postgres.external.secret.existingSecretName | string | `""` | name of an existing Secret to use. Set, if you want to separately maintain the Secret. |
+| postgres.external.secret.geodata_password | string | `"geogeonode"` |  |
+| postgres.external.secret.geonode_password | string | `"geonode"` |  |
+| postgres.external.secret.postgres_password | string | `"postgres"` |  |
 | postgres.geodata_databasename_and_username | string | `"geodata"` | geoserver database name and username |
 | postgres.geonode_databasename_and_username | string | `"geonode"` | geonode database name and username |
-| postgres.operator_manifest.numberOfInstances | int | `1` | number of database instances |
-| postgres.operator_manifest.pod_name | string | `"postgresql"` | pod name for postgres containers == teamID for mainifest |
-| postgres.operator_manifest.postgres_version | int | `15` | postgres version |
-| postgres.operator_manifest.storageSize | string | `"3Gi"` | Database storage size |
+| postgres.operator.numberOfInstances | int | `1` | number of database instances |
+| postgres.operator.pod_name | string | `"postgresql"` | pod name for postgres containers == teamID for mainifest |
+| postgres.operator.postgres_version | int | `15` | postgres version |
+| postgres.operator.storageSize | string | `"3Gi"` | Database storage size |
 | postgres.schema | string | `"public"` | database schema |
+| postgres.type | string | `"operator"` | type of used postgres: "operator" or "external". \ if external is used, host, port and password have to be set in postgres.external using values or external secret if operator is used, host port and passwords get set automatically using postgres-operator. If your Kubernetes cluster does not have a running postgres-operator, you can install the postgres-operator with  postgres-operator.enabled = true |
 | postgres.username | string | `"postgres"` | postgres username |
 | pycsw.config | string | based of pycsw example.cfg: https://github.com/geopython/pycsw/blob/master/docker/pycsw.cfg | pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/ |
 | pycsw.container_name | string | `"pycsw"` | pycsw container name |
@@ -204,7 +194,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | pycsw.endpoint | string | `"/catalogue/csw"` | pycsw url below geonode.ingress.externalDomain |
 | pycsw.image.name | string | `"geopython/pycsw"` | pycsw docker image |
 | pycsw.image.tag | string | `"2.6.1"` | pycsw docker image tag |
-| pycsw.imagePullSecret | string | `""` | secret to use to pull pycsw image |
+| pycsw.imagePullSecret | string | `""` | pull secret to use for pycsw image |
 | pycsw.mappings | string | copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py | pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/ |
 | pycsw.pod_name | string | `"pysw"` | pycsw pod name |
 | pycsw.port | int | `8000` | pycsw endpoint port |
@@ -227,4 +217,4 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | rabbitmq.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.11.3](https://github.com/norwoodj/helm-docs/releases/v1.11.3)
+Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)

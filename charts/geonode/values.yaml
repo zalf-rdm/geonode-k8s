@@ -591,6 +591,11 @@ rabbitmq:
     cpu: "750m"
 
 postgres:
+  # -- type of used postgres: "operator" or "external". \
+  # if external is used, host, port and password have to be set in postgres.external using values or external secret
+  # if operator is used, host port and passwords get set automatically using postgres-operator. If your Kubernetes cluster
+  # does not have a running postgres-operator, you can install the postgres-operator with  postgres-operator.enabled = true
+  type: operator
   # -- postgres username
   username: postgres
   # -- database schema
@@ -601,7 +606,7 @@ postgres:
   geodata_databasename_and_username: geodata
 
   # configuration for postgres operator database manifest
-  operator_manifest:
+  operator:
     # -- pod name for postgres containers == teamID for mainifest
     pod_name: postgresql
     # -- Database storage size
@@ -614,8 +619,7 @@ postgres:
     # infos @ https://postgres-operator.readthedocs.io/en/refactoring-sidecars/user/
     # get password after creation via: kubectl get secret {{ .Release.name }}.{{ .Release.name }}-{{ container_name }}.credentials -o 'jsonpath={.data.password}' | base64 -d
 
-  external_postgres:
-    enabled: False
+  external:
     hostname: my-external-postgres.com
     port: 5432
     secret:
@@ -639,22 +643,6 @@ postgres-operator:
   # -- not setting the podServiceAccount name will leed to generation of this name. This allows to run multiple postgres-operators in a single kubernetes cluster. just seperating them by namespace.
   podServiceAccount:
     name: ""
-
-# VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml
-postgres-operator-ui:
-  enabled: False
-  replicaCount: 1
-  envs:
-    operatorApiUrl: "http://{{ $.Release.Name }}-postgres-operator:8080"
-  service:
-    type: ClusterIP
-    port: 80
-  ingress:
-    enabled: False
-    ingressClassName:
-    hosts:
-      - host: postgres-ui
-        paths: [""]
 
 # -- (map of fixture files) Fixture files which shall be made available under /usr/src/geonode/geonode/fixtures (refer to https://docs.djangoproject.com/en/4.2/howto/initial-data/)
 geonodeFixtures:

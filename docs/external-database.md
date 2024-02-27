@@ -56,12 +56,12 @@ Now you have to configure your values.yaml to use this external database. You ca
 
 ```
 postgres:
+  type: external
   username: postgres
   geonode_databasename_and_username: geonode
   geodata_databasename_and_username: geodata
 
-  external_postgres:
-    enabled: True
+  external:
     hostname: my-external-postgres.com
     port: 5432
     postgres_password: 
