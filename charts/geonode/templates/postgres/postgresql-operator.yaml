@@ -1,6 +1,5 @@
 
-{{ $postgres_operator := index .Values "postgres-operator" "enabled" }}
-{{ if $postgres_operator }}
+{{- if eq .Values.postgres.type "operator" -}}
 apiVersion: "acid.zalan.do/v1"
 kind: postgresql
 metadata:
@@ -8,8 +7,8 @@ metadata:
 spec:
   teamId: {{ .Release.Name | quote }}
   volume:
-    size: {{ .Values.postgres.operator_manifest.storageSize }}
-  numberOfInstances: {{ int .Values.postgres.operator_manifest.numberOfInstances }}
+    size: {{ .Values.postgres.operator.storageSize }}
+  numberOfInstances: {{ int .Values.postgres.operator.numberOfInstances }}
   users:
     {{ .Values.postgres.username }}:
     - superuser
@@ -38,5 +37,5 @@ spec:
         pg_partman: {{ .Values.postgres.schema }}
         postgis: {{ .Values.postgres.schema }}
   postgresql:
-    version: {{ .Values.postgres.operator_manifest.postgres_version | quote }}
+    version: {{ .Values.postgres.operator.postgres_version | quote }}
 {{ end }}
