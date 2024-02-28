@@ -65,8 +65,8 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | geonode.haystack.engine_index_name | string | `"haystack"` | hystack index name |
 | geonode.haystack.engine_url | string | `"http://elasticsearch:9200/"` | hystack url |
 | geonode.haystack.search_results_per_page | string | `"200"` | hystack results per page |
-| geonode.image.name | string | `"52north/geonode"` | used geonode image |
-| geonode.image.tag | string | `"4.1.3"` | tag of used geonode image |
+| geonode.image.name | string | `"geonode/geonode"` | used geonode image |
+| geonode.image.tag | string | `"4.2.2"` | tag of used geonode image |
 | geonode.imagePullSecret | string | `""` | pull secret to use for geonode image |
 | geonode.ingress.annotations | object | `{}` | adds ingress annotations for nginx ingress class |
 | geonode.ingress.enabled | bool | `true` | enables external access |
@@ -139,7 +139,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | geonodeFixtures | map of fixture files | `{"somefixture.json":"[\n  {\n    \"pk\": 0,\n    \"model\": \"myapp.sample\"\n    \"description\": \"nice little content\"\n  }\n]\n"}` | Fixture files which shall be made available under /usr/src/geonode/geonode/fixtures (refer to https://docs.djangoproject.com/en/4.2/howto/initial-data/) |
 | geoserver.container_name | string | `"geoserver"` | geoserver container name |
 | geoserver.image.name | string | `"geonode/geoserver"` | geoserver image docker image (default in zalf namespace because geonode one was not up to date) |
-| geoserver.image.tag | string | `"2.23.0"` | geoserver docker image tag |
+| geoserver.image.tag | string | `"2.23.3-v2"` | geoserver docker image tag |
 | geoserver.imagePullSecret | string | `""` | pull secret to use for geoserver image |
 | geoserver.port | int | `8080` | geoserver port |
 | geoserver.resources.limits.cpu | int | `2` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
@@ -149,6 +149,9 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | geoserver.secret.admin_password | string | `"geoserver"` | geoserver admin password |
 | geoserver.secret.admin_username | string | `"admin"` | geoserver admin username |
 | geoserver.secret.existingSecretName | string | `""` | name of an existing Secret to use. Set, if you want to separately maintain the Secret. |
+| geoserver_data.container_name | string | `"geoserver-data-dir"` |  |
+| geoserver_data.image.name | string | `"geonode/geoserver_data"` | geoserver image docker image (default in zalf namespace because geonode one was not up to date) |
+| geoserver_data.image.tag | string | `"2.23.3-v1"` | geoserver docker image tag |
 | global.accessMode | string | `"ReadWriteMany"` | storage access mode used by helm dependency pvc |
 | global.storageClass | string | `nil` | storageClass used by helm dependencies pvc |
 | memcached.architecture | string | `"high-availability"` | memcached replica. Loadbalanaced via kubernetes. (only one entry in django settings.py) im memcached is activated under geonode.memcached.enabled this takes place |

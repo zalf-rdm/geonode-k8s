@@ -17,9 +17,9 @@ geonode:
 
   image:
     # -- used geonode image
-    name: 52north/geonode
+    name: geonode/geonode
     # -- tag of used geonode image
-    tag: "4.1.3"
+    tag: "4.2.2"
 
   # -- pull secret to use for geonode image
   imagePullSecret: ""
@@ -317,7 +317,7 @@ geonode:
         # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
         cpu: 2
 
-# CONFIGURATION FOR GEOSERVER DEPLOYMENT#
+# CONFIGURATION FOR GEOSERVER DEPLOYMENT
 geoserver:
   # -- geoserver container name
   container_name: geoserver
@@ -325,7 +325,7 @@ geoserver:
     # -- geoserver image docker image (default in zalf namespace because geonode one was not up to date)
     name: geonode/geoserver
     # -- geoserver docker image tag
-    tag: "2.23.0"
+    tag: "2.23.3-v2"
   # -- geoserver port
   port: 8080
 
@@ -351,6 +351,14 @@ geoserver:
       memory: "4Gi"
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: 2
+
+geoserver_data:
+  container_name: geoserver-data-dir
+  image:
+    # -- geoserver image docker image (default in zalf namespace because geonode one was not up to date)
+    name: geonode/geoserver_data
+    # -- geoserver docker image tag
+    tag: "2.23.3-v1"
 
 # CONFIGURATION FOR NGINX DEPLOYMENT
 nginx:

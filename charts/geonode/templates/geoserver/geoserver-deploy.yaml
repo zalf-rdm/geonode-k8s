@@ -21,27 +21,25 @@ spec:
     spec:
       terminationGracePeriodSeconds: 3
       initContainers:
-      - name: data-dir-conf
-        image: geonode/geoserver_data:{{ .Values.geoserver.image.tag }}
+      - name: {{ .Values.geoserver_data.container_name }}
+        image: "{{ .Values.geoserver_data.image.name }}:{{ .Values.geoserver_data.image.tag }}"
         command:
         - sh
         - -c
         - |
-          # Copy defaults from data container
-          cp -r /tmp/geonode/downloaded/data /geoserver_data
-
-          # Copy overrides from ConfigMap
-          cp /overrides/notifier.xml /geoserver_data/data/notifier/
-
-          # Update custom EPSG codes
-          cat /geoserver_data/data/user_projections/epsg.properties > /tmp/epsg.properties
-          {{- range .Values.geoserver.customEPSGs }}
-          echo '{{ . }}' >> /tmp/epsg.properties
-          {{- end }}
-          {{- range .Values.geoserver.extraCustomEPSGs }}
-          echo '{{ . }}' >> /tmp/epsg.properties
-          {{- end }}
-          sort -u /tmp/epsg.properties > /geoserver_data/data/user_projections/epsg.properties
+          if [ ! -f /geoserver_data/data/.geoserver_data_copied ] ; then
+            # Copy defaults from data container
+            echo "copying geoserver_data files into volume ..."
+            cp -r /tmp/geonode/downloaded/data/* /geoserver_data/data/
+            touch /geoserver_data/data/.geoserver_data_copied
+          else
+            echo "geoserver_data files already exists, skipping copy ..."
+          fi
+        envFrom:
+        - configMapRef:
+            name:  {{ include "geoserver_pod_name" . }}-env
+        - secretRef:
+            name: {{ .Values.geoserver.secret.existingSecretName | default (include "geoserver_secret_name" .) | quote }}
         volumeMounts:
         - name: "{{ include "persistant_volume_name" . }}"
           mountPath: /geoserver_data/data
