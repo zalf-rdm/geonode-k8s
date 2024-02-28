@@ -6,8 +6,6 @@ global:
 
 # geonode configuration
 geonode:
-  # -- pod name
-  pod_name: geonode
   # -- container name
   container_name: geonode
   # -- number of geonode replicas (! not working properly yet)
@@ -321,8 +319,6 @@ geonode:
 
 # CONFIGURATION FOR GEOSERVER DEPLOYMENT
 geoserver:
-  # -- geoserver pod name
-  pod_name: geoserver
   # -- geoserver container name
   container_name: geoserver
   image:
@@ -366,8 +362,6 @@ geoserver_data:
 
 # CONFIGURATION FOR NGINX DEPLOYMENT
 nginx:
-  # -- nginx pod name
-  pod_name: nginx
   # -- nginx container name
   container_name: nginx
   # -- nginx container replicas
@@ -404,8 +398,6 @@ nginx:
 pycsw:
   # -- enable single pycsw pod
   enabled: True
-  # -- pycsw pod name
-  pod_name: pysw
   # -- pycsw container replicas
   replicaCount: 1
   # -- pycsw container name
