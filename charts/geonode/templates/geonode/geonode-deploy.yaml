@@ -25,6 +25,7 @@ spec:
         checksum/geonode-env: {{ include (print $.Template.BasePath "/geonode/geonode-env.yaml") . | sha256sum }}
         checksum/geonode-secret: {{ include (print $.Template.BasePath "/geonode/geonode-secret.yaml") . | sha256sum }}
         checksum/geonode-local-settings: {{ include (print $.Template.BasePath "/geonode/geonode-local-settings.yaml") . | sha256sum }}
+        checksum/geonode-settings-additions: {{ include (print $.Template.BasePath "/geonode/geonode-settings-additions.yaml") . | sha256sum }}
         checksum/geonode-uwsig: {{ include (print $.Template.BasePath "/geonode/geonode-uwsgi-ini-conf.yaml") . | sha256sum }}
     spec:
       terminationGracePeriodSeconds: 3
@@ -50,7 +51,6 @@ spec:
       # This is the django app server
       - name: {{ .Values.geonode.container_name }}
         image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
-
         command:
         - bash
         - -c
@@ -71,6 +71,7 @@ spec:
 
           # Add config overrides
           cat /usr/src/geonode/geonode/geonode-k8s-settings.py >> /usr/src/geonode/geonode/settings.py
+          cat /usr/src/geonode/geonode/geonode-k8s-settings-additions.py >> /usr/src/geonode/geonode/settings.py
 
           # Setup
           touch /usr/src/geonode/invoke.log
@@ -142,6 +143,9 @@ spec:
         - name: geonode-k8s-settings-py
           mountPath: "/usr/src/geonode/geonode/geonode-k8s-settings.py"
           subPath: geonode-k8s-settings.py
+        - name: geonode-k8s-settings-additions-py
+          mountPath: "/usr/src/geonode/geonode/geonode-k8s-settings-additions.py"
+          subPath: geonode-k8s-settings-additions.py
           readOnly: true
         {{ if .Values.geonodeFixtures }}
         - name: geonode-fixtures
@@ -184,7 +188,7 @@ spec:
 
           # Add config overrides
           cat /usr/src/geonode/geonode/geonode-k8s-settings.py >> /usr/src/geonode/geonode/settings.py
-
+          cat /usr/src/geonode/geonode/geonode-k8s-settings-additions.py >> /usr/src/geonode/geonode/settings.py
           # Setup
           touch /var/log/celery.log
           dockerize -stdout /var/log/celery.log /usr/src/geonode/entrypoint.sh celery-cmd
@@ -248,6 +252,9 @@ spec:
         - name: geonode-k8s-settings-py
           mountPath: "/usr/src/geonode/geonode/geonode-k8s-settings.py"
           subPath: geonode-k8s-settings.py
+        - name: geonode-k8s-settings-additions-py
+          mountPath: "/usr/src/geonode/geonode/geonode-k8s-settings-additions.py"
+          subPath: geonode-k8s-settings-additions.py
           readOnly: true
         {{ if .Values.geonodeFixtures }}
         - name: geonode-fixtures
@@ -294,6 +301,13 @@ spec:
             items:
             - key: geonode-k8s-settings.py
               path: "geonode-k8s-settings.py"
+        - name: geonode-k8s-settings-additions-py
+          configMap:
+            name: {{ .Release.Name }}-geonode-k8s-settings-additions-py
+            defaultMode: 0744
+            items:
+            - key: geonode-k8s-settings-additions.py
+              path: "geonode-k8s-settings-additions.py"
         {{- if .Values.geonodeFixtures }}
         - name: geonode-fixtures
           configMap:
