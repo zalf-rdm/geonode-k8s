@@ -162,6 +162,8 @@ geonode:
     debug_static: False
     # -- the settings module to load
     settings_module: geonode.settings
+    # -- add additional settings to the settings py. This code will be appended to the end of the geonode settings.py
+    settings_additions: ""
 
     # -- FREETEXT_KEYWORDS_READONLY Make Free-Text Keywords writable from users. Or read-only when set to False.
     freetext_keywords_readonly: false
