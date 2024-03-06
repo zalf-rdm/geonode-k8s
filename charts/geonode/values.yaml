@@ -390,6 +390,9 @@ nginx:
       memory: "1Gi"
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: "800m"
+  access_control_allow:
+    # -- control value of Access-Control-Allow-Credentials in nginx configuration 
+    credentials: false
   external_cors:
     # -- Add Access-Control-Allow-Origin directive to allow integration from an external domain
     enabled: false
