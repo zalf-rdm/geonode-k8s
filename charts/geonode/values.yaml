@@ -20,7 +20,8 @@ geonode:
     name: geonode/geonode
     # -- tag of used geonode image
     tag: "4.2.2"
-
+  # -- image pull policy
+  imagePullPolicy: IfNotPresent
   # -- pull secret to use for geonode image
   imagePullSecret: ""
 
@@ -304,9 +305,22 @@ geonode:
     user_analytics_gzip: True
     centralized_dashboard_enabled: False
 
+  init:
+    # -- init container name
+    container_name: geonode-wait-for-db-and-rabbit
+    image:
+      # init container image
+      name: jwilder/dockerize
+      # init container image tag
+      tag: "0.6.1"
+      # init container image pull policy
+    imagePullPolicy: "IfNotPresent"
+
   celery:
     # -- celery container name
     container_name: celery
+    # -- celery image pull policy
+    imagePullPolicy: "IfNotPresent"
     resources:
       requests:
         # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
@@ -328,12 +342,12 @@ geoserver:
     name: geonode/geoserver
     # -- geoserver docker image tag
     tag: "2.23.3-v2"
-  # -- geoserver port
-  port: 8080
-
+  # -- geoserver image pull policy
+  imagePullPolicy: "IfNotPresent"
   # -- pull secret to use for geoserver image
   imagePullSecret: ""
-
+  # -- geoserver port
+  port: 8080
   secret:
     # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
     existingSecretName: ""
@@ -361,6 +375,8 @@ geoserver_data:
     name: geonode/geoserver_data
     # -- geoserver docker image tag
     tag: "2.23.3-v1"
+  # -- geoserver image pull policy
+  imagePullPolicy: "IfNotPresent"
 
 # CONFIGURATION FOR NGINX DEPLOYMENT
 nginx:
@@ -368,15 +384,16 @@ nginx:
   container_name: nginx
   # -- nginx container replicas
   replicaCount: 1
-
-  # -- pull secret to use for nginx image
-  imagePullSecret: ""
-
   image:
     # -- nginx docker image
     name: nginx
     # -- nginx docker image tag
     tag: "1.25"
+  # -- nginx image pull policy
+  imagePullPolicy: "IfNotPresent"
+  # -- pull secret to use for nginx image
+  imagePullSecret: ""
+
   # -- max file upload size
   maxClientBodySize: 2G
   resources:
@@ -404,15 +421,15 @@ pycsw:
   replicaCount: 1
   # -- pycsw container name
   container_name: pycsw
-
-  # -- pull secret to use for pycsw image
-  imagePullSecret: ""
-
   image:
     # -- pycsw docker image
     name: geopython/pycsw
     # -- pycsw docker image tag
     tag: "2.6.1"
+  # -- pycsw image pull policy
+  imagePullPolicy: "IfNotPresent"
+  # -- pull secret to use for pycsw image
+  imagePullSecret: ""
   # -- pycsw endpoint port
   port: 8000
   # -- pycsw url below geonode.ingress.externalDomain
@@ -428,6 +445,15 @@ pycsw:
       memory: "1Gi"
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: "500m"
+  init:
+    container_name: pycsw-wait-for-geonode
+    image:
+      # -- pycsw docker image
+      name: alpine/curl
+      # -- pycsw docker image tag
+      tag: "8.5.0"
+    # -- pycsw image pull policy
+    imagePullPolicy: "IfNotPresent"
   # -- pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/
   # @default -- copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py
   mappings: |-
