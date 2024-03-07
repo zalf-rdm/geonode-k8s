@@ -167,7 +167,7 @@ data:
 {{- if .Values.nginx.external_cors.enabled }}
         add_header Access-Control-Allow-Origin {{ .Values.nginx.external_cors.domain }};
 {{ end }}
-        add_header Access-Control-Allow-Credentials false;
+        add_header Access-Control-Allow-Credentials {{ .Values.nginx.access_control_allow.credentials }};
         add_header Access-Control-Allow-Headers "Content-Type, Accept, Authorization, Origin, User-Agent";
         add_header Access-Control-Allow-Methods "GET, POST, PUT, PATCH, OPTIONS";
 

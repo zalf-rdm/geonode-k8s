@@ -28,16 +28,12 @@ data:
     import ast
     import json
     import time
-    import docker
-    import socket
     import logging
     import datetime
     import requests
 
     from urllib.parse import urlparse, urlunparse
     from invoke import task
-
-    BOOTSTRAP_IMAGE_CHEIP = 'codenvy/che-ip:nightly'
 
     logger = logging.getLogger(__name__)
 
