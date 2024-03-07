@@ -41,9 +41,8 @@ data:
 
     logger = logging.getLogger(__name__)
 
-    GEOSERVER_STORE_NAME = "geogeonode" 
+    GEOSERVER_STORE_NAME = "geogeonode"
     GEOSERVER_WORKSPACE_NAME = "geonode"
-    GEOSERVER_USERNAME = "{{ .Values.geoserver.admin_username }}"
 
     @task
     def waitfordbs(ctx):
@@ -455,9 +454,9 @@ data:
         settings = os.getenv('DJANGO_SETTINGS_MODULE', 'geonode.settings')
         return settings
 
+
     def _gs_service_availability(url):
         import requests
-
         try:
             r = requests.request("get", url, verify=False)
             r.raise_for_status()  # Raises a HTTPError if the status is 4xx, 5xxx
@@ -476,8 +475,11 @@ data:
         from django.conf import settings
         from geoserver.catalog import Catalog
 
-        print("Setting GeoServer Admin Password...")
-        cat = Catalog(url, username=settings.OGC_SERVER_DEFAULT_USER, password=settings.OGC_SERVER_DEFAULT_PASSWORD)
+        geoserver_default_username = "admin"
+        geoserver_default_password = "geoserver"
+
+        print("Trying to changing default GeoServer Admin Password to defined password in values.yaml ...")
+        cat = Catalog(url, username=geoserver_default_username, password=geoserver_default_password)
         headers = {"Content-type": "application/xml", "Accept": "application/xml"}
         data = f"""<?xml version="1.0" encoding="UTF-8"?>
     <userPassword>
@@ -485,11 +487,10 @@ data:
     </userPassword>"""
 
         response = cat.http_request(f"{cat.service_url}/security/self/password", method="PUT", data=data, headers=headers)
-        print(f"Response Code: {response.status_code}")
         if response.status_code == 200:
             print("GeoServer admin password updated SUCCESSFULLY!")
         else:
-            logger.warning(f"WARNING: GeoServer admin password *NOT* updated: code [{response.status_code}]")
+            print("WARNING: GeoServer admin password *NOT* updated: code {}, this would can only work if the previous password is the default password ...".format(response.status_code))
 
 
     def _prepare_oauth_fixture():
@@ -516,6 +517,7 @@ data:
         with open("/tmp/default_oauth_apps_docker.json", "w") as fixturefile:
             json.dump(default_fixture, fixturefile)
 
+
     def _prepare_site_fixture():
         upurl = urlparse(os.environ["SITEURL"])
         default_fixture = [
@@ -527,6 +529,7 @@ data:
         ]
         with open("/tmp/default_site.json", "w") as fixturefile:
             json.dump(default_fixture, fixturefile)
+
 
     def _prepare_monitoring_fixture():
         pub_ip = os.getenv('GEONODE_LB_HOST_IP')
@@ -631,35 +634,34 @@ data:
         with open("/tmp/django_admin_docker.json", "w") as fixturefile:
             json.dump(default_fixture, fixturefile)
 
+
     ##############################################################
     # added by mwall for https://github.com/zalf-rdm/geonode-k8s #
     ##############################################################
-
     def _set_geoserver_database_store():
         ''' checks if a db store is already created in geoserver, if not create one '''
+
         print("Check if geoserver store is already set up ...")
-        geoserver_base_url = os.getenv('GEOSERVER_LOCATION')
-        geoserver_password = os.getenv('GEOSERVER_ADMIN_PASSWORD')
-        url = '{}rest/workspaces/{}/datastores/'.format(geoserver_base_url,GEOSERVER_WORKSPACE_NAME)
+        url = '{}rest/workspaces/{}/datastores/'.format(os.getenv('GEOSERVER_LOCATION'), GEOSERVER_WORKSPACE_NAME)
         headers = {'Content-Type': 'text/xml'}
-        auth = (GEOSERVER_USERNAME, geoserver_password)
+        auth = (os.environ.get("GEOSERVER_ADMIN_USER"), os.getenv('GEOSERVER_ADMIN_PASSWORD')
 
         try:
             r = requests.get(url, headers=headers, auth=auth)
             data = r.json()
             for datastore in data["dataStores"]["dataStore"]:
                 if datastore["name"] == GEOSERVER_STORE_NAME:
-                    print("Found datastore \"{}\" on geoserver, no need to create another ... ".format(GEOSERVER_STORE_NAME))
+                    print("Found datastore \"{}\" on geoserver, skipping creation ... ".format(GEOSERVER_STORE_NAME))
                     return
         except:
-            print("could not get datastore information from geoserver, trying to create ...")
+            print("ERROR: Could not get datastore information from geoserver, trying to create ...")
 
-        print("setup new datastore ...")
+        print("create new datastore \"{}\" on geoserver ...".format(GEOSERVER_STORE_NAME))
         db_user = database = os.getenv('GEONODE_GEODATABASE')
         db_password = os.getenv('GEONODE_GEODATABASE_PASSWORD')
         db_host = os.getenv('DATABASE_HOST')
         db_port = os.getenv('DATABASE_PORT')
-        url = '{}rest/workspaces/{}/datastores'.format(geoserver_base_url,GEOSERVER_WORKSPACE_NAME)
+        url = '{}rest/workspaces/{}/datastores'.format(os.getenv('GEOSERVER_LOCATION'), GEOSERVER_WORKSPACE_NAME)
         data = """
               <dataStore>
                 <name>{}</name>
@@ -675,7 +677,7 @@ data:
             """.format(GEOSERVER_STORE_NAME, db_host, db_port, database, db_user, db_password)
         try:
             r = requests.post(url, headers=headers, auth=auth,data=data)
-            print("created ...")
+            print("Datastore created ...")
         except:
-            print("something went wrong while performing datastore creating, skipping ...")
+            print("ERROR: Something went wrong while creating datastore ...")
             return
