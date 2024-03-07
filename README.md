@@ -39,14 +39,8 @@ To get an overview of the available configuration check out the values [docs](ch
 
 If you want to go straight for a production installation follow the [installation](#install) guide.
 
-Furhter docs:
-- [https-ingress](docs/https-ingress.md)
-- [access-geonode-database-from-outside-of-kubernetes](docs/access-geonode-database-from-outside.md)
-- [use-database-outside-of-this-helm-chart](docs/external-database.md)
-- [configure-nginx-ingress-body-size-timeout](docs/nginx-ingress-class.md)
-- [run-with-external-postgresql-database](docs/external-database.md)
-- [custom-secret-handling](docs/provide-custom-secret.md)
-- [how-to-configure-external-pycsw](docs/pycsw.md)
+Furhter docs you can find on [readthedocs](https://geonode-k8s.readthedocs.io/en/latest/).
+
 Install
 -------
 
