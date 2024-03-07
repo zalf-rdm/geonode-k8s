@@ -12,7 +12,6 @@ The annotations documented below gives you hints on nginx configuration options 
 
 If you run the nginx ingress controller on your cluster, you may ran into an issue where you are unable to upload larger files into your geonode instance.
 To avoid this you can increase the `proxy-body-size` for the [nignx-ingress](../charts/geonode/templates/nginx/nginx-ingress.yaml) definition:
-
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
