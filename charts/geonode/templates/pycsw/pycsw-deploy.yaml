@@ -20,6 +20,12 @@ spec:
         checksum/pycsw-mappings-py: {{ include (print $.Template.BasePath "/pycsw/pycsw-mappings-py.yaml") . | sha256sum }}
     spec:
       terminationGracePeriodSeconds: 3
+
+{{- if not (empty .Values.pycsw.imagePullSecret) }}
+      imagePullSecrets:
+      - name: {{ .Values.pycsw.imagePullSecret }}
+{{ end }}
+
       initContainers:
       # Wait for GeoNode to be up and running, else there can be a race conddition where pycsw creates the database table,
       # and lets crash init process of geonode

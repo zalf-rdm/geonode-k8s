@@ -21,13 +21,8 @@ data:
   # GeoNode APIs
   API_LOCKDOWN: 'False'
   TASTYPIE_APIKEY: ""
-  # TODO (mwall) set this automatically with helm magics not fully implemented
-  {{ if  ( eq .Release.Revision 1 )}}
-  IS_FIRST_START: 'True'
-  {{ else }}
-  IS_FIRST_START: 'False'
-  {{ end }}
-  FORCE_REINIT: 'False'
+  FORCE_REINIT: {{ .Values.geonode.general.force_reinit | quote }}
+
   # set this to true breaks upload
   ASYNC_SIGNALS: 'True'
   CACHE_BUSTING_STATIC_ENABLED: 'False'
@@ -76,7 +71,7 @@ data:
   GEOIP_PATH: /mnt/volumes/statics/geoip.db
 
   # Session/Access Control
-  LOCKDOWN_GEONODE: 'False'
+  LOCKDOWN_GEONODE: {{ .Values.geonode.accesscontrol.lockdown | quote }}
   CORS_ORIGIN_ALLOW_ALL: 'True'
   X_FRAME_OPTIONS: ALLOW-FROM ALL
   SESSION_EXPIRED_CONTROL_ENABLED: 'True'
@@ -125,11 +120,6 @@ data:
   {{ else }}
   CATALOGUE_ENGINE: geonode.catalogue.backends.pycsw_local
   {{ end}}
-  # OAuth2
-  # TODO (mwall) implement OAUTH2
-  OAUTH2_API_KEY: ""
-  OAUTH2_CLIENT_ID: ""
-  OAUTH2_CLIENT_SECRET: ""
 
   DJANGO_SETTINGS_MODULE: {{ .Values.geonode.general.settings_module }}
   DEFAULT_BACKEND_DATASTORE: datastore
@@ -190,6 +180,8 @@ data:
   DATABASE_HOST: {{ include "database_hostname" . | quote }}
   DATABASE_PORT: {{ include "database_port" . | quote }}
 
+  # enables ssl encrypted psql connection (required by postgres-operator databases)
+  PGSSLMODE: "require"
   POSTGRES_USER: {{ .Values.postgres.username | quote }}
   GEONODE_DATABASE: {{ .Values.postgres.geonode_databasename_and_username | quote }}
   GEONODE_GEODATABASE: {{ .Values.postgres.geodata_databasename_and_username | quote }}

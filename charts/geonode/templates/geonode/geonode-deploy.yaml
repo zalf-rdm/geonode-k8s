@@ -1,17 +1,9 @@
-# check if external and postgres-operator database backends are active
-{{ $postgres_operator := index .Values "postgres-operator" "enabled" }}
-{{ $postgres_operator_ui := index .Values "postgres-operator-ui" "enabled"}}
-# check if multiple database backends are active
-{{ if and .Values.postgres.external_postgres.enabled $postgres_operator }}
-  {{- fail "Error, two Database backends enabled, check .Values.postgres.external_postgres or .Values.postgres-operator ..." }}
-{{ else if  and (not .Values.postgres.external_postgres.enabled) (not $postgres_operator) }}
-  {{- fail "Error, no Database backend is enabled, check .Values.postgres.external_postgres or .Values.postgres-operator ..." }}
+# check if postgres.type is set to external operator
+{{ $is_operator := (eq .Values.postgres.type "operator") }}
+{{ $is_external := (eq .Values.postgres.type "external") }}
+{{ if not (or $is_operator  $is_external) }}
+  {{- fail "Deploymnent FAILED, unknown postgres.type defined, please set postgres.type to operator or external ..." }}
 {{ end }}
-# check if operator ui is activated even postgres-operator is disabled
-{{ if and ($postgres_operator_ui) (not $postgres_operator) }}
-  {{- fail "Error, postgres-operator-ui enabled even postgres-operator ist disabled ..." }}
-{{ end }}
-
 
 # geonode stateful set
 apiVersion: apps/v1
@@ -31,10 +23,17 @@ spec:
         org.geonode.instance: "{{ include "geonode_pod_name" . }}"
       annotations:
         checksum/geonode-env: {{ include (print $.Template.BasePath "/geonode/geonode-env.yaml") . | sha256sum }}
+        checksum/geonode-secret: {{ include (print $.Template.BasePath "/geonode/geonode-secret.yaml") . | sha256sum }}
         checksum/geonode-local-settings: {{ include (print $.Template.BasePath "/geonode/geonode-local-settings.yaml") . | sha256sum }}
+        checksum/geonode-settings-additions: {{ include (print $.Template.BasePath "/geonode/geonode-settings-additions.yaml") . | sha256sum }}
         checksum/geonode-uwsig: {{ include (print $.Template.BasePath "/geonode/geonode-uwsgi-ini-conf.yaml") . | sha256sum }}
     spec:
       terminationGracePeriodSeconds: 3
+
+{{- if not (empty .Values.geonode.imagePullSecret) }}
+      imagePullSecrets:
+      - name: {{ .Values.geonode.imagePullSecret }}
+{{ end }}
 
       initContainers:
       # Wait for Postgres and rabbit
@@ -52,7 +51,6 @@ spec:
       # This is the django app server
       - name: {{ .Values.geonode.container_name }}
         image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
-
         command:
         - bash
         - -c
@@ -73,6 +71,7 @@ spec:
 
           # Add config overrides
           cat /usr/src/geonode/geonode/geonode-k8s-settings.py >> /usr/src/geonode/geonode/settings.py
+          cat /usr/src/geonode/geonode/geonode-k8s-settings-additions.py >> /usr/src/geonode/geonode/settings.py
 
           # Setup
           touch /usr/src/geonode/invoke.log
@@ -90,26 +89,26 @@ spec:
         - configMapRef:
             name: {{ include "geonode_pod_name" . }}-env
         - secretRef:
-            name: {{ default "geonode-secret" .Values.geonode.secret.existingSecretName | quote }}
+            name: {{ .Values.geonode.secret.existingSecretName | default (include "geonode_secret_name" .) | quote }}
         - secretRef:
-            name: {{ default "geoserver-secret" .Values.geoserver.secret.existingSecretName | quote }}
+            name: {{ .Values.geoserver.secret.existingSecretName | default (include "geoserver_secret_name" .) | quote }}
 
         env:
         - name: GEONODE_DATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ include "database_geonode_password_secret_key_ref" . }}
-              key: password
+              key: {{ include "database_geonode_password_key_ref" . }}
         - name: GEONODE_GEODATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ include "database_geodata_password_secret_key_ref" . }}
-              key: password
+              key: {{ include "database_geodata_password_key_ref" . }}
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ include "database_postgres_password_secret_key_ref" . }}
-              key: password
+              key: {{ include "database_postgres_password_key_ref" . }}
         - name: GEODATABASE_URL
           value: "postgis://$(GEONODE_GEODATABASE):$(GEONODE_GEODATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_GEODATABASE)"
         - name: DATABASE_URL
@@ -144,6 +143,9 @@ spec:
         - name: geonode-k8s-settings-py
           mountPath: "/usr/src/geonode/geonode/geonode-k8s-settings.py"
           subPath: geonode-k8s-settings.py
+        - name: geonode-k8s-settings-additions-py
+          mountPath: "/usr/src/geonode/geonode/geonode-k8s-settings-additions.py"
+          subPath: geonode-k8s-settings-additions.py
           readOnly: true
         {{ if .Values.geonodeFixtures }}
         - name: geonode-fixtures
@@ -186,7 +188,7 @@ spec:
 
           # Add config overrides
           cat /usr/src/geonode/geonode/geonode-k8s-settings.py >> /usr/src/geonode/geonode/settings.py
-
+          cat /usr/src/geonode/geonode/geonode-k8s-settings-additions.py >> /usr/src/geonode/geonode/settings.py
           # Setup
           touch /var/log/celery.log
           dockerize -stdout /var/log/celery.log /usr/src/geonode/entrypoint.sh celery-cmd
@@ -195,11 +197,10 @@ spec:
         - configMapRef:
             name: {{ include "geonode_pod_name" . }}-env
         - secretRef:
-            name: {{ default "geonode-secret" .Values.geonode.secret.existingSecretName | quote }}
+            name: {{ .Values.geonode.secret.existingSecretName | default (include "geonode_secret_name" .) | quote }}
         - secretRef:
-            name: {{ default "geoserver-secret" .Values.geoserver.secret.existingSecretName | quote }}
+            name: {{ .Values.geoserver.secret.existingSecretName | default (include "geoserver_secret_name" .) | quote }}
 
-        env:
         env:
         - name: IS_CELERY
           value: 'True'
@@ -207,17 +208,17 @@ spec:
           valueFrom:
             secretKeyRef:
               name: {{ include "database_geonode_password_secret_key_ref" . }}
-              key: password
+              key: {{ include "database_geonode_password_key_ref" . }}
         - name: GEONODE_GEODATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ include "database_geodata_password_secret_key_ref" . }}
-              key: password
+              key: {{ include "database_geodata_password_key_ref" . }}
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ include "database_postgres_password_secret_key_ref" . }}
-              key: password
+              key: {{ include "database_postgres_password_key_ref" . }}
         - name: GEODATABASE_URL
           value: "postgis://$(GEONODE_GEODATABASE):$(GEONODE_GEODATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_GEODATABASE)"
         - name: DATABASE_URL
@@ -251,6 +252,9 @@ spec:
         - name: geonode-k8s-settings-py
           mountPath: "/usr/src/geonode/geonode/geonode-k8s-settings.py"
           subPath: geonode-k8s-settings.py
+        - name: geonode-k8s-settings-additions-py
+          mountPath: "/usr/src/geonode/geonode/geonode-k8s-settings-additions.py"
+          subPath: geonode-k8s-settings-additions.py
           readOnly: true
         {{ if .Values.geonodeFixtures }}
         - name: geonode-fixtures
@@ -297,6 +301,13 @@ spec:
             items:
             - key: geonode-k8s-settings.py
               path: "geonode-k8s-settings.py"
+        - name: geonode-k8s-settings-additions-py
+          configMap:
+            name: {{ .Release.Name }}-geonode-k8s-settings-additions-py
+            defaultMode: 0744
+            items:
+            - key: geonode-k8s-settings-additions.py
+              path: "geonode-k8s-settings-additions.py"
         {{- if .Values.geonodeFixtures }}
         - name: geonode-fixtures
           configMap:
