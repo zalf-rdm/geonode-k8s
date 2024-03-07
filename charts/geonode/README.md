@@ -147,7 +147,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | geoserver.resources.limits.memory | string | `"4Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geoserver.resources.requests.cpu | int | `1` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geoserver.resources.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| geoserver.secret.admin_password | string | `"geoserver"` | geoserver admin password |
+| geoserver.secret.admin_password | string | `"geoserver"` | geoserver admin password only gets only changed when the previous username/password combination is the default one (admin/geoserver) |
 | geoserver.secret.admin_username | string | `"admin"` | geoserver admin username |
 | geoserver.secret.existingSecretName | string | `""` | name of an existing Secret to use. Set, if you want to separately maintain the Secret. |
 | geoserver_data.container_name | string | `"geoserver-data-dir"` |  |

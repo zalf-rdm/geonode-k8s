@@ -339,7 +339,7 @@ geoserver:
     existingSecretName: ""
     # -- geoserver admin username
     admin_username: admin
-    # -- geoserver admin password
+    # -- geoserver admin password only gets only changed when the previous username/password combination is the default one (admin/geoserver)
     admin_password: "geoserver"
 
   resources:
