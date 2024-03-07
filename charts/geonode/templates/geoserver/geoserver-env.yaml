@@ -19,4 +19,4 @@ data:
   DATABASE_PORT: "{{ include "database_port" . }}"
   GEONODE_GEODATABASE: {{ .Values.postgres.geodata_databasename_and_username | quote  }}
   GEONODE_GEODATABASE_SCHEMA: {{ .Values.postgres.schema | quote }}
-  FORCE_REINIT: 'true'
+  FORCE_REINIT: {{ .Values.geoserver.force_reinit | quote }}
