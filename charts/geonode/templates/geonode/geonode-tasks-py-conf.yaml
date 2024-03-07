@@ -28,11 +28,14 @@ data:
     import ast
     import json
     import time
+    import logging
     import datetime
     import requests
 
     from urllib.parse import urlparse, urlunparse
     from invoke import task
+
+    logger = logging.getLogger(__name__)
 
     GEOSERVER_STORE_NAME = "geogeonode" 
     GEOSERVER_WORKSPACE_NAME = "geonode"
