@@ -337,10 +337,12 @@ geoserver:
   secret:
     # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
     existingSecretName: ""
+    # -- geoserver factory/previous password. This password is used to change the current password for the geoserver admin_user
+    admin_factory_password: geoserver
     # -- geoserver admin username
     admin_username: admin
-    # -- geoserver admin password only gets only changed when the previous username/password combination is the default one (admin/geoserver)
-    admin_password: "geoserver"
+    # -- geoserver admin password, respect admin_factory_password, if you gonna change the password from not factory password
+    admin_password: geoserver
 
   resources:
     requests:

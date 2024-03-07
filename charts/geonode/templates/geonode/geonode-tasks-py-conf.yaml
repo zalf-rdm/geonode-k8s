@@ -369,7 +369,6 @@ data:
     @task
     def geoserverfixture(ctx):
         print("********************geoserver fixture********************************")
-        _geoserver_info_provision(f"{os.environ['GEOSERVER_LOCATION']}rest/")
         _set_geoserver_database_store()
 
     @task
@@ -469,28 +468,6 @@ data:
         else:
             logger.info("GeoServer API are available!")
             return True
-
-
-    def _geoserver_info_provision(url):
-        from django.conf import settings
-        from geoserver.catalog import Catalog
-
-        geoserver_default_username = "admin"
-        geoserver_default_password = "geoserver"
-
-        print("Trying to changing default GeoServer Admin Password to defined password in values.yaml ...")
-        cat = Catalog(url, username=geoserver_default_username, password=geoserver_default_password)
-        headers = {"Content-type": "application/xml", "Accept": "application/xml"}
-        data = f"""<?xml version="1.0" encoding="UTF-8"?>
-    <userPassword>
-        <newPassword>{(os.getenv('GEOSERVER_ADMIN_PASSWORD', 'geoserver'))}</newPassword>
-    </userPassword>"""
-
-        response = cat.http_request(f"{cat.service_url}/security/self/password", method="PUT", data=data, headers=headers)
-        if response.status_code == 200:
-            print("GeoServer admin password updated SUCCESSFULLY!")
-        else:
-            print("WARNING: GeoServer admin password *NOT* updated: code {}, this would can only work if the previous password is the default password ...".format(response.status_code))
 
 
     def _prepare_oauth_fixture():
@@ -644,7 +621,7 @@ data:
         print("Check if geoserver store is already set up ...")
         url = '{}rest/workspaces/{}/datastores/'.format(os.getenv('GEOSERVER_LOCATION'), GEOSERVER_WORKSPACE_NAME)
         headers = {'Content-Type': 'text/xml'}
-        auth = (os.environ.get("GEOSERVER_ADMIN_USER"), os.getenv('GEOSERVER_ADMIN_PASSWORD')
+        auth = (os.environ.get("GEOSERVER_ADMIN_USER"), os.getenv('GEOSERVER_ADMIN_PASSWORD'))
 
         try:
             r = requests.get(url, headers=headers, auth=auth)
