@@ -1,5 +1,5 @@
 
-![Version: 1.0.10](https://img.shields.io/badge/Version-1.0.10-informational?style=flat-square)
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square)
 
 # Helm Chart for Geonode
 
@@ -35,6 +35,9 @@ This repository provides a helm chart for **geonode** including additional servi
 - pycsw: CSW interface (scalable)
 This helm chart provides the possibility to run most of the services redundant to increase performance on the one hand and increase fail safe on the other hand.
 
+## Documentation
+
+
 To get an overview of the available configuration check out the values [docs](charts/geonode/README.md). If you want to run the helm chart first on a minikube cluster check out the [minikube](docs/minikube-installation.md) guide. Also check the minikube-values.yaml for basic configuration. 
 
 If you want to go straight for a production installation follow the [installation](#install) guide.
@@ -49,21 +52,7 @@ Install
 * A Kubernetes cluster (or [minikube](docs/minikube-installation.md))
 * [Helm](https://helm.sh/)
 
-The chart will automatically install required dependencies, i.e. a RabbitMQ broker and a Postgres database with `postgis` extensions installed, and link them up.
-
-| GeoNode-k8s<br /> chart version | GeoNode<br /> version(s) | geonode container image | geoserver container image | 
-|---------------------------|--------------------|-------------------------|---------------------------|
-| [1.0.0](https://github.com/zalf-rdm/geonode-k8s/releases/tag/1.0.0) | [4.1.2](https://github.com/GeoNode/geonode/releases/tag/4.1.2) | [52north/geonode:4.1.2](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
-| [1.0.1](https://github.com/zalf-rdm/geonode-k8s/releases/tag/1.0.1) | [4.1.2](https://github.com/GeoNode/geonode/releases/tag/4.1.2) | [52north/geonode:4.1.2](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
-| [1.0.2](https://github.com/zalf-rdm/geonode-k8s/releases/tag/geonode-k8s-1.0.2) | [4.1.2](https://github.com/GeoNode/geonode/releases/tag/4.1.2) | [52north/geonode:4.1.2](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
-| [1.0.3](https://github.com/zalf-rdm/geonode-k8s/releases/tag/geonode-k8s-1.0.3) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
-| [1.0.4](https://github.com/zalf-rdm/geonode-k8s/releases/tag/geonode-k8s-1.0.4) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
-| [1.0.5](https://github.com/zalf-rdm/geonode-k8s/releases/tag/geonode-k8s-1.0.5) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
-| [1.0.6](https://github.com/zalf-rdm/geonode-k8s/releases/tag/geonode-k8s-1.0.6) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
-| [1.0.7](https://github.com/zalf-rdm/geonode-k8s/releases/tag/geonode-k8s-1.0.7) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
-| [1.0.8](https://github.com/zalf-rdm/geonode-k8s/releases/tag/geonode-k8s-1.0.8) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
-| [1.0.9](https://github.com/zalf-rdm/geonode-k8s/releases/tag/geonode-k8s-1.0.9) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
-| [1.0.10](https://github.com/zalf-rdm/geonode-k8s/releases/tag/geonode-k8s-1.0.10) | [4.1.3](https://github.com/GeoNode/geonode/releases/tag/4.1.3)  | [52north/geonode:4.1.3](https://hub.docker.com/r/52north/geonode/tags) | [geonode/geoserver:2.23.0](https://hub.docker.com/r/geonode/geoserver/tags) |
+The chart will automatically install required dependencies, i.e. a RabbitMQ broker and a Postgres database with `postgis` extensions installed, and link them up. If you want to run an older geonode version with geonode-k8s check the [release-to-version list](docs/list-of-releases-and-versions.md).
 
 ## Install chart dependencies
 
