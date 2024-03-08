@@ -3,3 +3,5 @@ my-values.yaml
 **/Chart.lock
 charts/*/charts
 .vscode
+venv
+.venv

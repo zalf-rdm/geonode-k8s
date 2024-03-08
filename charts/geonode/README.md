@@ -35,6 +35,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | geonode.acme.enabled | bool | `false` | enables cert-manager to do ACME challenges (aka certificates via letsencrypt) |
 | geonode.acme.stageUrl | string | `"https://acme-staging-v02.api.letsencrypt.org/directory"` | ACME staging environment (use acme-staging to avoid running into rate limits) stageUrl: https://acme-v02.api.letsencrypt.org/directory |
 | geonode.celery.container_name | string | `"celery"` | celery container name |
+| geonode.celery.imagePullPolicy | string | `"IfNotPresent"` | celery image pull policy |
 | geonode.celery.resources.limits.cpu | int | `2` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.celery.resources.limits.memory | string | `"2Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geonode.celery.resources.requests.cpu | int | `1` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
@@ -68,11 +69,16 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | geonode.haystack.search_results_per_page | string | `"200"` | hystack results per page |
 | geonode.image.name | string | `"geonode/geonode"` | used geonode image |
 | geonode.image.tag | string | `"4.2.2"` | tag of used geonode image |
+| geonode.imagePullPolicy | string | `"IfNotPresent"` | image pull policy |
 | geonode.imagePullSecret | string | `""` | pull secret to use for geonode image |
 | geonode.ingress.annotations | object | `{}` | adds ingress annotations for nginx ingress class |
 | geonode.ingress.enabled | bool | `true` | enables external access |
 | geonode.ingress.ingressClassName | string | `nil` | define kubernetes ingress class for geonode ingress |
 | geonode.ingress.tlsSecret | string | `"geonode-tls-secret"` | tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/ (for the use of cert-manager, configure the acme section properly). is used when geonode.general.externalScheme is set to 'https' |
+| geonode.init.container_name | string | `"geonode-wait-for-db-and-rabbit"` | init container name |
+| geonode.init.image.name | string | `"jwilder/dockerize"` |  |
+| geonode.init.image.tag | string | `"0.6.1"` |  |
+| geonode.init.imagePullPolicy | string | `"IfNotPresent"` |  |
 | geonode.ldap.always_update_user | bool | `true` | always update local user database from ldap |
 | geonode.ldap.attr_map_email_addr | string | `"mailPrimaryAddress"` | email attribute used from ldap |
 | geonode.ldap.attr_map_first_name | string | `"givenName"` | given name attribute used from ldap |
@@ -142,6 +148,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | geoserver.force_reinit | bool | `true` | set force reinit true so that changing passwords etc. in Values.yaml will take effect after restarting the pod this on the other hand will increase pod initializing time, only change if you know what you are doing |
 | geoserver.image.name | string | `"geonode/geoserver"` | geoserver image docker image (default in zalf namespace because geonode one was not up to date) |
 | geoserver.image.tag | string | `"2.23.3-v2"` | geoserver docker image tag |
+| geoserver.imagePullPolicy | string | `"IfNotPresent"` | geoserver image pull policy |
 | geoserver.imagePullSecret | string | `""` | pull secret to use for geoserver image |
 | geoserver.port | int | `8080` | geoserver port |
 | geoserver.resources.limits.cpu | int | `2` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
@@ -155,6 +162,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | geoserver_data.container_name | string | `"geoserver-data-dir"` |  |
 | geoserver_data.image.name | string | `"geonode/geoserver_data"` | geoserver image docker image (default in zalf namespace because geonode one was not up to date) |
 | geoserver_data.image.tag | string | `"2.23.3-v1"` | geoserver docker image tag |
+| geoserver_data.imagePullPolicy | string | `"IfNotPresent"` | geoserver image pull policy |
 | global.accessMode | string | `"ReadWriteMany"` | storage access mode used by helm dependency pvc |
 | global.storageClass | string | `nil` | storageClass used by helm dependencies pvc |
 | memcached.architecture | string | `"high-availability"` | memcached replica. Loadbalanaced via kubernetes. (only one entry in django settings.py) im memcached is activated under geonode.memcached.enabled this takes place |
@@ -165,6 +173,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | nginx.external_cors.enabled | bool | `false` | Add Access-Control-Allow-Origin directive to allow integration from an external domain |
 | nginx.image.name | string | `"nginx"` | nginx docker image |
 | nginx.image.tag | string | `"1.25"` | nginx docker image tag |
+| nginx.imagePullPolicy | string | `"IfNotPresent"` | nginx image pull policy |
 | nginx.imagePullSecret | string | `""` | pull secret to use for nginx image |
 | nginx.maxClientBodySize | string | `"2G"` | max file upload size |
 | nginx.replicaCount | int | `1` | nginx container replicas |
@@ -198,7 +207,12 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | pycsw.endpoint | string | `"/catalogue/csw"` | pycsw url below geonode.ingress.externalDomain |
 | pycsw.image.name | string | `"geopython/pycsw"` | pycsw docker image |
 | pycsw.image.tag | string | `"2.6.1"` | pycsw docker image tag |
+| pycsw.imagePullPolicy | string | `"IfNotPresent"` | pycsw image pull policy |
 | pycsw.imagePullSecret | string | `""` | pull secret to use for pycsw image |
+| pycsw.init.container_name | string | `"pycsw-wait-for-geonode"` |  |
+| pycsw.init.image.name | string | `"alpine/curl"` | pycsw docker image |
+| pycsw.init.image.tag | string | `"8.5.0"` | pycsw docker image tag |
+| pycsw.init.imagePullPolicy | string | `"IfNotPresent"` | pycsw image pull policy |
 | pycsw.mappings | string | copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py | pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/ |
 | pycsw.port | int | `8000` | pycsw endpoint port |
 | pycsw.replicaCount | int | `1` | pycsw container replicas |
