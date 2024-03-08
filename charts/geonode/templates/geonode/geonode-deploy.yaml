@@ -37,9 +37,9 @@ spec:
 
       initContainers:
       # Wait for Postgres and rabbit
-      - name: geonode-wait-for-db-and-rabbit
-        image: jwilder/dockerize
-        imagePullPolicy: IfNotPresent
+      - name: {{ .Values.geonode.init.container_name }}
+        image: "{{ .Values.geonode.init.image.name }}:{{ .Values.geonode.init.image.tag }}"
+        imagePullPolicy: {{ .Values.geonode.init.imagePullPolicy }}
         args:
         - -timeout=60s
         - -wait
@@ -51,6 +51,7 @@ spec:
       # This is the django app server
       - name: {{ .Values.geonode.container_name }}
         image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
+        imagePullPolicy: {{ .Values.geonode.imagePullPolicy }}
         command:
         - bash
         - -c
@@ -164,6 +165,7 @@ spec:
       # Celery is the task worker
       - name: {{ .Values.geonode.celery.container_name }}
         image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
+        imagePullPolicy: {{ .Values.geonode.celery.imagePullPolicy }}
         command:
         - bash
         - -c

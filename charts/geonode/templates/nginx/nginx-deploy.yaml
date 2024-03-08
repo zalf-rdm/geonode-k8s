@@ -26,7 +26,7 @@ spec:
       containers:
       - name: {{ .Values.nginx.container_name }}
         image: "{{ .Values.nginx.image.name }}:{{ .Values.nginx.image.tag }}"
-
+        imagePullPolicy: {{ .Values.nginx.imagePullPolicy }}
         ports:
         {{- if (eq .Values.geonode.general.externalScheme "https" )}}
         - containerPort: 443

@@ -23,6 +23,7 @@ spec:
       initContainers:
       - name: {{ .Values.geoserver_data.container_name }}
         image: "{{ .Values.geoserver_data.image.name }}:{{ .Values.geoserver_data.image.tag }}"
+        imagePullPolicy: {{ .Values.geoserver_data.imagePullPolicy }}
         command:
         - sh
         - -c
@@ -55,6 +56,7 @@ spec:
       containers:
       - name: {{ .Values.geoserver.container_name }}
         image: "{{ .Values.geoserver.image.name }}:{{ .Values.geoserver.image.tag }}"
+        imagePullPolicy: {{ .Values.geoserver.imagePullPolicy }}
         ports:
         - containerPort: {{ .Values.geoserver.port }}
 
