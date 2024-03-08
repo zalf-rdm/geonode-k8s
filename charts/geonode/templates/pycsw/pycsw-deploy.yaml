@@ -29,9 +29,9 @@ spec:
       initContainers:
       # Wait for GeoNode to be up and running, else there can be a race conddition where pycsw creates the database table,
       # and lets crash init process of geonode
-      - name: pycsw-wait-for-geonode
-        image: alpine/curl
-        imagePullPolicy: IfNotPresent
+      - name: {{ .Values.pycsw.init.container_name }}
+        image: "{{ .Values.pycsw.init.image.name }}:{{ .Values.pycsw.init.image.tag }}"
+        imagePullPolicy: {{ .Values.pycsw.init.imagePullPolicy }}
         command: ["/bin/sh","-c"]
         args: ['while [ $(curl -ksw "%{http_code}" "$GEONODE_ENDPOINT:8001" -o /dev/null) -ne 200 ]; do sleep 5; echo "health check failed . Waiting for GeoNode ($GEONODE_ENDPOINT:8001) ..."; done']
         env:
@@ -41,6 +41,7 @@ spec:
       containers:
       - name: {{ .Values.pycsw.container_name }}
         image: "{{ .Values.pycsw.image.name }}:{{ .Values.pycsw.image.tag }}"
+        imagePullPolicy: {{ .Values.pycsw.imagePullPolicy }}
         envFrom:
           - configMapRef:
               name: {{ include "pycsw_pod_name" . }}-env
