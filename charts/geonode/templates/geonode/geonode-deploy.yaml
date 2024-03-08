@@ -24,6 +24,7 @@ spec:
       annotations:
         checksum/geonode-env: {{ include (print $.Template.BasePath "/geonode/geonode-env.yaml") . | sha256sum }}
         checksum/geonode-secret: {{ include (print $.Template.BasePath "/geonode/geonode-secret.yaml") . | sha256sum }}
+        checksum/geonode-tasks-py: {{ include (print $.Template.BasePath "/geonode/geonode-tasks-py-conf.yaml") . | sha256sum }}
         checksum/geonode-local-settings: {{ include (print $.Template.BasePath "/geonode/geonode-local-settings.yaml") . | sha256sum }}
         checksum/geonode-settings-additions: {{ include (print $.Template.BasePath "/geonode/geonode-settings-additions.yaml") . | sha256sum }}
         checksum/geonode-uwsig: {{ include (print $.Template.BasePath "/geonode/geonode-uwsgi-ini-conf.yaml") . | sha256sum }}

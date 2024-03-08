@@ -145,6 +145,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | geonode.uwsgi.worker_reload_mercy | int | `60` | How long to wait before forcefully killing workers |
 | geonodeFixtures | map of fixture files | `{"somefixture.json":"[\n  {\n    \"pk\": 0,\n    \"model\": \"myapp.sample\"\n    \"description\": \"nice little content\"\n  }\n]\n"}` | Fixture files which shall be made available under /usr/src/geonode/geonode/fixtures (refer to https://docs.djangoproject.com/en/4.2/howto/initial-data/) |
 | geoserver.container_name | string | `"geoserver"` | geoserver container name |
+| geoserver.force_reinit | bool | `true` | set force reinit true so that changing passwords etc. in Values.yaml will take effect after restarting the pod this on the other hand will increase pod initializing time, only change if you know what you are doing |
 | geoserver.image.name | string | `"geonode/geoserver"` | geoserver image docker image (default in zalf namespace because geonode one was not up to date) |
 | geoserver.image.tag | string | `"2.23.3-v2"` | geoserver docker image tag |
 | geoserver.imagePullPolicy | string | `"IfNotPresent"` | geoserver image pull policy |
@@ -154,7 +155,8 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | geoserver.resources.limits.memory | string | `"4Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geoserver.resources.requests.cpu | int | `1` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | geoserver.resources.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| geoserver.secret.admin_password | string | `"geoserver"` | geoserver admin password |
+| geoserver.secret.admin_factory_password | string | `"geoserver"` | geoserver factory/previous password. This password is used to change the current password for the geoserver admin_user |
+| geoserver.secret.admin_password | string | `"geoserver"` | geoserver admin password, respect admin_factory_password, if you gonna change the password from not factory password |
 | geoserver.secret.admin_username | string | `"admin"` | geoserver admin username |
 | geoserver.secret.existingSecretName | string | `""` | name of an existing Secret to use. Set, if you want to separately maintain the Secret. |
 | geoserver_data.container_name | string | `"geoserver-data-dir"` |  |
@@ -165,6 +167,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.1.3, Geoserver: 2.23.0, p
 | global.storageClass | string | `nil` | storageClass used by helm dependencies pvc |
 | memcached.architecture | string | `"high-availability"` | memcached replica. Loadbalanaced via kubernetes. (only one entry in django settings.py) im memcached is activated under geonode.memcached.enabled this takes place |
 | memcached.replicaCount | int | `1` |  |
+| nginx.access_control_allow.credentials | bool | `false` | control value of Access-Control-Allow-Credentials in nginx configuration |
 | nginx.container_name | string | `"nginx"` | nginx container name |
 | nginx.external_cors.domain | string | `""` | Target domain for CORS |
 | nginx.external_cors.enabled | bool | `false` | Add Access-Control-Allow-Origin directive to allow integration from an external domain |
