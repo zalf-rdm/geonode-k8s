@@ -7,6 +7,63 @@ entries:
       artifacthub.io/links: |
         - name: Chart Source
           url: https://github.com/zalf-rdm/geonode-k8s/
+        - name: Docs
+          url: https://geonode-k8s.readthedocs.io/en/latest/
+        - name: support
+          url: https://github.com/zalf-rdm/geonode-k8s/issues/
+        - name: Geonode
+          url: https://www.geonode.org/
+    apiVersion: v2
+    created: "2024-03-08T12:54:14.799812795Z"
+    dependencies:
+    - condition: postgres-operator.enabled
+      name: postgres-operator
+      repository: https://opensource.zalando.com/postgres-operator/charts/postgres-operator/
+      version: ~1.9.0
+    - condition: rabbitmq.enabled
+      name: rabbitmq
+      repository: https://charts.bitnami.com/bitnami
+      version: ~10.1.7
+    - condition: geonode.memcached.enabled
+      name: memcached
+      repository: https://charts.bitnami.com/bitnami
+      version: ~6.x.x
+    description: 'Helm Chart for Geonode. Supported versions: Geonode: 4.2.2, Geoserver:
+      2.23.3-v2, pyCSW: 2.6.1'
+    digest: 6ef5df4bb56e98b49de0f339645d953c1b2b9dd6cf84f8246ff19a9460d98a94
+    home: https://geonode.org/
+    icon: https://raw.githubusercontent.com/zalf-rdm/geonode-k8s/main/docs/img/geonode-k8s-logo.png
+    keywords:
+    - geonode
+    - geospatial
+    - geodata
+    - SDI
+    - http
+    - web
+    - python
+    - geoserver
+    - postresql
+    - postgis
+    - rabbitmq
+    - memcached
+    - django
+    maintainers:
+    - email: marcel.wallschlaeger@zalf.de
+      name: mwallschlaeger
+      url: https://github.com/mwallschlaeger
+    name: geonode-k8s
+    sources:
+    - https://github.com/zalf-rdm/geonode-k8s
+    - https://github.com/geonode/geonode
+    urls:
+    - https://github.com/zalf-rdm/geonode-k8s/releases/download/geonode-k8s-1.1.0/geonode-k8s-1.1.0.tgz
+    version: 1.1.0
+  - annotations:
+      artifacthub.io/category: storage
+      artifacthub.io/license: GPL3
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/zalf-rdm/geonode-k8s/
         - name: Geonode
           url: https://www.geonode.org/
         - name: support
@@ -651,4 +708,4 @@ entries:
     urls:
     - https://github.com/zalf-rdm/geonode-k8s/releases/download/geonode-k8s-1.0.0/geonode-k8s-1.0.0.tgz
     version: 1.0.0
-generated: "2024-02-08T11:02:17.095000496Z"
+generated: "2024-03-08T12:54:14.799865995Z"
