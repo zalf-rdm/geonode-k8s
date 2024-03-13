@@ -48,6 +48,14 @@
 {{- end -}}
 {{- end -}}
 
+{{- define "database_ssl" -}}
+{{- if (eq .Values.postgres.type "operator") -}}
+require
+{{- else if (eq .Values.postgres.type "external") -}}
+{{ .Values.postgres.external.ssl }}
+{{- end -}}
+{{- end -}}
+
 # secret key reference for the password of user:  .Values.postgres.username
 {{- define "database_postgres_password_secret_key_ref" -}}
 {{- if (eq .Values.postgres.type "operator") -}}

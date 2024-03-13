@@ -658,6 +658,7 @@ postgres:
   external:
     hostname: my-external-postgres.com
     port: 5432
+    ssl: prefer
     secret:
       # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
       existingSecretName: ""
