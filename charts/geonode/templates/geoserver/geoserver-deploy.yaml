@@ -82,14 +82,12 @@ spec:
         readinessProbe:
           tcpSocket:
             port: {{ .Values.geoserver.port }}
-          initialDelaySeconds: 60
           periodSeconds: 5
           failureThreshold: 15
-
         livenessProbe:
           tcpSocket:
             port: {{ .Values.geoserver.port }}
-          initialDelaySeconds: 180
+          initialDelaySeconds: 90
           periodSeconds: 5
           failureThreshold: 15
 

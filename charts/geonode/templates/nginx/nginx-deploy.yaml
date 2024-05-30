@@ -28,12 +28,11 @@ spec:
         image: "{{ .Values.nginx.image.name }}:{{ .Values.nginx.image.tag }}"
         imagePullPolicy: {{ .Values.nginx.imagePullPolicy }}
         ports:
+          - name: http
         {{- if (eq .Values.geonode.general.externalScheme "https" )}}
-        - containerPort: 443
-          name: https
+            containerPort: 443
         {{- else }}
-        - containerPort: 80
-          name: http
+            containerPort: 80
         {{- end }}
 
         volumeMounts:
@@ -45,7 +44,17 @@ spec:
           subPath: favicon.ico
         - name: nginx-confd
           mountPath: /etc/nginx/conf.d
-
+        readinessProbe:
+          httpGet:
+            path: /static
+            port: http
+          timeoutSeconds: 2
+        livenessProbe:
+          httpGet:
+            path: /static
+            port: http
+          initialDelaySeconds: 65
+          timeoutSeconds: 5
         resources:
           requests:
             memory: {{ .Values.nginx.resources.requests.memory }}

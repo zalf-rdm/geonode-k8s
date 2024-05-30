@@ -58,6 +58,7 @@ spec:
         - -c
         - |
           # install dockerize...
+          export DOCKERIZE_VERSION=v0.7.0
           wget -q https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
@@ -84,9 +85,10 @@ spec:
           dockerize -stdout /var/log/geonode.log /usr/local/bin/uwsgi --ini /usr/src/geonode/uwsgi.ini
 
         ports:
-        - containerPort: 8000
-        - containerPort: 8001
-
+        - name: http
+          containerPort: 8000
+        - name: http-monitor
+          containerPort: 8001
         envFrom:
         - configMapRef:
             name: {{ include "geonode_pod_name" . }}-env
@@ -154,7 +156,17 @@ spec:
           mountPath: "/usr/src/geonode/geonode/fixtures"
           readOnly: true
         {{ end }}
-
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http-monitor
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http-monitor
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
         resources:
           requests:
             memory: {{ .Values.geonode.resources.requests.memory }}
@@ -172,6 +184,7 @@ spec:
         - -c
         - |
           # install dockerize...
+          export DOCKERIZE_VERSION=v0.7.0
           wget -q https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
