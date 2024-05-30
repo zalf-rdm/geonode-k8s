@@ -72,12 +72,12 @@ spec:
           httpGet:
             path: /
             port: http
-          timeoutSeconds: 2
+          timeoutSeconds: 5
         livenessProbe:
           httpGet:
             path: /
             port: http
-          initialDelaySeconds: 5
+          initialDelaySeconds: 10
           timeoutSeconds: 5
         resources:
           requests:

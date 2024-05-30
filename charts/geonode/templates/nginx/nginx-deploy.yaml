@@ -44,17 +44,15 @@ spec:
           subPath: favicon.ico
         - name: nginx-confd
           mountPath: /etc/nginx/conf.d
-        readinessProbe:
-          httpGet:
-            path: /static
-            port: http
-          timeoutSeconds: 2
+
+        # this will fail as long as statics are not build by the geonode sts
         livenessProbe:
           httpGet:
-            path: /static
+            path: /
             port: http
-          initialDelaySeconds: 65
+          initialDelaySeconds: 15
           timeoutSeconds: 5
+
         resources:
           requests:
             memory: {{ .Values.nginx.resources.requests.memory }}

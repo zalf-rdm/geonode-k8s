@@ -58,7 +58,6 @@ spec:
         - -c
         - |
           # install dockerize...
-          export DOCKERIZE_VERSION=v0.7.0
           wget -q https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
@@ -156,17 +155,20 @@ spec:
           mountPath: "/usr/src/geonode/geonode/fixtures"
           readOnly: true
         {{ end }}
-        readinessProbe:
+
+        startupProbe:
           httpGet:
             path: /
             port: http-monitor
-          timeoutSeconds: 5
+          failureThreshold: 10
+          periodSeconds: 10
+
         livenessProbe:
           httpGet:
             path: /
             port: http-monitor
-          initialDelaySeconds: 60
-          timeoutSeconds: 10
+          initialDelaySeconds: 90
+          periodSeconds: 10
         resources:
           requests:
             memory: {{ .Values.geonode.resources.requests.memory }}
@@ -184,7 +186,6 @@ spec:
         - -c
         - |
           # install dockerize...
-          export DOCKERIZE_VERSION=v0.7.0
           wget -q https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
             && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
