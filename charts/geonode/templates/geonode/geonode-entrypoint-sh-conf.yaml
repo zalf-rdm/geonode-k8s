@@ -67,7 +67,7 @@ data:
             invoke updateadmin
         fi
 
-        invoke statics
+        # invoke statics
         invoke waitforgeoserver
         invoke geoserverfixture
         invoke postscript

@@ -413,6 +413,8 @@ data:
     def initialized(ctx):
         print("**************************init file********************************")
         ctx.run("date > /mnt/volumes/statics/geonode_init.lock")
+        ctx.run("mkdir -p /mnt/volumes/statics/uploads")
+
 
     @task
     def prescript(ctx):

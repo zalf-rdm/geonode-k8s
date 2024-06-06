@@ -22,6 +22,24 @@ spec:
       imagePullSecrets:
       - name: {{ .Values.nginx.imagePullSecret }}
 {{ end }}
+      initContainers:
+      # This is the django app server
+      - name: {{ .Values.nginx.container_name }}-build-static
+        image: "{{ .Values.geonode.image.name }}:{{ .Values.geonode.image.tag }}"
+        imagePullPolicy: {{ .Values.geonode.imagePullPolicy }}
+        command:
+        - bash
+        - -c
+        - |
+          mkdir -p $STATIC_ROOT
+          python manage.py collectstatic --noinput
+        envFrom:
+          - configMapRef:
+              name: {{ include "geonode_pod_name" . }}-env
+        volumeMounts:
+        - name: pvc-{{ .Release.Name }}-statics
+          mountPath: /mnt/volumes/statics
+          subPath: statics
 
       containers:
       - name: {{ .Values.nginx.container_name }}
@@ -37,7 +55,7 @@ spec:
         {{- end }}
 
         volumeMounts:
-        - name: "{{ include "persistant_volume_name" . }}"
+        - name: pvc-{{ .Release.Name }}-statics
           mountPath: /mnt/volumes/statics
           subPath: statics
         - name: geonode-favicon
@@ -61,6 +79,6 @@ spec:
       - name: geonode-favicon
         configMap:
           name: {{ .Release.Name }}-geonode-favicon
-      - name: "{{ include "persistant_volume_name" . }}"
+      - name: pvc-{{ .Release.Name }}-statics
         persistentVolumeClaim:
-          claimName: pvc-{{ .Release.Name }}-geonode
+          claimName: pvc-{{ .Release.Name }}-statics
