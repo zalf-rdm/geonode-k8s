@@ -57,7 +57,8 @@ spec:
           value: "postgresql://$(GEONODE_DATABASE):$(GEONODE_DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(GEONODE_DATABASE)"
 
         ports:
-        - containerPort: {{ .Values.pycsw.port }}
+        - name: http
+          containerPort: {{ .Values.pycsw.port }}
         volumeMounts:
         - name: pycsw-cfg
           mountPath: "/etc/pycsw/pycsw.cfg"
@@ -67,6 +68,17 @@ spec:
           mountPath: /etc/pycsw/pycsw-mappings.py
           subPath: pycsw-mappings.py
           readOnly: true
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
         resources:
           requests:
             memory: {{ .Values.pycsw.resources.requests.memory }}
@@ -74,12 +86,6 @@ spec:
           limits:
             memory: {{ .Values.pycsw.resources.limits.memory }}
             cpu: {{ .Values.pycsw.resources.limits.cpu }}
-        # livenessProbe:
-        #   httpGet:
-        #     path: /
-        #     port: {{ .Values.pycsw.port }}
-        #   initialDelaySeconds: 3
-        #   periodSeconds: 10
 
       volumes:
       - name: pycsw-cfg
