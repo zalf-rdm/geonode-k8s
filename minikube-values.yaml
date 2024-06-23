@@ -32,7 +32,7 @@ geonode:
     authentication_method: username_email
 
 pycsw:
-  enabled: False
+  enabled: True
 
 postgres-operator:
   enabled: True
