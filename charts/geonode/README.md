@@ -143,6 +143,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.3.0, Geoserver: 2.24.3-v1
 | geonode.uwsgi.processes | int | `128` | Maximum number of workers allowed |
 | geonode.uwsgi.reload_on_rss | int | `2048` | Restart workers after this much resident memory |
 | geonode.uwsgi.worker_reload_mercy | int | `60` | How long to wait before forcefully killing workers |
+| geonode.version | string | `"4.3.0"` | geonode version, used for some distinguassion between version of GeoNode |
 | geonodeFixtures | map of fixture files | `{"somefixture.json":"[\n  {\n    \"pk\": 0,\n    \"model\": \"myapp.sample\"\n    \"description\": \"nice little content\"\n  }\n]\n"}` | Fixture files which shall be made available under /usr/src/geonode/geonode/fixtures (refer to https://docs.djangoproject.com/en/4.2/howto/initial-data/) |
 | geoserver.container_name | string | `"geoserver"` | geoserver container name |
 | geoserver.force_reinit | bool | `true` | set force reinit true so that changing passwords etc. in Values.yaml will take effect after restarting the pod this on the other hand will increase pod initializing time, only change if you know what you are doing |
