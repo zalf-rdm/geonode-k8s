@@ -1,6 +1,6 @@
-# Installation guide for Minicube
+# Installation guide for Minikube
 
-## Install Minicube
+## Install Minikube
 
 To install minikube itself follow the instruction on https://kubernetes.io/de/docs/tasks/tools/install-minikube/
 
@@ -12,7 +12,7 @@ Download or update latest helm chart dependencies listed in /chart.yaml.
 helm dependency update charts/geonode
 ```
 
-## Edit Minicube values
+## Edit Minikube values
 
 View and edit the predefined minikube values under /minikube-values.yaml
 

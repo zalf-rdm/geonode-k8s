@@ -1,8 +1,8 @@
 # geonode-k8s
 
-![Version: 1.1.1](https://img.shields.io/badge/Version-1.1.1-informational?style=flat-square)
+![Version: 1.2.1](https://img.shields.io/badge/Version-1.2.1-informational?style=flat-square)
 
-Helm Chart for Geonode. Supported versions: Geonode: 4.2.2, Geoserver: 2.23.3-v2, pyCSW: 2.6.1
+Helm Chart for Geonode. Supported versions: Geonode: 4.3.0, Geoserver: 2.24.3-v1, pyCSW: 2.6.1
 
 **Homepage:** <https://geonode.org/>
 
@@ -68,7 +68,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.2.2, Geoserver: 2.23.3-v2
 | geonode.haystack.engine_url | string | `"http://elasticsearch:9200/"` | hystack url |
 | geonode.haystack.search_results_per_page | string | `"200"` | hystack results per page |
 | geonode.image.name | string | `"geonode/geonode"` | used geonode image |
-| geonode.image.tag | string | `"4.2.2"` | tag of used geonode image |
+| geonode.image.tag | string | `"4.3.0"` | tag of used geonode image |
 | geonode.imagePullPolicy | string | `"IfNotPresent"` | image pull policy |
 | geonode.imagePullSecret | string | `""` | pull secret to use for geonode image |
 | geonode.ingress.annotations | object | `{}` | adds ingress annotations for nginx ingress class |
@@ -143,11 +143,12 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.2.2, Geoserver: 2.23.3-v2
 | geonode.uwsgi.processes | int | `128` | Maximum number of workers allowed |
 | geonode.uwsgi.reload_on_rss | int | `2048` | Restart workers after this much resident memory |
 | geonode.uwsgi.worker_reload_mercy | int | `60` | How long to wait before forcefully killing workers |
+| geonode.version | string | `"4.3.0"` | geonode version, used for some distinguassion between version of GeoNode |
 | geonodeFixtures | map of fixture files | `{"somefixture.json":"[\n  {\n    \"pk\": 0,\n    \"model\": \"myapp.sample\"\n    \"description\": \"nice little content\"\n  }\n]\n"}` | Fixture files which shall be made available under /usr/src/geonode/geonode/fixtures (refer to https://docs.djangoproject.com/en/4.2/howto/initial-data/) |
 | geoserver.container_name | string | `"geoserver"` | geoserver container name |
 | geoserver.force_reinit | bool | `true` | set force reinit true so that changing passwords etc. in Values.yaml will take effect after restarting the pod this on the other hand will increase pod initializing time, only change if you know what you are doing |
 | geoserver.image.name | string | `"geonode/geoserver"` | geoserver image docker image (default in zalf namespace because geonode one was not up to date) |
-| geoserver.image.tag | string | `"2.23.3-v2"` | geoserver docker image tag |
+| geoserver.image.tag | string | `"2.24.3-v1"` | geoserver docker image tag |
 | geoserver.imagePullPolicy | string | `"IfNotPresent"` | geoserver image pull policy |
 | geoserver.imagePullSecret | string | `""` | pull secret to use for geoserver image |
 | geoserver.port | int | `8080` | geoserver port |
@@ -192,6 +193,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.2.2, Geoserver: 2.23.3-v2
 | postgres.external.secret.geodata_password | string | `"geogeonode"` |  |
 | postgres.external.secret.geonode_password | string | `"geonode"` |  |
 | postgres.external.secret.postgres_password | string | `"postgres"` |  |
+| postgres.external.ssl | string | `"prefer"` |  |
 | postgres.geodata_databasename_and_username | string | `"geodata"` | geoserver database name and username |
 | postgres.geonode_databasename_and_username | string | `"geonode"` | geonode database name and username |
 | postgres.operator.numberOfInstances | int | `1` | number of database instances |
