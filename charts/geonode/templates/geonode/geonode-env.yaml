@@ -116,7 +116,7 @@ data:
   # Configure PYCSW
   {{ if .Values.pycsw.enabled }}
   CATALOGUE_ENGINE: geonode.catalogue.backends.pycsw_http
-  CATALOGUE_URL: "{{ include "public_url" . }}/{{ .Values.pycsw.endpoint }}/"
+  CATALOGUE_URL: "{{ include "public_url" . }}{{ .Values.pycsw.endpoint }}"
   {{ else }}
   CATALOGUE_ENGINE: geonode.catalogue.backends.pycsw_local
   {{ end}}
