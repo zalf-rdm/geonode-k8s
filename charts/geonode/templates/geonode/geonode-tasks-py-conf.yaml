@@ -312,22 +312,22 @@ data:
         except Exception:
             pass
 
-@task
-def statics(ctx):
-    print("**************************statics*******************************")
-    try:
-        static_root = os.environ.get("STATIC_ROOT", "/mnt/volumes/statics/static/")
-        media_root = os.environ.get("MEDIA_ROOT", "/mnt/volumes/statics/uploaded/")
+    @task
+    def statics(ctx):
+        print("**************************statics*******************************")
+        try:
+            static_root = os.environ.get("STATIC_ROOT", "/mnt/volumes/statics/static/")
+            media_root = os.environ.get("MEDIA_ROOT", "/mnt/volumes/statics/uploaded/")
 
-        ctx.run(f"mkdir -pv {static_root} {media_root}")
-        ctx.run(
-            f"python manage.py collectstatic --noinput --settings={_localsettings()}",
-            pty=True,
-        )
-    except Exception:
-        import traceback
+            ctx.run(f"mkdir -pv {static_root} {media_root}")
+            ctx.run(
+                f"python manage.py collectstatic --noinput --settings={_localsettings()}",
+                pty=True,
+            )
+        except Exception:
+            import traceback
 
-        traceback.print_exc()
+            traceback.print_exc()
 
 
     @task
