@@ -29,11 +29,7 @@ spec:
         imagePullPolicy: {{ .Values.nginx.imagePullPolicy }}
         ports:
           - name: http
-        {{- if (eq .Values.geonode.general.externalScheme "https" )}}
-            containerPort: 443
-        {{- else }}
             containerPort: 80
-        {{- end }}
 
         volumeMounts:
         - name: "{{ include "persistant_volume_name" . }}"
