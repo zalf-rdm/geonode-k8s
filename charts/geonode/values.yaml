@@ -442,7 +442,7 @@ pycsw:
   imagePullSecret: ""
   # -- pycsw endpoint port
   port: 8000
-  # -- pycsw url below geonode.ingress.externalDomain
+  # -- pycsw url below geonode.general.externalDomain
   endpoint: /catalogue/csw
   resources:
     requests:
