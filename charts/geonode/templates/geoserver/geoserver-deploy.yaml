@@ -78,7 +78,10 @@ spec:
         - name: "{{ include "persistant_volume_name" . }}"
           mountPath: /geoserver_data/data
           subPath: geoserver-data-dir
-
+        - name: "{{ include "persistant_volume_name" . }}"
+          mountPath: /mnt/volumes/statics
+          subPath: statics
+        
         readinessProbe:
           tcpSocket:
             port: {{ .Values.geoserver.port }}
