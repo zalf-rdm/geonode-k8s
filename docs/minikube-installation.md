@@ -19,6 +19,7 @@ View and edit the predefined minikube values under /minikube-values.yaml
 ## Run Installation
 
 To run the installation on minikube run:
+
 ```bash
 helm upgrade --cleanup-on-fail   --install --namespace geonode --create-namespace --values minikube-values.yaml geonode charts/geonode
 ```
@@ -82,7 +83,7 @@ kubectl -n geonode logs pod/geonode-geonode-0 -f
 
 ## Expose Service to outside world
 
-This installation requires to access geonode via "geonode" (or the value in .Values.geonode.ingress.externalDomain) dns entry.  So, add an entry to your /etc/hosts. First of all find the related ip addr from kubernetes service like:
+This installation requires to access geonode via "geonode" (or the value in .Values.geonode.general.externalDomain) dns entry.  So, add an entry to your /etc/hosts. First of all find the related ip addr from kubernetes service like:
 
 ```bash
 # list all services in geonode namespace
