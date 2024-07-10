@@ -47,7 +47,7 @@ spec:
               name: {{ include "pycsw_pod_name" . }}-env
         env: 
         - name: PYCSW_SERVER_URL
-          value: "{{ .Values.geonode.ingress.externalScheme}}://{{ .Values.geonode.ingress.externalDomain }}{{ .Values.pycsw.endpoint }}"
+          value: "{{ include "public_url" . }}{{ .Values.pycsw.endpoint }}"
         - name: GEONODE_DATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
