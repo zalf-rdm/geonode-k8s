@@ -353,7 +353,7 @@ data:
             pty=True,
         )
         ctx.run(
-            f"python manage.py loaddata geonode/base/fixtures/initial_data.json \
+            f"python manage.py loaddata {{ include "initial_data_path" . }} \
     --settings={_localsettings()}",
             pty=True,
         )
