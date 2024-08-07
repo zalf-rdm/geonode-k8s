@@ -163,6 +163,8 @@ geonode:
     debug: False
     # -- enable django static debug
     debug_static: False
+    # -- the name of the geonode project used (keep geonode for base image)
+    geonode_project: geonode
     # -- the settings module to load
     settings_module: geonode.settings
     # -- add additional settings to the settings py. This code will be appended to the end of the geonode settings.py

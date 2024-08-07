@@ -44,7 +44,7 @@ data:
 
   # General settings
   FREETEXT_KEYWORDS_READONLY: {{ include "boolean2str" .Values.geonode.general.freetext_keywords_readonly | quote }}
-  FIXTURE_DIRS: "[ '/usr/src/geonode/geonode/fixtures' ]"
+  FIXTURE_DIRS: "[ '{{ include "geonode_path" .}}/fixtures' ]"
   # PUBLISHING
   RESOURCE_PUBLISHING: {{ include "boolean2str" .Values.geonode.general.publishing.resource_publishing_by_staff | quote }}
   ADMIN_MODERATE_UPLOADS: {{ include "boolean2str" .Values.geonode.general.publishing.admin_moderate_uploads | quote }}
@@ -121,7 +121,7 @@ data:
   CATALOGUE_ENGINE: geonode.catalogue.backends.pycsw_local
   {{ end}}
 
-  DJANGO_SETTINGS_MODULE: {{ .Values.geonode.general.settings_module }}
+  DJANGO_SETTINGS_MODULE: {{ include "settings_module" . }}
   DEFAULT_BACKEND_DATASTORE: datastore
   DEFAULT_BACKEND_UPLOADER: geonode.importer
 

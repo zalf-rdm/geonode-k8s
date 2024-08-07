@@ -138,3 +138,19 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
 {{- define "boolean2str" -}}
 {{ . | ternary "True" "False" }}
 {{- end -}}
+
+{{- define "settings_module" -}}
+{{- if (not .Values.geonode.general.settings_module) -}}
+{{ .Values.geonode.general.geonode_project }}.settings
+{{- else -}}
+{{ .Values.geonode.general.settings_module }}
+{{- end -}}
+{{- end -}}
+
+{{- define "geonode_root_path" -}}
+/usr/src/{{ .Values.geonode.general.geonode_project }}
+{{- end -}}
+
+{{- define "geonode_path" -}}
+/usr/src/{{ .Values.geonode.general.geonode_project }}/{{ .Values.geonode.general.geonode_project }}
+{{- end -}}

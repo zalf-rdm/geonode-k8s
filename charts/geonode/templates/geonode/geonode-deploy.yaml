@@ -71,17 +71,18 @@ spec:
           cd /usr/src/geonode/
           {{ end }}
 
+          cd {{ include "geonode_root_path" .}}/
           # Add config overrides
-          cat /usr/src/geonode/geonode/geonode-k8s-settings.py >> /usr/src/geonode/geonode/settings.py
-          cat /usr/src/geonode/geonode/geonode-k8s-settings-additions.py >> /usr/src/geonode/geonode/settings.py
+          cat /usr/src/geonode/geonode/geonode-k8s-settings.py >> {{ include "geonode_path" .}}/settings.py
+          cat /usr/src/geonode/geonode/geonode-k8s-settings-additions.py >> {{ include "geonode_path" .}}/settings.py
 
           # Setup
-          touch /usr/src/geonode/invoke.log
-          dockerize -stdout /usr/src/geonode/invoke.log /usr/src/geonode/entrypoint.sh
+          touch {{ include "geonode_root_path" .}}/invoke.log
+          dockerize -stdout {{ include "geonode_root_path" .}}/invoke.log {{ include "geonode_root_path" .}}/entrypoint.sh
 
           # Run web server
           touch /var/log/geonode.log
-          dockerize -stdout /var/log/geonode.log /usr/local/bin/uwsgi --ini /usr/src/geonode/uwsgi.ini
+          dockerize -stdout /var/log/geonode.log /usr/local/bin/uwsgi --ini {{ include "geonode_root_path" .}}/uwsgi.ini
 
         ports:
         - name: http
@@ -133,14 +134,14 @@ spec:
         - name: cache-volume
           mountPath: /tmp
         - name: tasks-py
-          mountPath: "/usr/src/geonode/tasks.py"
+          mountPath: "{{ include "geonode_root_path" .}}/tasks.py"
           subPath: tasks.py
           readOnly: true
         - name: entrypoint-sh
-          mountPath: "/usr/src/geonode/entrypoint.sh"
+          mountPath: "{{ include "geonode_root_path" .}}/entrypoint.sh"
           subPath: entrypoint.sh
         - name: uwsgi-ini
-          mountPath: "/usr/src/geonode/uwsgi.ini"
+          mountPath: "{{ include "geonode_root_path" .}}/uwsgi.ini"
           subPath: uwsgi.ini
           readOnly: true
         - name: geonode-k8s-settings-py
@@ -152,7 +153,7 @@ spec:
           readOnly: true
         {{ if .Values.geonodeFixtures }}
         - name: geonode-fixtures
-          mountPath: "/usr/src/geonode/geonode/fixtures"
+          mountPath: "{{ include "geonode_path" .}}/fixtures"
           readOnly: true
         {{ end }}
 
@@ -199,16 +200,18 @@ spec:
           cd /usr/src/geonode/
           {{ end }}
 
+          cd {{ include "geonode_root_path" .}}/
+
           {{ if .Values.geonode.sentry.enabled }}
           pip install sentry-sdk
           {{ end }}
 
           # Add config overrides
-          cat /usr/src/geonode/geonode/geonode-k8s-settings.py >> /usr/src/geonode/geonode/settings.py
-          cat /usr/src/geonode/geonode/geonode-k8s-settings-additions.py >> /usr/src/geonode/geonode/settings.py
+          cat /usr/src/geonode/geonode/geonode-k8s-settings.py >> {{ include "geonode_path" .}}/settings.py
+          cat /usr/src/geonode/geonode/geonode-k8s-settings-additions.py >> {{ include "geonode_path" .}}/settings.py
           # Setup
           touch /var/log/celery.log
-          dockerize -stdout /var/log/celery.log /usr/src/geonode/entrypoint.sh celery-cmd
+          dockerize -stdout /var/log/celery.log {{ include "geonode_root_path" .}}/entrypoint.sh celery-cmd
 
         envFrom:
         - configMapRef:
@@ -260,10 +263,10 @@ spec:
         - name: cache-volume
           mountPath: /tmp
         - name: entrypoint-sh
-          mountPath: "/usr/src/geonode/entrypoint.sh"
+          mountPath: "{{ include "geonode_root_path" .}}/entrypoint.sh"
           subPath: entrypoint.sh
         - name: tasks-py
-          mountPath: "/usr/src/geonode/tasks.py"
+          mountPath: "{{ include "geonode_root_path" .}}/tasks.py"
           subPath: tasks.py
           readOnly: true
         - name: geonode-k8s-settings-py
@@ -275,7 +278,7 @@ spec:
           readOnly: true
         {{ if .Values.geonodeFixtures }}
         - name: geonode-fixtures
-          mountPath: "/usr/src/geonode/geonode/fixtures"
+          mountPath: "{{ include "geonode_path" .}}/fixtures"
           readOnly: true
         {{ end }}
 
