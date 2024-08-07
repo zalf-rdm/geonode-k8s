@@ -141,9 +141,9 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
 
 {{- define "settings_module" -}}
 {{- if (not .Values.geonode.general.settings_module) -}}
-{{ .Values.geonode.general.settings_module }}
-{{- else -}}
 {{ .Values.geonode.general.geonode_project }}.settings
+{{- else -}}
+{{ .Values.geonode.general.settings_module }}
 {{- end -}}
 {{- end -}}
 
