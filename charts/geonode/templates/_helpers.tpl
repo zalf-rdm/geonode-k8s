@@ -154,3 +154,11 @@ amqp://{{ .Values.rabbitmq.auth.username }}:{{ .Values.rabbitmq.auth.password }}
 {{- define "geonode_path" -}}
 /usr/src/{{ .Values.geonode.general.geonode_project }}/{{ .Values.geonode.general.geonode_project }}
 {{- end -}}
+
+{{- define "initial_data_path" -}}
+{{- if (eq .Values.geonode.general.geonode_project "geonode") -}}
+geonode/base/fixtures/initial_data.json
+{{- else -}}
+initial_data.json
+{{- end -}}
+{{- end -}}
