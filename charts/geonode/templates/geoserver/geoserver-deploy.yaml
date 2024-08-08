@@ -73,6 +73,9 @@ spec:
               secretKeyRef:
                 name: {{ include "database_geodata_password_secret_key_ref" . }}
                 key: {{ include "database_geodata_password_key_ref" . }}
+          {{- with .Values.geoserver.extraPodEnv }}
+          {{- tpl . $ | nindent 10 }}
+          {{- end }}
 
         volumeMounts:
         - name: "{{ include "persistant_volume_name" . }}"
