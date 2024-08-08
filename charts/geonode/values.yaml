@@ -364,6 +364,22 @@ geoserver:
     admin_username: admin
     # -- geoserver admin password, respect admin_factory_password, if you gonna change the password from not factory password
     admin_password: geoserver
+    # -- additional elements to include in the secret provided to GeoServer, if not using an existing secret
+    extraSecrets: |
+#  key_1: value_1
+
+  # -- additional elements to include in the config map provided to GeoServer
+  extraConfigMap: |
+# file_1: conf content
+  
+  # -- Define this for extra GeoServer environment variables
+  # Format:
+  # extraPodEnv: |
+  #   - name: KEY_1
+  #     value: "VALUE_1"
+  #   - name: KEY_2
+  #     value: "VALUE_2"
+  extraPodEnv: |
 
   resources:
     requests:
