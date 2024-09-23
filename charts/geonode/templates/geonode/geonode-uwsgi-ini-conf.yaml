@@ -9,8 +9,8 @@ data:
     http-socket = 0.0.0.0:8001
     # pidfile = /tmp/geonode.pid
 
-    chdir = /usr/src/geonode/
-    module = geonode.wsgi:application
+    chdir = {{ include "geonode_root_path" . }}/
+    module = {{ .Values.geonode.general.geonode_project }}.wsgi:application
 
     strict = false
     master = true
@@ -24,7 +24,7 @@ data:
     # path to where uwsgi logs will be saved
     logto = /var/log/geonode.log
 
-    touch-reload = /usr/src/geonode/geonode/wsgi.py
+    touch-reload = {{ include "geonode_path" . }}/wsgi.py
     buffer-size = {{ .Values.geonode.uwsgi.buffer_size }}
 
     harakiri = {{ .Values.geonode.uwsgi.harakiri }}
@@ -49,4 +49,4 @@ data:
     cheaper-busyness-backlog-step = {{ .Values.geonode.uwsgi.cheaper_busyness_backlog_step }}
 
     # daemonize = /var/log/uwsgi/geonode.log
-    # cron = -1 -1 -1 -1 -1 /usr/local/bin/python /usr/src/geonode/manage.py collect_metrics -n
+    # cron = -1 -1 -1 -1 -1 /usr/local/bin/python {{ include "geonode_root_path" . }}/manage.py collect_metrics -n
