@@ -107,7 +107,7 @@ data:
       }
 
 
-      {{if (eq .Values.geonode.ingress.enabled false) }}
+{{if (eq .Values.geonode.ingress.enabled false) }}
       # GeoServer
       location /geoserver {
         client_max_body_size {{ .Values.nginx.maxClientBodySize }};
@@ -122,7 +122,7 @@ data:
         proxy_pass http://{{ include "geoserver_pod_name" . }}:{{ .Values.geoserver.port }};
       }
 
-      {{ if .Values.pycsw.enabled }}
+{{ if .Values.pycsw.enabled }}
       # external PYCSW forward 
       location {{ .Values.pycsw.endpoint }} {
         client_max_body_size {{ .Values.nginx.maxClientBodySize }};
@@ -145,8 +145,8 @@ data:
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
       }
-      {{ end }}
-      {{ end }}
+{{ end }}
+{{ end }}
       location / {
         client_max_body_size {{ .Values.nginx.maxClientBodySize }};
 
