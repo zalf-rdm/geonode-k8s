@@ -2,7 +2,7 @@
 
 ![Version: 1.2.3-alpha](https://img.shields.io/badge/Version-1.2.3--alpha-informational?style=flat-square)
 
-Helm Chart for Geonode. Supported versions: Geonode: 4.3.1, Geoserver: 2.24.4-v1, pyCSW: 2.6.1
+Helm Chart for Geonode. Supported versions: Geonode: 4.4.0, Geoserver: 2.24.4-v1, pyCSW: 2.6.1
 
 **Homepage:** <https://geonode.org/>
 
@@ -21,9 +21,9 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.3.1, Geoserver: 2.24.4-v1
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://charts.bitnami.com/bitnami | memcached | ~6.x.x |
-| https://charts.bitnami.com/bitnami | rabbitmq | ~10.1.7 |
-| https://opensource.zalando.com/postgres-operator/charts/postgres-operator/ | postgres-operator | ~1.9.0 |
+| https://charts.bitnami.com/bitnami | memcached | ~7.5.2 |
+| https://charts.bitnami.com/bitnami | rabbitmq | ~15.0.3 |
+| https://opensource.zalando.com/postgres-operator/charts/postgres-operator/ | postgres-operator | ~1.12.0 |
 
 ## Values
 
@@ -69,7 +69,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.3.1, Geoserver: 2.24.4-v1
 | geonode.haystack.engine_url | string | `"http://elasticsearch:9200/"` | hystack url |
 | geonode.haystack.search_results_per_page | string | `"200"` | hystack results per page |
 | geonode.image.name | string | `"geonode/geonode"` | used geonode image |
-| geonode.image.tag | string | `"4.3.1"` | tag of used geonode image |
+| geonode.image.tag | string | `"4.4.0"` | tag of used geonode image |
 | geonode.imagePullPolicy | string | `"IfNotPresent"` | image pull policy |
 | geonode.imagePullSecret | string | `""` | pull secret to use for geonode image |
 | geonode.ingress.annotations | object | `{}` | adds ingress annotations for nginx ingress class |
@@ -144,7 +144,7 @@ Helm Chart for Geonode. Supported versions: Geonode: 4.3.1, Geoserver: 2.24.4-v1
 | geonode.uwsgi.processes | int | `128` | Maximum number of workers allowed |
 | geonode.uwsgi.reload_on_rss | int | `2048` | Restart workers after this much resident memory |
 | geonode.uwsgi.worker_reload_mercy | int | `60` | How long to wait before forcefully killing workers |
-| geonode.version | string | `"4.3.1"` | geonode version, used for some distinguassion between version of GeoNode |
+| geonode.version | string | `"4.4.0"` | geonode version, used for some distinguassion between version of GeoNode |
 | geonodeFixtures | map of fixture files | `{"somefixture.json":"[\n  {\n    \"pk\": 0,\n    \"model\": \"myapp.sample\"\n    \"description\": \"nice little content\"\n  }\n]\n"}` | Fixture files which shall be made available under /usr/src/geonode/geonode/fixtures (refer to https://docs.djangoproject.com/en/4.2/howto/initial-data/) |
 | geoserver.container_name | string | `"geoserver"` | geoserver container name |
 | geoserver.extraConfigMap | string | `""` | additional elements to include in the config map provided to GeoServer |
