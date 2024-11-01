@@ -116,6 +116,6 @@ minikube tunnel
 
 There are several ways to expose services from minikube, find information in the minikube docs under: https://minikube.sigs.k8s.io/docs/handbook/accessing/
 
-Now you are able to access the geonode installation by opening your browser and open http://geonode for geonode and http://geonode/geoserver for geoserver
+Now you are able to access the geonode installation by opening your browser and open http://geonode.local for geonode and http://geonode.local/geoserver for geoserver
 
 Have Fun!

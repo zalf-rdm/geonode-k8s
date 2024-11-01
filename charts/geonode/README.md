@@ -1,6 +1,6 @@
 # geonode-k8s
 
-![Version: 1.2.3-alpha](https://img.shields.io/badge/Version-1.2.3--alpha-informational?style=flat-square)
+![Version: 1.2.3-alpha](https://img.shields.io/badge/Version-1.2.3--alpha-informational?style=flat-square) ![AppVersion: 4.4.0](https://img.shields.io/badge/AppVersion-4.4.0-informational?style=flat-square)
 
 Helm Chart for Geonode. Supported versions: Geonode: 4.4.0, Geoserver: 2.24.4-v1, pyCSW: 2.6.1
 
