@@ -355,6 +355,12 @@ geoserver:
   force_reinit: true
   # -- geoserver port
   port: 8080
+  printing:
+    extraHosts: |
+#      - !dnsMatch
+#        host: data.geopf.fr
+#        port: 80
+
   secret:
     # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
     existingSecretName: ""
