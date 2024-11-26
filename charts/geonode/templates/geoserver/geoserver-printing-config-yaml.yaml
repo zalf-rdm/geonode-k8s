@@ -5,6 +5,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   config.yaml: |
+    # The content is a copy from the one available in https://github.com/GeoNode/geoserver-geonode-ext
+    # It is provided through the geoserver_data docker image but we need to override it
     #===========================================================================
     # allowed DPIs
     #===========================================================================
@@ -53,14 +55,13 @@ data:
     disableScaleLocking: true
     #======
     brokenUrlPlaceholder: 'default'
-    # brokenUrlPlaceholder: 'throw'
 
-    #proxyBaseUrl: http://geoserver:8080/geoserver/pdf
     connectionTimeout: 2000
     socketTimeout: 2000
 
     #===========================================================================
     # the list of allowed ips
+    # The original list is available here : https://github.com/GeoNode/geoserver-geonode-ext/blob/main/data/printing/config.yaml
     #===========================================================================
     hosts:
       - !ipMatch
@@ -70,12 +71,6 @@ data:
       - !dnsMatch
         host: localhost
         port: 80
-      - !dnsMatch
-        host: {{ .Values.geonode.general.externalDomain }}
-        port: 8080
-      - !dnsMatch
-        host: {{ .Values.geonode.general.externalDomain }}
-        port: 443
       - !dnsMatch
         host: labs.metacarta.com
         port: 80
@@ -148,6 +143,14 @@ data:
       - !dnsMatch
         host: api.mapbox.com/styles/v1/mapbox/streets-v9/tiles
         port: 80
+      # GeoNode K8s addition (rules to access the geoserver services with an external domain)
+      - !dnsMatch
+        host: {{ .Values.geonode.general.externalDomain }}
+        port: 8080
+      - !dnsMatch
+        host: {{ .Values.geonode.general.externalDomain }}
+        port: 443
+      # GeoNode K8s addition (custom rules)
       {{- with .Values.geoserver.printing.extraHosts }}
       {{- tpl . $ | nindent 6 }}
       {{- end }}
